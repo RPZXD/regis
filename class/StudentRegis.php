@@ -72,7 +72,7 @@ class StudentRegis {
                     INNER JOIN tbl_confirm t ON u.numreg = t.numreg
                     WHERE u.level = '4' 
                     AND u.typeregis = 'โควต้า' 
-                    ORDER BY u.create_at DESC
+                    ORDER BY t.no ASC
                     ";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
