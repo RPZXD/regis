@@ -192,7 +192,7 @@ function loadTable() {
                             confirmStatusText = 'ไม่ระบุ';
                     }
                     var row = '<tr>' +
-                    '<td class="text-center">' + (index + 1) + '</td>' +
+                    '<td class="text-center">' + record.no + '</td>' +
                     '<td class="text-center">' + confirmStatusText + '</td>' +
                     '<td class="text-center">' + record.citizenid + '</td>' +
                     '<td>' + record.fullname + '</td>' +
