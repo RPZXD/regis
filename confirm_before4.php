@@ -167,7 +167,7 @@
                     </div>
                 <!-- /.card -->
                 <div class="text-center mt-4 mb-4">
-                    <a href="confirm41.php" class="btn-lg btn-primary form-control">เข้าสู่หน้ารายงานตัว</a>
+                    <a href="confirm4.php" class="btn-lg btn-primary form-control">เข้าสู่หน้ารายงานตัว</a>
                 </div>
             </div>
             <!-- /.col -->
