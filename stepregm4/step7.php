@@ -30,8 +30,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>
@@ -49,8 +49,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>
@@ -67,8 +67,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>
@@ -85,8 +85,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>
@@ -103,8 +103,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>
@@ -121,8 +121,8 @@
      <option class="text-center"  value="1">ห้อง 2 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)</option>
      <option class="text-center"  value="2">ห้อง 3 : วิทยาศาสตร์พลังสิบ</option>
      <option class="text-center"  value="3">ห้อง 4 : วิทยาศาสตร์ คณิตศาสตร์</option>
-     <option class="text-center"  value="4">ห้อง 5 : ศิลปศาสตร์และสังคมศาสตร์</option>
-     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์</option>
+     <option class="text-center"  value="4">ห้อง 5 : สังคมศาสตร์และภาษาไทย</option>
+     <option class="text-center"  value="5">ห้อง 6 : ภาษาศาสตร์ (ภาษาอังกฤษ, ภาษาจีน)</option>
      <option class="text-center"  value="6">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอาหาร</option>
      <option class="text-center"  value="7">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการเกษตร</option>
      <option class="text-center"  value="8">ห้อง 7 : บริหารอุตสาหกรรม แผน การจัดการอุตสาหกรรม</option>

@@ -223,7 +223,8 @@ function check() {
     11: [11, 12, 13],
     12: [11, 12, 13],
     13: [11, 12, 13],
-    14: [14]
+    14: [14, 15],
+    15: [14, 15]
   };
   for (let a = 0; a < 14; a++) {
     const select = d.getElementById(`number${a + 1}`);

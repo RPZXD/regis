@@ -14,7 +14,6 @@ class Setting {
     private $uploadDir_award = "../uploads/file_award/";
     private $uploadDir_profile = "../uploads/phototeach/";
 
-    private $year = "2568";
 
     public function getPageTitle() {
         $this->pageTitle = $this->titlesystem . " | " . $this->school;

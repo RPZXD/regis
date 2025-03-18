@@ -215,7 +215,9 @@ function check() {
     3: [3],
     4: [4],
     5: [5],
-    6: [6, 7, 8]
+    6: [6, 7, 8],
+    7: [6, 7, 8],
+    8: [6, 7, 8]
   };
   for (let a = 0; a < 8; a++) {
     const select = d.getElementById(`number${a + 1}`);

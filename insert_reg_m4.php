@@ -12,10 +12,10 @@ try {
     $db->exec("set names utf8");
 
     // รับค่าการตั้งค่าปีการศึกษา
-    $settings_stmt = $db->prepare("SELECT year FROM setting");
+    $settings_stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
     $settings_stmt->execute();
     $settings = $settings_stmt->fetch(PDO::FETCH_ASSOC);
-    $pee = $settings['year'];
+    $pee = $settings['value'];
 
     // รับข้อมูลจากฟอร์ม
     $data = [

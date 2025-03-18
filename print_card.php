@@ -13,8 +13,11 @@ $uid = isset($_GET['citizenid']) ? $_GET['citizenid'] : '';
 $connectDB = new Database_Regis();
 $db = $connectDB->getConnection();
 $studentRegis = new StudentRegis($db);
-
-$setting = new Setting();
+// รับค่าการตั้งค่าปีการศึกษา
+$settings_stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
+$settings_stmt->execute();
+$settings = $settings_stmt->fetch(PDO::FETCH_ASSOC);
+$year = $settings['value'];
 
 $student = $studentRegis->getStudentByCitizId($uid);
 
@@ -88,7 +91,7 @@ $html .= '<div style="position:absolute;top:30px;left:150px;width: 440px; height
             ';
 $html .= '<div style="position:absolute;top:50px;left:150px;width: 440px; height: 35px; border: 0px solid black;font-weight: bold;text-align: center;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-            เพื่อเข้าศึกษาต่อระดับชั้นมัธยมศึกษาปีที่ ' . $level . ' ปีการศึกษา '.$setting->getYear().'
+            เพื่อเข้าศึกษาต่อระดับชั้นมัธยมศึกษาปีที่ ' . $level . ' ปีการศึกษา '.$year.'
             </div>
             </div>
             ';

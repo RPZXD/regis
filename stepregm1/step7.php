@@ -33,14 +33,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -58,14 +59,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -82,14 +84,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -106,14 +109,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -130,14 +134,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -154,14 +159,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -178,14 +184,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -202,14 +209,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -226,14 +234,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
@@ -250,14 +259,15 @@
      <option class="text-center"  value="4">ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)</option>
      <option class="text-center"  value="5">ห้อง 7 : ภาษาไทย</option>
      <option class="text-center"  value="6">ห้อง 8 : สังคมศึกษา</option>
-     <option class="text-center"  value="7">ห้อง 9 : แผน - อุตสาหกรรม</option>
-     <option class="text-center"  value="8">ห้อง 9 : แผน - พาณิชยกรรม</option>
-     <option class="text-center"  value="9">ห้อง 10 : แผน - เกษตรกรรม</option>
-     <option class="text-center"  value="10">ห้อง 10 : แผน – คหกรรม</option>
-     <option class="text-center"  value="11">ห้อง 11 : แผน - ศิลปะ</option>
-     <option class="text-center"  value="12">ห้อง 11 : แผน - ดนตรี</option>
-     <option class="text-center"  value="13">ห้อง 11 : แผน - นาฏศิลป์</option>
-     <option class="text-center"  value="14">ห้อง 12 :  กีฬา</option>
+     <option class="text-center"  value="7">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม</option>
+     <option class="text-center"  value="8">ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม</option>
+     <option class="text-center"  value="9">ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม</option>
+     <option class="text-center"  value="10">ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม</option>
+     <option class="text-center"  value="11">ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ</option>
+     <option class="text-center"  value="12">ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี</option>
+     <option class="text-center"  value="13">ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์</option>
+     <option class="text-center"  value="14">ห้อง 12 : กีฬา แผน - ฟุตบอล</option>
+     <option class="text-center"  value="15">ห้อง 12 : กีฬา แผน - วู้ดบอล</option>
      </select> 
  </div>
 </div>
