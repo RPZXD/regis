@@ -66,6 +66,43 @@ function getRoomNameM4($number) {
     }
 }
 
+function getRoomNameM1($number) {
+    switch ($number) {
+        case 1:
+            return "ห้อง 3 : วิทยาศาสตร์ คณิตศาสตร์ และเทคโนโลยี (Coding)";
+        case 2:
+            return "ห้อง 4 : วิทยาศาสตร์พลังสิบ";
+        case 3:
+            return "ห้อง 5 : ภาษาต่างประเทศ (ภาษาอังกฤษ)";
+        case 4:
+            return "ห้อง 6 : ภาษาต่างประเทศ (ภาษาจีน)";
+        case 5:
+            return "ห้อง 7 : ภาษาไทย";
+        case 6:
+            return "ห้อง 8 : สังคมศึกษา";
+        case 7:
+            return "ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - อุตสาหกรรม";
+        case 8:
+            return "ห้อง 9 : อุตสาหกรรม - พาณิชยกรรม แผน - พาณิชยกรรม";
+        case 9:
+            return "ห้อง 10 : เกษตรกรรม - คหกรรม แผน - เกษตรกรรม";
+        case 10:
+            return "ห้อง 10 : เกษตรกรรม - คหกรรม แผน – คหกรรม";
+        case 11:
+            return "ห้อง 11 : ศิลปะ - ดนตรี แผน - ศิลปะ";
+        case 12:
+            return "ห้อง 11 : ศิลปะ - ดนตรี แผน - ดนตรี";
+        case 13:
+            return "ห้อง 11 : ศิลปะ - ดนตรี แผน - นาฏศิลป์";
+        case 14:
+            return "ห้อง 12 : กีฬา แผน - ฟุตบอล";
+        case 15:
+            return "ห้อง 12 : กีฬา แผน - วู้ดบอล";
+        default:
+            return "";
+    }
+}
+
 $mpdf = new \Mpdf\Mpdf([
 	'default_font_size' => 14,
 	'default_font' => 'sarabun'
@@ -91,11 +128,25 @@ function typeText($type){
     }
     return $results;
 }
+
+function ck_typeregis($type){
+    switch ($type) {
+        case "ในเขต":
+            $results = '<input type="checkbox">&nbsp;&nbsp;ในเขตพื้นที่บริการ';
+            break;
+        case "นอกเขต":
+            $results = '<input type="checkbox">&nbsp;&nbsp;นอกเขตพื้นที่บริการ';
+            break;
+        default:
+            $results = '';
+            break;
+    }
+    return $results;
+
+}
 // logo && header
 $html = '<div style="position:absolute;top:30px;left:50px;"><img src="dist/img/logo-phicha.png" alt="" style="width:65px;height:65px;"></div>';
-$html .= '<div style="position:absolute;top:30px;left:230px;font-weight: bold;">ใบสมัครเข้าศึกษาต่อระดับชั้น มัธยมศึกษาปีที่ '.$student['level'].' ปีการศึกษา '.$year.'</div>';
-$html .= '<div style="position:absolute;top:55px;left:290px;font-weight: bold;">โรงเรียนพิชัย &nbsp;&nbsp;อำเภอพิชัย &nbsp;&nbsp;จังหวัดอุตรดิตถ์</div>';
-$html .= '<div style="position:absolute;top:80px;left:340px;font-weight: bold;">ประเภทห้องเรียนปกติ</div>';
+$html .= '<div style="position:absolute;top:30px;left:150px;font-weight: bold;width: 500x; height: 80px;border: 0px solid black;font-weight: bold;text-align: center">ใบสมัครเข้าศึกษาต่อระดับชั้นมัธยมศึกษาปีที่ '.$student['level'].'<br>โรงเรียนพิชัย ปีการศึกษา '.$year .'<br>ประเภทห้องเรียนปกติ</div>';
 
 
 // ขวาบน เฉพาะเจ้าหน้าที่
@@ -114,24 +165,35 @@ $html .= '<div style="position:absolute;top:110px;left:630px;width: 110px; heigh
 
 
 // กรอบ ประเภทของการสมัคร
-$html .= '<div style="position:absolute;top:110px;left:180px;width: 420px; height: 35px; border: 2px solid black;font-weight: bold;text-align: center;">
+if ($level == 4) {
+    $html .= '<div style="position:absolute;top:110px;left:180px;width: 420px; height: 35px; border: 0px solid black;font-weight: bold;text-align: center;">
             <div style="display: flex; justify-content: center; align-items: center;margin-top: 8px;">
-            '. $space_bar . typeText($type) .'
+            '. str_repeat("_", 50) .'
             </div>
             </div>
             ';
-//312 425
-if($student['typeregis'] == 'ในเขต'){
-$html .= '<div style="position:absolute;top:116px;left:312px;font-weight:">
-            /
+} else {
+    $html .= '<div style="position:absolute;top:110px;left:180px;width: 420px; height: 35px; border: 2px solid black;font-weight: bold;text-align: center;">
+            <div style="display: flex; justify-content: center; align-items: center;margin-top: 8px;">
+            โปรดระบุ'. $space_bar  .'<input type="checkbox">&nbsp;&nbsp;ในเขตพื้นที่บริการ&nbsp;&nbsp;<input type="checkbox">&nbsp;&nbsp;นอกเขตพื้นที่บริการ
+            </div>
             </div>
             ';
-}else if ($student['typeregis'] == 'นอกเขต') {
-    $html .= '<div style="position:absolute;top:116px;left:425px;font-weight:">
-    /
-    </div>
-    ';
+    //304 425
+    if($student['typeregis'] == 'ในเขต'){
+    $html .= '<div style="position:absolute;top:120px;left:304px;font-weight:">
+                /
+                </div>
+                ';
+    }else if ($student['typeregis'] == 'นอกเขต') {
+        $html .= '<div style="position:absolute;top:120x;left:429px;font-weight:">
+        /
+        </div>
+        ';
 }
+    
+}
+
 
 
 // รายละเอียดผู้สมัคร #1 
@@ -203,30 +265,34 @@ $html .= '<div style="position:absolute;top:385px;left:50px;width: 660px; height
             . 'โทรศัพท์' . $space_bar . $student['parent_tel']
             . '</div></div>';
 
+      
 $html .= '<div style="position:absolute;top:470px;left:50px;width: 660px; height: 40px; border: 0px solid black;text-align: left;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 16px;font-weight: bold;">
-            นักเรียนมีความประสงค์จะเข้าเรียนในแผนการเรียน (เรียงลำดับตามความต้องการ 1- 5)' 
+            นักเรียนมีความประสงค์จะเข้าเรียนในแผนการเรียน (เรียงลำดับตามความต้องการ ' . 
+            (($level == 4) ? "1 - 6" : "1 - 10") . ')' 
             . '</div></div>';
+            
 
 $html .= '<div style="position:absolute;top:495px;left:50px;width: 660px; height: 280px; border: 0px solid black;text-align: left;">
 <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">'; 
 
 // ลำดับแผนการเรียน
-for ($i = 1; $i < 6; $i++) {
-    $html .= 'ลำดับที่ ' . $i . $space_bar . getRoomNameM4($student["number" . $i]) . "<br>"; 
+$max = ($level == 4) ? 7 : 11;
+for ($i = 1; $i < $max; $i++) {
+    $html .= 'ลำดับที่ ' . $i . $space_bar . (($level == 4) ? getRoomNameM4($student["number" . $i]) : getRoomNameM1($student["number" . $i]) )  . "<br>"; 
 }
 
 $html .= '</div></div>';
           
 
-$html .= '<div style="position:absolute;top:650px;left:50px;width: 700px; height: 90px; border: 0px solid black;text-align: left;">
+$html .= '<div style="position:absolute;top:'.  (($level == 4) ? "650px" : "750px") .';left:50px;width: 700px; height: 90px; border: 0px solid black;text-align: left;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;font-weight: bold;">
             ลงชื่อผู้สมัคร......................................................(นักเรียน)' . str_repeat($space_bar, 7)
             . 'ลงชื่อ......................................................(ผู้ปกครอง)'
             . '<br>วันที่ยื่นใบสมัคร......................................................'
             . '</div></div>';
 
-$html .= '<div style="position:absolute;top:720px;left:65px;width: 660px; height: 140px; border: 1px solid black;text-align: left;">
+$html .= '<div style="position:absolute;top:'.  (($level == 4) ? "720px" : "820px") .';left:65px;width: 660px; height: 140px; border: 1px solid black;text-align: left;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;font-weight: bold;">
             (เฉพาะเจ้าหน้าที่)'
             . '<br>ตรวจสอบการสมัคร' . $space_bar . '☐' . $space_bar . 'ครบถ้วน'
@@ -235,7 +301,7 @@ $html .= '<div style="position:absolute;top:720px;left:65px;width: 660px; height
             . '</div></div>';
 
 
-$html .= '<div style="position:absolute;top:775px;left:530px;"><img src="../dist/img/signal.png" alt="" style="width:60%;height:60%"></div>';
+$html .= '<div style="position:absolute;top:'.  (($level == 4) ? "775px" : "875px") .';left:530px;"><img src="../dist/img/signal.png" alt="" style="width:60%;height:60%"></div>';
 
     
 $mpdf->WriteHTML($html);
