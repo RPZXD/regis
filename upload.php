@@ -1,4 +1,15 @@
-<?php require_once('header.php'); ?>
+<?php 
+require_once 'header.php'; 
+require_once 'config/Database.php';
+require_once 'class/Upload.php';
+
+$connectDB = new Database_Regis();
+$db = $connectDB->getConnection();
+
+$uploads = new Uploads($db);
+
+
+?>
 <body class="hold-transition sidebar-mini layout-fixed light-mode">
 <div class="wrapper">
 
@@ -60,97 +71,24 @@
 
                             <!-- Form for level 1 -->
                             <form id="uploadFormLevel1" enctype="multipart/form-data">
-                                <div class="form-group mt-2">
-                                    <label for="document1">1. ใบสมัครของโรงเรียนพิชัย 
-                                        <span class="text-danger">ที่กรอกข้อมูลในระบบถูกต้องครบถ้วน และพิมพ์ใบสมัคร จากระบบ พร้อมติดรูปถ่ายหน้าตรง ขนาด ๑.๕ นิ้ว พร้อมลงลายมือชื่อนักเรียนและผู้ปกครองในใบสมัครที่พิมพ์ ออกจากระบบให้ครบถ้วน</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document1" name="document1">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document2">2. สำเนาบัตรประจำตัวประชาชนของนักเรียน 
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document2" name="document2">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document3">3. สำเนาทะเบียนบ้านของนักเรียน
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document3" name="document3">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document4">4. สำเนาทะเบียนบ้านของบิดา
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document4" name="document4">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document5">5. สำเนาทะเบียนบ้านของมารดา
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document5" name="document5">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document6">6. ใบรับรองผลการเรียนเฉลี่ยรวม
-                                        <span class="text-danger">ในระดับชั้นประถมศึกษาปีที่ ๔ และ ๕ (ปพ.๗) หรือระเบียนแสดงผลการเรียน (ปพ.๑) จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document6" name="document6">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document7">7. รูปถ่ายสี
-                                    <span class="text-danger">(แต่งกายเครื่องแบบนักเรียน) หน้าตรง ไม่สวมหมวก ไม่ใส่แว่นตาดำ ขนาด ๓ x ๔ เซนติเมตร หรือ ๑.๕ นิ้ว (ถ่ายไว้ไม่เกิน ๖ เดือน) จำนวน ๑ รูป</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document7" name="document7">
-                                </div>
-                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (๑ - ๗) ในระบบการรับสมัครออนไลน์</span><br>
+                                <?php
+                                    $documents1 = $uploads->selectConfigUploadsByLevel(1);
+                                    // เรียกฟังก์ชัน generateFileUploadForm เพื่อแสดงฟอร์ม
+                                    $uploads->generateFileUploadForm($documents1);
+                                ?>
+
+                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (1 - 7) ในระบบการรับสมัครออนไลน์</span><br>
                                 <button type="submit" class="btn btn-success my-2 form-control">อัพโหลด</button>
                             </form>
 
-                            <!-- Form for level 1 -->
+                            <!-- Form for level 4 -->
                             <form id="uploadFormLevel4" enctype="multipart/form-data">
-                                <div class="form-group mt-2">
-                                    <label for="document1">๑) ใบสมัครของโรงเรียนพิชัย 
-                                        <span class="text-danger">ที่กรอกข้อมูลในระบบถูกต้องครบถ้วน และพิมพ์ใบสมัคร จากระบบ พร้อมติดรูปถ่ายหน้าตรง ขนาด ๑.๕ นิ้ว พร้อมลงลายมือชื่อนักเรียนและผู้ปกครองในใบสมัคร ที่พิมพ์ออกจากระบบให้ครบถ้วน</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document1" name="document1">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document2">๒) สำเนาบัตรประจำตัวประชาชนของนักเรียน 
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document2" name="document2">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document3">๓) สำเนาทะเบียนบ้านของนักเรียน
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document3" name="document3">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document4">๔) สำเนาทะเบียนบ้านของบิดา
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document4" name="document4">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document5">๕) สำเนาทะเบียนบ้านของมารดา
-                                        <span class="text-danger">พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง หรือแบบรับรองรายการทะเบียนราษฎร (ท.ร. ๑๔) ที่ได้รับการรับรองจากหน่วยงานราชการ จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document5" name="document5">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document6">๖) ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน
-                                        <span class="text-danger">(ปพ.๑) ๕ ภาคเรียน จำนวน ๑ ฉบับ</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document6" name="document6">
-                                </div>
-                                <div class="form-group mt-2">
-                                    <label for="document7">๗) รูปถ่ายสี
-                                    <span class="text-danger">(แต่งกายเครื่องแบบนักเรียน) หน้าตรง ไม่สวมหมวก ไม่ใส่แว่นตาดำ ขนาด ๓ x ๔ เซนติเมตร หรือ ๑.๕ นิ้ว (ถ่ายไว้ไม่เกิน ๖ เดือน) จำนวน ๑ รูป</span>
-                                    </label>
-                                    <input type="file" accept="image/*" class="form-control" id="document7" name="document7">
-                                </div>
-                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (๑ - ๗) ในระบบการรับสมัครออนไลน์</span><br>
+                                <?php
+                                    $documents4 = $uploads->selectConfigUploadsByLevel(4);
+                                    // เรียกฟังก์ชัน generateFileUploadForm เพื่อแสดงฟอร์ม
+                                    $uploads->generateFileUploadForm($documents4);
+                                ?>
+                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (1 - 7) ในระบบการรับสมัครออนไลน์</span><br>
                                 <button type="submit" class="btn btn-success my-2 form-control">อัพโหลด</button>
                             </form>
                         </div>
@@ -244,17 +182,29 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
 document.getElementById('uploadFormLevel1').addEventListener('submit', function(event) {
     event.preventDefault();
     var formData = new FormData(this);
-    var citizenid = document.getElementById('search_input').value; // Get the citizenid from the search input
-    formData.append('citizenid', citizenid); // Append the citizenid to the formData
+    var citizenid = document.getElementById('search_input').value;
+    formData.append('citizenid', citizenid);
 
-    // Append name parameters for each file input
-    formData.append('document1_name', 'ใบสมัครของโรงเรียนพิชัย');
-    formData.append('document2_name', 'สำเนาบัตรประจำตัวประชาชนของนักเรียน');
-    formData.append('document3_name', 'สำเนาทะเบียนบ้านของนักเรียน');
-    formData.append('document4_name', 'สำเนาทะเบียนบ้านของบิดา');
-    formData.append('document5_name', 'สำเนาทะเบียนบ้านของมารดา');
-    formData.append('document6_name', 'ใบรับรองผลการเรียนเฉลี่ยรวม');
-    formData.append('document7_name', 'รูปถ่ายสี');
+    // สร้าง array ของเอกสาร
+    const documents = [
+        { inputId: 'document1', name: 'ใบสมัครของโรงเรียนพิชัย', key: 'document1_name' },
+        { inputId: 'document2', name: 'สำเนาบัตรประจำตัวประชาชนของนักเรียน', key: 'document2_name' },
+        { inputId: 'document3', name: 'สำเนาทะเบียนบ้านของนักเรียน', key: 'document3_name' },
+        { inputId: 'document4', name: 'สำเนาทะเบียนบ้านของบิดา', key: 'document4_name' },
+        { inputId: 'document5', name: 'สำเนาทะเบียนบ้านของมารดา', key: 'document5_name' },
+        { inputId: 'document6', name: 'ใบรับรองผลการเรียนเฉลี่ยรวม(หน้าแรก)', key: 'document6_name' },
+        { inputId: 'document7', name: 'ใบรับรองผลการเรียนเฉลี่ยรวม(หน้าหลัง)', key: 'document7_name' },
+        { inputId: 'document8', name: 'รูปถ่ายสี', key: 'document8_name' },
+        { inputId: 'document9', name: 'หนังสือรับรองการอยู่อาศัย', key: 'document9_name' }
+    ];
+
+    // เช็คว่า input มีไฟล์ไหม ก่อนจะ append
+    documents.forEach(doc => {
+        const fileInput = document.getElementById(doc.inputId);
+        if (fileInput && fileInput.files.length > 0) {
+            formData.append(doc.key, doc.name);
+        }
+    });
 
     Swal.fire({
         title: 'กำลังอัพโหลด...',
@@ -298,6 +248,7 @@ document.getElementById('uploadFormLevel1').addEventListener('submit', function(
     });
 });
 
+
 document.getElementById('uploadFormLevel4').addEventListener('submit', function(event) {
     event.preventDefault();
     var formData = new FormData(this);
@@ -310,8 +261,9 @@ document.getElementById('uploadFormLevel4').addEventListener('submit', function(
     formData.append('document3_name', 'สำเนาทะเบียนบ้านของนักเรียน');
     formData.append('document4_name', 'สำเนาทะเบียนบ้านของบิดา');
     formData.append('document5_name', 'สำเนาทะเบียนบ้านของมารดา');
-    formData.append('document6_name', 'ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน');
-    formData.append('document7_name', 'รูปถ่ายสี');
+    formData.append('document6_name', 'ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน (หน้าแรก)');
+    formData.append('document7_name', 'ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน (หน้าหลัง)');
+    formData.append('document8_name', 'รูปถ่ายสี');
 
     Swal.fire({
         title: 'กำลังอัพโหลด...',

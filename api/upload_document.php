@@ -10,6 +10,10 @@ $uploads = new Uploads($db);
 $citizenid = $_POST['citizenid'];
 $files = $_FILES;
 
+if (!isset($files['document9'])) {
+    $files['document9'] = null;
+}
+
 $result = $uploads->uploadDocument($citizenid, $files);
 
 echo json_encode($result);

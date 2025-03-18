@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const regis4quotaStartDate = new Date('2025-02-15');
   const regis4quotaEndDate = new Date('2025-02-20');
   const regis4StartDate = new Date('2025-03-20');
-  const regis4EndDate = new Date('2025-03-22');
+  const regis4EndDate = new Date('2025-03-24');
 
   function isWithinDateRange(start, end) {
     return currentDate >= start && currentDate <= end;

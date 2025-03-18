@@ -1,6 +1,6 @@
 <h4><label class="text-primary text-center">ขั้นตอนที่ 7 : </label></h4>
 
-<h4 class="text-primary">ผลการเรียน รวมเฉลี่ย (ปพ.7)</h4>
+<h4 class="text-primary">ผลการเรียน รวมเฉลี่ย (ปพ.1)</h4>
 
 <div class="row mb-3">
 
