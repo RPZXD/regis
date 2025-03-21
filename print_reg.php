@@ -107,15 +107,15 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     .then(data => {
         Swal.close();
         if (data.exists) {
-            if (data.status !== 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'คุณได้ผ่านเกณฑ์ไปแล้ว',
-                    text: ''
-                });
-                document.getElementById('studentInfo').classList.add('d-none');
-                return; // หยุดการทำงาน ไม่ต้องแสดงข้อมูล
-            }
+            // if (data.status !== 0) {
+            //     Swal.fire({
+            //         icon: 'warning',
+            //         title: 'คุณได้ผ่านเกณฑ์ไปแล้ว',
+            //         text: ''
+            //     });
+            //     document.getElementById('studentInfo').classList.add('d-none');
+            //     return; // หยุดการทำงาน ไม่ต้องแสดงข้อมูล
+            // }
 
             Swal.fire({
                 icon: 'success',

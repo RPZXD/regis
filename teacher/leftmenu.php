@@ -48,18 +48,36 @@ echo "<hr>";
 
 echo createNavItem('index.php', 'fas fa-home', 'หน้าหลัก');
 
-$subItems = [
-    ['href' => 'm1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (สอบคัดเลือกทั่วไป)'],
-    ['href' => 'm4_quota.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (โควต้า ม3เดิม)'],
-    ['href' => 'm4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (สอบคัดเลือกทั่วไป)']
+$subItems_Data = [
+    ['href' => 'm1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (ทั่วไป)'],
+    ['href' => 'm4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (ทั่วไป)'],
+    ['href' => 'm4_quota.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (โควต้าม3เดิม)']
 ];
-$subItems2 = [
-    ['href' => 'con_m1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (สอบคัดเลือกทั่วไป)'],
-    ['href' => 'con_m4_quota.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (โควต้า ม3เดิม)'],
-    ['href' => 'con_m4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (สอบคัดเลือกทั่วไป)']
+$subItems_Check = [
+    ['href' => 'check_m1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (ทั่วไป)'],
+    ['href' => 'check_m4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (ทั่วไป)']
 ];
-echo createNavSubMenu('fa-user', 'ข้อมูลสมัคร', $subItems);
-echo createNavSubMenu('fa-tasks', 'รายงานตัว', $subItems2);
+$subItems_Pass = [
+    ['href' => 'pass_m1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (ทั่วไป)'],
+    ['href' => 'pass_m4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (ทั่วไป)']
+];
+$subItems_Report = [
+    ['href' => 'con_m1_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม1 (ทั่วไป)'],
+    ['href' => 'con_m4_nomal.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (ทั่วไป)'],
+    ['href' => 'con_m4_quota.php', 'iconClass' => 'fa-user-plus', 'text' => 'ม4 (โควต้าม3เดิม)']
+];
+
+$subItems_Config = [
+    ['href' => 'config_year.php', 'iconClass' => 'fa-calendar', 'text' => 'ปีการศึกษาที่รับ'],
+    ['href' => 'config_check.php', 'iconClass' => 'fa-tasks', 'text' => 'หลักฐาน'],
+    ['href' => 'config_plan.php', 'iconClass' => 'fa-clipboard', 'text' => 'แผนการเรียน']
+];
+echo createNavSubMenu('fa-user', 'ข้อมูลสมัคร', $subItems_Data);
+echo createNavSubMenu('fa-check', 'ตรวจหลักฐาน', $subItems_Check);
+echo createNavSubMenu('fa-check', 'นักเรียนที่ผ่านการตรวจแล้ว', $subItems_Pass);
+echo createNavSubMenu('fa-tasks', 'รายงานตัว', $subItems_Report);
+echo '<hr>';
+echo createNavSubMenu('fa-pen', 'ตั้งค่า', $subItems_Config);
 
 // echo createNavItem('m4_esc.php', 'fas fa-user-plus', 'ม4 (ห้องเรียนพิเศษ)');
 

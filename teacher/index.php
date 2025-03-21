@@ -41,6 +41,9 @@ if (isset($_SESSION['Teacher_login'])) {
 $Count_Confirm_Confirmed = $studentRegis->countConfirm(1, 4, 'โควต้า', 2568);
 $Count_Confirm_Declined = $studentRegis->countConfirm(9, 4, 'โควต้า', 2568);
 $Count_Confirm_Pending = $studentRegis->countConfirm(0, 4, 'โควต้า', 2568);
+$Count_m1_in = $studentRegis->countRegis(1, 'ในเขต', 2568);
+$Count_m1_out = $studentRegis->countRegis(1, 'นอกเขต', 2568);
+$Count_m4 = $studentRegis->countRegis(4, 'รอบทั่วไป', 2568);
 
 require_once('header.php');
 
@@ -74,6 +77,63 @@ require_once('header.php');
                           <h4 class="text-lg font-semibold">ยินดีต้อนรับคุณครู <?php echo $userData['Teach_name'] ?> เข้าสู่ระบบรับสมัครนักเรียน | โรงเรียนพิชัย</h4>
                       </div>
                   </div>
+            </div>
+            <div class="row justify-content-center">
+              <h3 class="text-xl font-semibold text-gray-900 mt-6">ยอดสมัครระดับชั้นมัธยมศึกษาปีที่ 1</h3>
+
+            </div>
+                
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                <div class="flex flex-wrap mt-4">
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                      <!-- small box -->
+                      <div class="bg-blue-500 text-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                          <h3 class="text-3xl font-bold"><?=$Count_m1_in?></h3>
+                          <i class="ion ion-person-add text-4xl"></i>
+                        </div>
+                        <p class="mt-2">ในเขตพื้นที่บริการ</p>
+                      </div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                      <!-- small box -->
+                      <div class="bg-pink-500 text-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                          <h3 class="text-3xl font-bold"><?=$Count_m1_out?></h3>
+                          <i class="ion ion-person-add text-4xl"></i>
+                        </div>
+                        <p class="mt-2">นอกเขตพื้นที่บริการ</p>
+                      </div>
+                    </div>
+
+                
+                </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+              <h3 class="text-xl font-semibold text-gray-900 mt-6">ยอดสมัครระดับชั้นมัธยมศึกษาปีที่ 4</h3>
+
+            </div>
+                
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                <div class="flex flex-wrap mt-4">
+                    <div class="w-full md:w-1/1 px-2 mb-4">
+                      <!-- small box -->
+                      <div class="bg-purple-500 text-white p-4 rounded-lg shadow">
+                        <div class="flex justify-between items-center">
+                          <h3 class="text-3xl font-bold"><?=$Count_m4?></h3>
+                          <i class="ion ion-person-add text-4xl"></i>
+                        </div>
+                        <p class="mt-2">รอบทั่วไป</p>
+                      </div>
+                    </div>
+
+                
+                </div>
+                </div>
             </div>
             <div class="row justify-content-center">
               <h3 class="text-xl font-semibold text-gray-900 mt-6">ยอดรายงานตัว ม4 (โควต้า ม3เดิม)</h3>

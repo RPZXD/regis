@@ -8,13 +8,14 @@ $db = $database->getConnection();
 $uploads = new Uploads($db);
 
 $citizenid = $_POST['citizenid'];
+$level = $_POST['level'];
 $files = $_FILES;
 
 if (!isset($files['document9'])) {
     $files['document9'] = null;
 }
 
-$result = $uploads->uploadDocument($citizenid, $files);
+$result = $uploads->uploadDocument($citizenid, $level, $files);
 
 echo json_encode($result);
 ?>

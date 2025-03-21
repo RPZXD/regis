@@ -28,7 +28,7 @@
                 <div class="card card-default">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <h2 class="text-center text-lg"><i class="fas fa-bullhorn"></i>&nbsp;&nbsp;อัพโหลดหลักฐาน</h2>
+                            <h2 class="text-center text-lg"><i class="fas fa-bullhorn"></i>&nbsp;&nbsp;ตรวจสอบสถานะ อัพโหลดหลักฐาน</h2>
                         </h3>
                     </div>
                     <!-- /.card-header -->
@@ -56,10 +56,15 @@
                         
                             <h5 class="card-title">ข้อมูลผู้สมัคร</h5>
                             <p id="studentDetails"></p>
+                            <span class="badge bg-info text-2xl text-center font-bold mt-3" id="showTextStr">-</span>
                             <hr class="my-2 mx-2">
 
                             <div id="uploadStatus" class="callout callout-info d-none">
-                                    <h5 class="text-blue-700 text-lg">สถานะการอัพโหลด</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0 text-red-600 text-lg mt-3">ตรวจสอบสถานะ</h5>
+                                    
+                                </div>
+
                                     <table class="table table-bordered">
                                         <thead class="bg-blue-400 text-white text-center">
                                             <tr>
@@ -102,6 +107,12 @@
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
     var searchInput = document.getElementById('search_input').value;
+    const statusMap = {
+                        0: '⏰ รอการตรวจสอบจากเจ้าหน้าที่',
+                        1: '✅ ตรวจสอบเรียบร้อยแล้ว',
+                        2: '❌ ไม่ผ่านกรุณาแก้ไขหลักฐาน'
+                    };
+
 
     Swal.fire({
         title: 'กำลังค้นหา...',
@@ -132,6 +143,20 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
             document.getElementById('studentDetails').innerText = `ชื่อ: ${data.fullname}\nประเภทการสมัคร: ${data.typeregis}\nระดับชั้นที่สมัคร: ชั้นมัธยมศึกษาปีที่ ${data.level}\nวันเกิด: ${data.birthday}\nเบอร์โทร: ${data.now_tel}\nเบอร์โทรผู้ปกครอง: ${data.parent_tel}`;
             document.getElementById('studentInfo').classList.remove('d-none');
 
+            var showTextStr = '';
+
+            if (data.status == 0) {
+                showTextStr = 'รอการตรวจสอบหลักฐาน';
+            } else if (data.status == 1) {
+                showTextStr = 'การสมัครเสร็จสมบูรณ์';
+            } else if (data.status == 2) {
+                showTextStr = 'กรุณาอัพโหลดหลักฐาน';
+            } else if (data.status == 9) {
+                showTextStr = 'กรุณาแก้ไขหลักฐาน';
+            }
+
+            document.getElementById('showTextStr').innerText = showTextStr;
+
             // Fetch upload status
             fetch('api/fetch_upload_status.php', {
                 method: 'POST',
@@ -145,29 +170,35 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
                 var uploadStatusBody = document.getElementById('uploadStatusBody');
                 if (uploadData.length > 0) {
                     var rows = '';
+
+
                     uploadData.forEach(function(upload, index) {
+                        // ใช้ statusMap เพื่อแปลง status เป็นข้อความ
+                        var statusMessage = statusMap[upload.status] || 'สถานะไม่ระบุ';
                         var statusClass = '';
                         var statusTitle = '';
-                        if (upload.status === 'ตรวจสอบเรียบร้อยแล้ว') {
-                            statusClass = 'badge bg-success';
+                        if (statusMessage === '✅ ตรวจสอบเรียบร้อยแล้ว') {
+                            statusClass = 'text-base badge bg-success';
                             statusTitle = 'ไฟล์นี้ได้รับการตรวจสอบและผ่านเรียบร้อยแล้ว';
-                        } else if (upload.status === 'โปรดแก้ไข') {
-                            statusClass = 'badge bg-danger';
+                        } else if (statusMessage === '❌ ไม่ผ่านกรุณาแก้ไขหลักฐาน') {
+                            statusClass = 'text-base badge bg-danger';
                             statusTitle = 'มีข้อผิดพลาด กรุณาแก้ไขไฟล์';
-                        } else if (upload.status === 'รอการตรวจสอบจากเจ้าหน้าที่') {
-                            statusClass = 'badge bg-warning text-dark';
+                        } else if (statusMessage === '⏰ รอการตรวจสอบจากเจ้าหน้าที่') {
+                            statusClass = 'text-base badge bg-warning text-dark';
                             statusTitle = 'กำลังรอเจ้าหน้าที่ตรวจสอบ';
                         }
+
                         rows += `<tr>
-                            <td>${index + 1}. ${upload.name}</td>
+                            <td>${upload.label}</td>
                             <td>
                                 <span class="${statusClass}" data-bs-toggle="tooltip" title="${statusTitle}">
-                                    ${upload.status}
+                                    ${statusMessage}
                                 </span>
                             </td>
-                            <td>${upload.status === 'โปรดแก้ไข' && upload.error_detail ? upload.error_detail : '-'}</td>
+                            <td>${upload.status === 2 && upload.error_detail ? upload.error_detail : '-'}</td>
                         </tr>`;
                     });
+
                     uploadStatusBody.innerHTML = rows;
                     document.getElementById('uploadStatus').classList.remove('d-none');
 

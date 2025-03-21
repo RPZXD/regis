@@ -91,8 +91,19 @@ class StudentRegis {
                         old_school, 
                         old_school_province, 
                         now_tel, 
-                        parent_tel, 
-                        status 
+                        parent_tel,
+                        gpa_total, 
+                        number1,
+                        number2,
+                        number3,
+                        number4,
+                        number5,
+                        number6, 
+                        number7, 
+                        number8, 
+                        number9, 
+                        number10, 
+                        status
                     FROM users 
                     WHERE level = '1' 
                     AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')
@@ -102,6 +113,132 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getM1NomalStudents_Check() {
+        $query = "SELECT 
+                        u.id, 
+                        u.citizenid, 
+                        CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+                        CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname, 
+                        u.level, 
+                        u.create_at, 
+                        u.typeregis, 
+                        u.old_school, 
+                        u.old_school_province, 
+                        u.now_tel, 
+                        u.parent_tel,
+                        u.gpa_total, 
+                        u.status,
+                        -- document1
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.path END), '') AS upload_path1,
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.error_detail END), '') AS error_detail1,
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.status END), '') AS status1,
+                        -- document2
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.path END), '') AS upload_path2,
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.error_detail END), '') AS error_detail2,
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.status END), '') AS status2,
+                        -- document3
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.path END), '') AS upload_path3,
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.error_detail END), '') AS error_detail3,
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.status END), '') AS status3,
+                        -- document4
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.path END), '') AS upload_path4,
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.error_detail END), '') AS error_detail4,
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.status END), '') AS status4,
+                        -- document5
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.path END), '') AS upload_path5,
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.error_detail END), '') AS error_detail5,
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.status END), '') AS status5,
+                        -- document6
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.path END), '') AS upload_path6,
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.error_detail END), '') AS error_detail6,
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.status END), '') AS status6,
+                        -- document7
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.path END), '') AS upload_path7,
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.error_detail END), '') AS error_detail7,
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.status END), '') AS status7,
+                        -- document8
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.path END), '') AS upload_path8,
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.error_detail END), '') AS error_detail8,
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.status END), '') AS status8,
+                        -- document9
+                        COALESCE(MAX(CASE WHEN t.name = 'document9' THEN t.path END), '') AS upload_path9,
+                        COALESCE(MAX(CASE WHEN t.name = 'document9' THEN t.error_detail END), '') AS error_detail9,
+                        COALESCE(MAX(CASE WHEN t.name = 'document9' THEN t.status END), '') AS status9
+                    FROM users u
+                    LEFT JOIN tbl_uploads t ON u.citizenid = t.citizenid
+                    WHERE u.level = '1' 
+                        AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')
+                    GROUP BY u.id
+                    ORDER BY u.create_at ASC
+
+
+                    ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
+    public function getM4NomalStudents_Check() {
+        $query = "SELECT 
+                        u.id, 
+                        u.citizenid, 
+                        CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+                        CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname, 
+                        u.level, 
+                        u.create_at, 
+                        u.typeregis, 
+                        u.old_school, 
+                        u.old_school_province, 
+                        u.now_tel, 
+                        u.parent_tel,
+                        u.gpa_total, 
+                        u.status,
+                        -- document1
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.path END), '') AS upload_path1,
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.error_detail END), '') AS error_detail1,
+                        COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.status END), '') AS status1,
+                        -- document2
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.path END), '') AS upload_path2,
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.error_detail END), '') AS error_detail2,
+                        COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.status END), '') AS status2,
+                        -- document3
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.path END), '') AS upload_path3,
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.error_detail END), '') AS error_detail3,
+                        COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.status END), '') AS status3,
+                        -- document4
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.path END), '') AS upload_path4,
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.error_detail END), '') AS error_detail4,
+                        COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.status END), '') AS status4,
+                        -- document5
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.path END), '') AS upload_path5,
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.error_detail END), '') AS error_detail5,
+                        COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.status END), '') AS status5,
+                        -- document6
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.path END), '') AS upload_path6,
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.error_detail END), '') AS error_detail6,
+                        COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.status END), '') AS status6,
+                        -- document7
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.path END), '') AS upload_path7,
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.error_detail END), '') AS error_detail7,
+                        COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.status END), '') AS status7,
+                        -- document8
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.path END), '') AS upload_path8,
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.error_detail END), '') AS error_detail8,
+                        COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.status END), '') AS status8
+                    FROM users u
+                    LEFT JOIN tbl_uploads t ON u.citizenid = t.citizenid
+                    WHERE u.level = '4' 
+                        AND u.typeregis = 'รอบทั่วไป'
+                    GROUP BY u.id
+                    ORDER BY u.create_at ASC
+                    ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
     public function getM4NomalStudents() {
         $query = "SELECT 
@@ -115,7 +252,14 @@ class StudentRegis {
                         old_school, 
                         old_school_province, 
                         now_tel, 
-                        parent_tel, 
+                        parent_tel,
+                        gpa_total, 
+                        number1,
+                        number2,
+                        number3,
+                        number4,
+                        number5,
+                        number6,
                         status 
                     FROM users 
                     WHERE level = '4' 
@@ -133,6 +277,7 @@ class StudentRegis {
                         citizenid, 
                         CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
                         stu_prefix,
+                        typeregis,
                         stu_name,
                         stu_lastname, 
                         now_tel,
@@ -144,6 +289,10 @@ class StudentRegis {
                         number4,
                         number5,
                         number6, 
+                        number7, 
+                        number8, 
+                        number9, 
+                        number10, 
                         parent_tel 
                     FROM users 
                     WHERE id = :id";
@@ -152,6 +301,7 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
 
     public function getStudentByCitizId($id) {
         $query = "SELECT 
@@ -225,6 +375,134 @@ class StudentRegis {
             return false;
         }
     }
+    public function updateStudentM1($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6, $number7, $number8, $number9, $number10) {
+        $query = "UPDATE users 
+                    SET 
+                        citizenid = :citizenid, 
+                        typeregis = :typeregis, 
+                        stu_prefix = :stu_prefix, 
+                        stu_name = :stu_name, 
+                        stu_lastname = :stu_lastname, 
+                        date_birth = :date_birth, 
+                        month_birth = :month_birth, 
+                        year_birth = :year_birth, 
+                        now_tel = :now_tel, 
+                        parent_tel = :parent_tel,
+                        gpa_total = :gpa_total,
+                        number1 = :number1,
+                        number2 = :number2,
+                        number3 = :number3,
+                        number4 = :number4,
+                        number5 = :number5,
+                        number6 = :number6,
+                        number7 = :number7,
+                        number8 = :number8,
+                        number9 = :number9,
+                        number10 = :number10
+                    WHERE id = :id";
+        
+        // Prepare the query
+        $stmt = $this->conn->prepare($query);
+    
+        // Bind parameters
+        $stmt->bindParam(':citizenid', $citizenid);
+        $stmt->bindParam(':typeregis', $typeregis);
+        $stmt->bindParam(':stu_prefix', $stu_prefix);
+        $stmt->bindParam(':stu_name', $stu_name);
+        $stmt->bindParam(':stu_lastname', $stu_lastname);
+        $stmt->bindParam(':date_birth', $date_birth);
+        $stmt->bindParam(':month_birth', $month_birth);
+        $stmt->bindParam(':year_birth', $year_birth);
+        $stmt->bindParam(':now_tel', $now_tel);
+        $stmt->bindParam(':parent_tel', $parent_tel);
+        $stmt->bindParam(':gpa_total', $gpa_total);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':number1', $number1);
+        $stmt->bindParam(':number2', $number2);
+        $stmt->bindParam(':number3', $number3);
+        $stmt->bindParam(':number4', $number4);
+        $stmt->bindParam(':number5', $number5);
+        $stmt->bindParam(':number6', $number6);
+        $stmt->bindParam(':number7', $number7);
+        $stmt->bindParam(':number8', $number8);
+        $stmt->bindParam(':number9', $number9);
+        $stmt->bindParam(':number10', $number10);
+    
+        try {
+            // Execute the query
+            if ($stmt->execute()) {
+                return true; // Successfully updated
+            } else {
+                // Log the error and return false
+                error_log("Update failed: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+        } catch (PDOException $e) {
+            // Log any exception
+            error_log("PDOException: " . $e->getMessage());
+            return false;
+        }
+    }
+    public function updateStudentM4($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6) {
+        $query = "UPDATE users 
+                    SET 
+                        citizenid = :citizenid, 
+                        typeregis = :typeregis, 
+                        stu_prefix = :stu_prefix, 
+                        stu_name = :stu_name, 
+                        stu_lastname = :stu_lastname, 
+                        date_birth = :date_birth, 
+                        month_birth = :month_birth, 
+                        year_birth = :year_birth, 
+                        now_tel = :now_tel, 
+                        parent_tel = :parent_tel,
+                        gpa_total = :gpa_total,
+                        number1 = :number1,
+                        number2 = :number2,
+                        number3 = :number3,
+                        number4 = :number4,
+                        number5 = :number5,
+                        number6 = :number6
+                    WHERE id = :id";
+        
+        // Prepare the query
+        $stmt = $this->conn->prepare($query);
+    
+        // Bind parameters
+        $stmt->bindParam(':citizenid', $citizenid);
+        $stmt->bindParam(':typeregis', $typeregis);
+        $stmt->bindParam(':stu_prefix', $stu_prefix);
+        $stmt->bindParam(':stu_name', $stu_name);
+        $stmt->bindParam(':stu_lastname', $stu_lastname);
+        $stmt->bindParam(':date_birth', $date_birth);
+        $stmt->bindParam(':month_birth', $month_birth);
+        $stmt->bindParam(':year_birth', $year_birth);
+        $stmt->bindParam(':now_tel', $now_tel);
+        $stmt->bindParam(':parent_tel', $parent_tel);
+        $stmt->bindParam(':gpa_total', $gpa_total);
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':number1', $number1);
+        $stmt->bindParam(':number2', $number2);
+        $stmt->bindParam(':number3', $number3);
+        $stmt->bindParam(':number4', $number4);
+        $stmt->bindParam(':number5', $number5);
+        $stmt->bindParam(':number6', $number6);
+    
+        try {
+            // Execute the query
+            if ($stmt->execute()) {
+                return true; // Successfully updated
+            } else {
+                // Log the error and return false
+                error_log("Update failed: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+        } catch (PDOException $e) {
+            // Log any exception
+            error_log("PDOException: " . $e->getMessage());
+            return false;
+        }
+    }
     
     public function getStudentByCitizenId($citizen_id) {
         $query = "SELECT 
@@ -260,6 +538,52 @@ class StudentRegis {
                         status
                     FROM users 
                     WHERE citizenid = :search_input OR CONCAT(stu_prefix, stu_name, ' ', stu_lastname) LIKE :search_input_like";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':search_input', $search_input);
+        $search_input_like = '%' . $search_input . '%';
+        $stmt->bindParam(':search_input_like', $search_input_like);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getStudentBySearchInputM1($search_input) {
+        $query = "SELECT 
+                        citizenid,
+                        typeregis,
+                        level, 
+                        CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
+                        stu_prefix,
+                        stu_name,
+                        stu_lastname, 
+                        now_tel, 
+                        parent_tel,
+                        numreg,
+                        status
+                    FROM users 
+                    WHERE level = 1 AND citizenid = :search_input OR CONCAT(stu_prefix, stu_name, ' ', stu_lastname) LIKE :search_input_like";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':search_input', $search_input);
+        $search_input_like = '%' . $search_input . '%';
+        $stmt->bindParam(':search_input_like', $search_input_like);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getStudentBySearchInputM4($search_input) {
+        $query = "SELECT 
+                        citizenid,
+                        typeregis,
+                        level, 
+                        CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
+                        stu_prefix,
+                        stu_name,
+                        stu_lastname, 
+                        now_tel, 
+                        parent_tel,
+                        numreg,
+                        status
+                    FROM users 
+                    WHERE level = 4 AND citizenid = :search_input OR CONCAT(stu_prefix, stu_name, ' ', stu_lastname) LIKE :search_input_like";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':search_input', $search_input);
         $search_input_like = '%' . $search_input . '%';
@@ -359,6 +683,27 @@ class StudentRegis {
             return false;
         }
     }
+    public function updateStatus($id, $status) {
+        $query = "UPDATE users 
+                  SET status = :status,
+                      update_at = NOW() 
+                  WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':id', $id);
+
+        try {
+            if ($stmt->execute()) {
+                return true; // Successfully updated
+            } else {
+                error_log("Update failed: " . implode(", ", $stmt->errorInfo()));
+                return false;
+            }
+        } catch (PDOException $e) {
+            error_log("PDOException: " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function countConfirm($status, $level, $typeregis, $year) {
         $sql = "SELECT COUNT(*) AS total_count 
@@ -371,6 +716,23 @@ class StudentRegis {
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':status', $status, PDO::PARAM_INT);
+        $stmt->bindParam(':level', $level, PDO::PARAM_INT);
+        $stmt->bindParam(':typeregis', $typeregis, PDO::PARAM_STR);
+        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['total_count'] ?? 0;
+    }
+    // ...existing code...
+    public function countRegis($level, $typeregis, $year) {
+        $sql = "SELECT COUNT(*) AS total_count 
+                FROM users
+                WHERE level = :level
+                AND typeregis = :typeregis
+                AND reg_pee = :year";
+
+        $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':level', $level, PDO::PARAM_INT);
         $stmt->bindParam(':typeregis', $typeregis, PDO::PARAM_STR);
         $stmt->bindParam(':year', $year, PDO::PARAM_INT);

@@ -115,7 +115,7 @@ require_once('header.php');
               <div class="card-body">
 
                 <button id="regis4quotaBtn" class="btn btn-success form-control mt-3" onclick="location.href='regis4_quota.php'" disabled><i class="fas fas fa-user-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;สมัคร ม.4 (โควต้า) << คลิกที่นี่ &nbsp;&nbsp;<i class="fas fas fa-exclamation"></i></button>
-                <button id="regis4Btn" class="btn btn-success form-control mt-3" onclick="location.href='regis4_esc.php'" disabled><i class="fas fas fa-user-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;สมัคร ม.4 (สอบคัดเลือกทั่วไป) << คลิกที่นี่ &nbsp;&nbsp;<i class="fas fas fa-exclamation"></i></button>
+                <button id="regis4Btn" class="btn btn-success form-control mt-3" onclick="location.href='regis4.php'" disabled><i class="fas fas fa-user-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;สมัคร ม.4 (สอบคัดเลือกทั่วไป) << คลิกที่นี่ &nbsp;&nbsp;<i class="fas fas fa-exclamation"></i></button>
               </div>
               </div>
               <!-- /.card-body -->

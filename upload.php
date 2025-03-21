@@ -1,19 +1,8 @@
-<?php 
-require_once 'header.php'; 
-require_once 'config/Database.php';
-require_once 'class/Upload.php';
-
-$connectDB = new Database_Regis();
-$db = $connectDB->getConnection();
-
-$uploads = new Uploads($db);
-
-
-?>
+<?php require_once('header.php');?>
 <body class="hold-transition sidebar-mini layout-fixed light-mode">
 <div class="wrapper">
 
-    <?php require_once('warpper.php'); ?>
+    <?php require_once('warpper.php');?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -22,7 +11,7 @@ $uploads = new Uploads($db);
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">อัพโหลดหลักฐาน</h1>
+            <h1 class="m-0"></h1>
           </div><!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
@@ -36,67 +25,41 @@ $uploads = new Uploads($db);
         <!-- เพิ่มส่วนนี้ -->
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card card-default">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <h2 class="text-center text-lg"><i class="fas fa-bullhorn"></i>&nbsp;&nbsp;อัพโหลดหลักฐาน</h2>
-                        </h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <form id="searchForm">
-                            <div class="form-row justify-content-center align-items-center form-control-lg">
-                                <div class="col-auto">
-                                    <label class="sr-only" for="search_input">เลขบัตรประชาชน 13 หลักหรือชื่อ:</label>
-                                    <input type="text" class="form-control text-center mb-2" id="search_input" name="search_input" placeholder="เลขบัตรประชาชน 13 หลักหรือชื่อ" required>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-primary mb-2">ค้นหา</button>
-                                </div>
+                <div class="flex flex-wrap mt-4">
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <!-- small box -->
+                        <a href="upload_m1.php" class="bg-green-500 text-white p-4 rounded-lg shadow block hover:bg-green-600 transition">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-3xl font-bold"></h3>
+                                <i class="fas fa-upload text-4xl"></i>
                             </div>
-                        </form>
-                        <p class="text-center text-danger mt-3">*** กรุณากรอกเลขบัตรประชาชน 13 หลักหรือชื่อเพื่อค้นหา ***</p>
-                        
+                            <p class="mt-2 text-lg">อัพโหลดหลักฐาน มัธยมศึกษาปีที่ 1</p>
+                        </a>
                     </div>
-                    <!-- /.card-body -->
-                </div>
+                    <!-- ./col -->
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <!-- small box -->
+                        <a href="upload_m4.php" class="bg-blue-500 text-white p-4 rounded-lg shadow block hover:bg-blue-600 transition">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-3xl font-bold"></h3>
+                                <i class="fas fa-upload text-4xl"></i>
+                            </div>
+                            <p class="mt-2 text-lg">อัพโหลดหลักฐาน มัธยมศึกษาปีที่ 4</p>
+                        </a>
+                    </div>
+
                 
-                <div id="studentInfo" class="d-none">
-                    <div class="card">
-                        <div class="card-body">
-                        
-                            <h5 class="card-title">ข้อมูลผู้สมัคร</h5>
-                            <p id="studentDetails"></p>
-                            <hr class="my-2 mx-2">
-
-                            <!-- Form for level 1 -->
-                            <form id="uploadFormLevel1" enctype="multipart/form-data">
-                                <?php
-                                    $documents1 = $uploads->selectConfigUploadsByLevel(1);
-                                    // เรียกฟังก์ชัน generateFileUploadForm เพื่อแสดงฟอร์ม
-                                    $uploads->generateFileUploadForm($documents1);
-                                ?>
-
-                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (1 - 7) ในระบบการรับสมัครออนไลน์</span><br>
-                                <button type="submit" class="btn btn-success my-2 form-control">อัพโหลด</button>
-                            </form>
-
-                            <!-- Form for level 4 -->
-                            <form id="uploadFormLevel4" enctype="multipart/form-data">
-                                <?php
-                                    $documents4 = $uploads->selectConfigUploadsByLevel(4);
-                                    // เรียกฟังก์ชัน generateFileUploadForm เพื่อแสดงฟอร์ม
-                                    $uploads->generateFileUploadForm($documents4);
-                                ?>
-                                <span class="text-danger text-lg">หมายเหตุ ให้นักเรียนอัปโหลดเอกสารในข้อ (1 - 7) ในระบบการรับสมัครออนไลน์</span><br>
-                                <button type="submit" class="btn btn-success my-2 form-control">อัพโหลด</button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
+
+
         <!-- จบส่วนที่เพิ่ม -->
+
+
+        <!-- เพิ่ม callout สำหรับแสดงข้อมูลเบื้องต้น -->
+
+        <!-- จบ callout -->
 
     </div><!-- /.container-fluid -->
         
@@ -104,10 +67,12 @@ $uploads = new Uploads($db);
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-    <?php require_once('footer.php'); ?>
+    <?php require_once('footer.php');?>
 </div>
 <!-- ./wrapper -->
 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.getElementById('searchForm').addEventListener('submit', function(event) {
@@ -123,7 +88,7 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
         }
     });
 
-    fetch('api/fetch_reg.php', {
+    fetch('api/fetch_confirm.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -134,6 +99,16 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     .then(data => {
         Swal.close();
         if (data.exists) {
+            if (data.status !== 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'คุณสมบัติไม่ผ่านเกณฑ์',
+                    text: 'ผู้สมัครไม่ผ่านเงื่อนไขที่กำหนด'
+                });
+                document.getElementById('studentInfo').classList.add('d-none');
+                return; // หยุดการทำงาน ไม่ต้องแสดงข้อมูล
+            }
+
             Swal.fire({
                 icon: 'success',
                 title: 'พบข้อมูล',
@@ -150,15 +125,47 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
                 `เบอร์โทรผู้ปกครอง: ${data.parent_tel}`;
             
             document.getElementById('studentInfo').classList.remove('d-none');
-
-            // Show the appropriate form based on the level
-            if (data.level == 1) {
-                document.getElementById('uploadFormLevel1').classList.remove('d-none');
-                document.getElementById('uploadFormLevel4').classList.add('d-none');
-            } else if (data.level == 4) {
-                document.getElementById('uploadFormLevel4').classList.remove('d-none');
-                document.getElementById('uploadFormLevel1').classList.add('d-none');
+            
+            if (data.confirm_status == 0) {
+                document.getElementById('ConfirmButton').classList.remove('d-none');
+                document.getElementById('DisclaimButton').classList.remove('d-none');
+            } else {
+                document.getElementById('ConfirmButton').classList.add('d-none');
+                document.getElementById('DisclaimButton').classList.add('d-none');
+                let statusText = data.confirm_status == 1 ? 'ยืนยัน' : 'สละสิทธิ์';
+                document.getElementById('studentDetails').innerText += `\nคุณได้ทำการ${statusText}สิทธิ์ไปแล้ว`;
             }
+
+            document.getElementById('ConfirmButton').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'ยืนยันสิทธิ์!',
+                    text: "คุณต้องการยืนยันสิทธิ์การเข้าศึกษาต่อในรอบโควตาใช่หรือไม่?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยัน',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        updateConfirmStatus(data.numreg, 1);
+                    }
+                });
+            });
+
+            document.getElementById('DisclaimButton').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'สละสิทธิ์!',
+                    text: "คุณต้องการสละสิทธิ์การเข้าศึกษาต่อในรอบโควตาใช่หรือไม่?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'สละสิทธิ์',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        updateConfirmStatus(data.numreg, 9);
+                    }
+                });
+            });
+
         } else {
             Swal.fire({
                 icon: 'error',
@@ -179,134 +186,43 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     });
 });
 
-document.getElementById('uploadFormLevel1').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var formData = new FormData(this);
-    var citizenid = document.getElementById('search_input').value;
-    formData.append('citizenid', citizenid);
-
-    // สร้าง array ของเอกสาร
-    const documents = [
-        { inputId: 'document1', name: 'ใบสมัครของโรงเรียนพิชัย', key: 'document1_name' },
-        { inputId: 'document2', name: 'สำเนาบัตรประจำตัวประชาชนของนักเรียน', key: 'document2_name' },
-        { inputId: 'document3', name: 'สำเนาทะเบียนบ้านของนักเรียน', key: 'document3_name' },
-        { inputId: 'document4', name: 'สำเนาทะเบียนบ้านของบิดา', key: 'document4_name' },
-        { inputId: 'document5', name: 'สำเนาทะเบียนบ้านของมารดา', key: 'document5_name' },
-        { inputId: 'document6', name: 'ใบรับรองผลการเรียนเฉลี่ยรวม(หน้าแรก)', key: 'document6_name' },
-        { inputId: 'document7', name: 'ใบรับรองผลการเรียนเฉลี่ยรวม(หน้าหลัง)', key: 'document7_name' },
-        { inputId: 'document8', name: 'รูปถ่ายสี', key: 'document8_name' },
-        { inputId: 'document9', name: 'หนังสือรับรองการอยู่อาศัย', key: 'document9_name' }
-    ];
-
-    // เช็คว่า input มีไฟล์ไหม ก่อนจะ append
-    documents.forEach(doc => {
-        const fileInput = document.getElementById(doc.inputId);
-        if (fileInput && fileInput.files.length > 0) {
-            formData.append(doc.key, doc.name);
-        }
-    });
-
-    Swal.fire({
-        title: 'กำลังอัพโหลด...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    fetch('api/upload_document.php', {
+function updateConfirmStatus(numreg, status) {
+    fetch('api/update_confirm_status.php', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ numreg: numreg, status: status })
     })
     .then(response => response.json())
     .then(data => {
-        Swal.close();
         if (data.success) {
             Swal.fire({
                 icon: 'success',
                 title: 'สำเร็จ',
-                text: 'อัพโหลดหลักฐานเรียบร้อยแล้ว'
-            }).then(() => {
-              location.reload();
+                text: 'สถานะได้รับการอัปเดตเรียบร้อยแล้ว'
             });
+            document.getElementById('ConfirmButton').classList.add('d-none');
+            document.getElementById('DisclaimButton').classList.add('d-none');
+            let statusText = status == 1 ? 'ยืนยัน' : 'สละสิทธิ์';
+            document.getElementById('studentDetails').innerText += `\nคุณได้ทำการ${statusText}สิทธิ์ไปแล้ว`;
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถอัพโหลดหลักฐานได้'
+                text: 'ไม่สามารถอัปเดตสถานะได้'
             });
         }
     })
     .catch(error => {
-        Swal.close();
         Swal.fire({
             icon: 'error',
             title: 'เกิดข้อผิดพลาด',
-            text: 'ไม่สามารถอัพโหลดหลักฐานได้'
+            text: 'ไม่สามารถอัปเดตสถานะได้'
         });
     });
-});
-
-
-document.getElementById('uploadFormLevel4').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var formData = new FormData(this);
-    var citizenid = document.getElementById('search_input').value; // Get the citizenid from the search input
-    formData.append('citizenid', citizenid); // Append the citizenid to the formData
-
-    // Append name parameters for each file input
-    formData.append('document1_name', 'ใบสมัครของโรงเรียนพิชัย');
-    formData.append('document2_name', 'สำเนาบัตรประจำตัวประชาชนของนักเรียน');
-    formData.append('document3_name', 'สำเนาทะเบียนบ้านของนักเรียน');
-    formData.append('document4_name', 'สำเนาทะเบียนบ้านของบิดา');
-    formData.append('document5_name', 'สำเนาทะเบียนบ้านของมารดา');
-    formData.append('document6_name', 'ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน (หน้าแรก)');
-    formData.append('document7_name', 'ระเบียนแสดงผลการเรียนหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน (หน้าหลัง)');
-    formData.append('document8_name', 'รูปถ่ายสี');
-
-    Swal.fire({
-        title: 'กำลังอัพโหลด...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false, 
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    fetch('api/upload_document.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        Swal.close();
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'สำเร็จ',
-                text: 'อัพโหลดหลักฐานเรียบร้อยแล้ว'
-            }).then(() => {
-              location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถอัพโหลดหลักฐานได้'
-            });
-        }
-    })
-    .catch(error => {
-        Swal.close();
-        Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            text: 'ไม่สามารถอัพโหลดหลักฐานได้'
-        });
-    });
-});
+}
 </script>
-<?php require_once('scirpt.php'); ?>
+<?php require_once('scirpt.php');?>
 </body>
 </html>

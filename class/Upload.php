@@ -4,71 +4,99 @@ class Uploads {
 
     public function __construct($db) {
         $this->conn = $db;
+        $this->createConfigUploadsTable();
+    }
+
+    // Method to create config_uploads table if it doesn't exist
+    private function createConfigUploadsTable() {
+        $query = "CREATE TABLE IF NOT EXISTS config_uploads (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            level INT NOT NULL,
+            document_id VARCHAR(255) NOT NULL,
+            label VARCHAR(255) NOT NULL,
+            description TEXT
+        )";
+        $this->conn->exec($query);
     }
 
     // Method to handle document upload
-    public function uploadDocument($citizenid, $files) {
-        $uploadDir = '../uploads/' . $citizenid . '/' ;
+    public function uploadDocument($citizenid, $level, $files) {
+        $uploadDir = '../uploads/' . $citizenid . '/';
         $uploadedFiles = [];
-
+    
+        if (empty($files)) {
+            return ['success' => false, 'message' => 'No files uploaded'];
+        }
+    
         foreach ($files as $key => $file) {
             $docName = isset($_POST[$key . '_name']) ? $_POST[$key . '_name'] : null;
-
-            // Skip file if no document name is provided
+    
             if ($docName === null || $file['error'] == UPLOAD_ERR_NO_FILE) {
                 continue;
             }
-
+    
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                return ['success' => false, 'message' => 'File upload error: ' . $file['error']];
+            }
+    
             $newFileName = date('YmdHis') . '_' . bin2hex(random_bytes(3)) . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
             $targetFile = $uploadDir . $newFileName;
-
+    
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+    
             if (move_uploaded_file($file['tmp_name'], $targetFile)) {
                 $uploadedFiles[$key] = $targetFile;
-
-                // Check if the file with the same name already exists and has the status '✅ ตรวจสอบเรียบร้อยแล้ว'
-                $query = "SELECT id FROM tbl_uploads WHERE citizenid = :citizenid AND name = :name AND status = '✅ ตรวจสอบเรียบร้อยแล้ว'";
+    
+                // ตรวจสอบไฟล์ในฐานข้อมูล
+                $query = "SELECT id, status FROM tbl_uploads WHERE citizenid = :citizenid AND name = :name";
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':citizenid', $citizenid);
                 $stmt->bindParam(':name', $docName);
                 $stmt->execute();
                 $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
                 if ($existingFile) {
-                    // Skip updating the file if it already exists with the status '✅ ตรวจสอบเรียบร้อยแล้ว'
-                    continue;
-                }
-
-                // Check if the file with the same name already exists
-                $query = "SELECT id FROM tbl_uploads WHERE citizenid = :citizenid AND name = :name";
-                $stmt = $this->conn->prepare($query);
-                $stmt->bindParam(':citizenid', $citizenid);
-                $stmt->bindParam(':name', $docName);
-                $stmt->execute();
-                $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($existingFile) {
-                    $query = "UPDATE tbl_uploads SET path = :path, create_at = NOW() WHERE id = :id";
-                    $stmt = $this->conn->prepare($query);
-                    $stmt->bindParam(':path', $newFileName);
-                    $stmt->bindParam(':id', $existingFile['document_id']);
+                    if ($existingFile['status'] == 1) {
+                        // ข้ามถ้า status = 1
+                        continue;
+                    } else {
+                        // ถ้า status ≠ 1 ทำการอัพเดท path
+                        $query = "UPDATE tbl_uploads SET path = :path, create_at = NOW() WHERE id = :id";
+                        $stmt = $this->conn->prepare($query);
+                        $stmt->bindParam(':path', $newFileName);
+                        $stmt->bindParam(':id', $existingFile['id']);
+                        $stmt->execute();
+                    }
                 } else {
-                    $query = "INSERT INTO tbl_uploads (citizenid, name, path, create_at) VALUES (:citizenid, :name, :path, NOW())";
+                    // ไม่พบไฟล์ -> INSERT ใหม่
+                    $query = "INSERT INTO tbl_uploads (citizenid, name, path, level, create_at) VALUES (:citizenid, :name, :path, :level, NOW())";
                     $stmt = $this->conn->prepare($query);
                     $stmt->bindParam(':citizenid', $citizenid);
                     $stmt->bindParam(':name', $docName);
                     $stmt->bindParam(':path', $newFileName);
+                    $stmt->bindParam(':level', $level);
+                    $stmt->execute();
                 }
-                $stmt->execute();
             } else {
                 return ['success' => false, 'message' => 'Failed to upload ' . $file['name']];
             }
         }
-
+    
         return ['success' => true, 'message' => 'Documents uploaded successfully', 'files' => $uploadedFiles];
     }
-
-    // ...existing code...
-
+    
+    // Method to fetch the status of an uploaded image
+    public function getStatusImg($citizenid, $upload_name) {
+        $query = "SELECT status FROM tbl_uploads WHERE citizenid = :citizenid AND name = :upload_name";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':citizenid', $citizenid);
+        $stmt->bindParam(':upload_name', $upload_name);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
     public function selectConfigUploadsByLevel($level) {
         $sql = "SELECT * FROM config_uploads WHERE level = :level";
         $stmt = $this->conn->prepare($sql);
@@ -76,6 +104,7 @@ class Uploads {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Function to generate file upload form
     public function generateFileUploadForm($documents) {
@@ -90,7 +119,6 @@ class Uploads {
             echo '</div>';
         }
     }
-
 
 }
 ?>
