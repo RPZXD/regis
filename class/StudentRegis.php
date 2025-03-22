@@ -178,6 +178,60 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function getM1NomalStudents_Pass($date) {
+        $query = "SELECT 
+                        id, 
+                        citizenid, 
+                        CONCAT_WS('/', date_birth, month_birth, year_birth) AS birthday, 
+                        CONCAT(stu_prefix, stu_name, ' ', stu_lastname) AS fullname, 
+                        level, 
+                        create_at, 
+                        typeregis, 
+                        old_school, 
+                        old_school_province, 
+                        now_tel, 
+                        parent_tel,
+                        gpa_total, 
+                        status,
+                        update_at
+                    FROM users u
+                    WHERE level = '1' 
+                        AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')
+                        AND status = 1
+                        AND DATE(update_at) = :date
+                    ORDER BY update_at ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':date', $date);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getM4NomalStudents_Pass($date) {
+        $query = "SELECT 
+                        id, 
+                        citizenid, 
+                        CONCAT_WS('/', date_birth, month_birth, year_birth) AS birthday, 
+                        CONCAT(stu_prefix, stu_name, ' ', stu_lastname) AS fullname, 
+                        level, 
+                        create_at, 
+                        typeregis, 
+                        old_school, 
+                        old_school_province, 
+                        now_tel, 
+                        parent_tel,
+                        gpa_total, 
+                        status,
+                        update_at
+                    FROM users u
+                    WHERE level = '4' 
+                        AND typeregis = 'รอบทั่วไป'
+                        AND status = 1
+                        AND DATE(update_at) = :date
+                    ORDER BY update_at ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':date', $date);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     
 
     public function getM4NomalStudents_Check() {

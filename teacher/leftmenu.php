@@ -74,7 +74,7 @@ $subItems_Config = [
 ];
 echo createNavSubMenu('fa-user', 'ข้อมูลสมัคร', $subItems_Data);
 echo createNavSubMenu('fa-check', 'ตรวจหลักฐาน', $subItems_Check);
-echo createNavSubMenu('fa-check', 'นักเรียนที่ผ่านการตรวจแล้ว', $subItems_Pass);
+echo createNavSubMenu('fa-clipboard-list', 'นักเรียนที่ผ่านการตรวจแล้ว', $subItems_Pass);
 echo createNavSubMenu('fa-tasks', 'รายงานตัว', $subItems_Report);
 echo '<hr>';
 echo createNavSubMenu('fa-pen', 'ตั้งค่า', $subItems_Config);

@@ -56,6 +56,7 @@ $uploads = new Uploads($db);
                             </div>
                         </form>
                         <p class="text-center text-danger mt-3">*** กรุณากรอกเลขบัตรประชาชน 13 หลักหรือชื่อเพื่อค้นหา ***</p>
+                        <p class="text-center text-danger mt-3 text-bold text-lg">*** หากจะแก้ไขเอกสารสามารถอัพโหลดเฉพาะเอกสารที่ต้องการแก้ไขเท่านั้น ***</p>
                         
                     </div>
                     <!-- /.card-body -->
