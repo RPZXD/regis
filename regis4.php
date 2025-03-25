@@ -203,7 +203,30 @@ require_once('header.php');
 </script>
 
 <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function () {
+    // กำหนดวันที่และช่วงเวลาที่ต้องการตรวจสอบ
+    let reportDate = new Date(2568 - 543, 3, 13); // ปี ค.ศ. = ปี พ.ศ. - 543 (March 13, 2025)
+    let startTime = new Date(reportDate);
+    startTime.setHours(8, 30, 0); // 08:30:00
 
+    let endTime = new Date(reportDate);
+    endTime.setHours(13, 10, 0); // 12:00:00
+
+    // เวลาปัจจุบัน
+    let now = new Date();
+
+    // ตรวจสอบเงื่อนไข ถ้ายังไม่ถึงเวลาให้แจ้งเตือนและ redirect
+    if (now < startTime || now > endTime || now.toDateString() !== reportDate.toDateString()) {
+        Swal.fire({
+            icon: "warning",
+            title: "ขณะนี้ยังไม่ถึงเวลาสมัคร",
+            text: "",
+            confirmButtonText: "ตกลง"
+        }).then(() => {
+            window.location.href = "index.php"; // Redirect ไปที่ index.php
+        });
+    }
+});
 function check() {
   const d = document;
   const myArray = Array.from({length: 6}, (_, i) =>

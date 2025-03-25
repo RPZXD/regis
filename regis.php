@@ -150,13 +150,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const endTime = new Date(todayString + ' 16:00:00');
 
   const regis1StartDate = new Date('2025-03-20');
-  const regis1EndDate = new Date('2025-03-24');
+  const regis1EndDate = new Date('2025-03-23');
   const regis1escStartDate = new Date('2025-03-15');
   const regis1escEndDate = new Date('2025-03-19');
   const regis4quotaStartDate = new Date('2025-02-15');
   const regis4quotaEndDate = new Date('2025-02-20');
   const regis4StartDate = new Date('2025-03-20');
-  const regis4EndDate = new Date('2025-03-24');
+  const regis4EndDate = new Date('2025-03-23');
 
   function isWithinDateRange(start, end) {
     return currentDate >= start && currentDate <= end;
