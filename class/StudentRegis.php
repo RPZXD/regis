@@ -579,19 +579,23 @@ class StudentRegis {
 
     public function getStudentBySearchInput($search_input) {
         $query = "SELECT 
-                        citizenid,
-                        typeregis,
-                        level, 
-                        CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
-                        stu_prefix,
-                        stu_name,
-                        stu_lastname, 
-                        now_tel, 
-                        parent_tel,
-                        numreg,
-                        status
-                    FROM users 
-                    WHERE citizenid = :search_input OR CONCAT(stu_prefix, stu_name, ' ', stu_lastname) LIKE :search_input_like";
+                        users.citizenid,
+                        users.typeregis,
+                        users.level, 
+                        CONCAT_WS('-', users.date_birth, users.month_birth, users.year_birth) AS birthday, 
+                        users.stu_prefix,
+                        users.stu_name,
+                        users.stu_lastname, 
+                        users.now_tel, 
+                        users.parent_tel,
+                        users.numreg,
+                        users.status
+                    FROM users
+                    INNER JOIN tbl_confirm ON users.numreg = tbl_confirm.numreg
+                    WHERE 
+                        users.citizenid = :search_input 
+                        OR CONCAT(users.stu_prefix, users.stu_name, ' ', users.stu_lastname) LIKE :search_input_like
+                    ";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':search_input', $search_input);
         $search_input_like = '%' . $search_input . '%';

@@ -72,8 +72,14 @@ function typeText($type){
             $results = "ห้องเรียนปกติ 
 สำหรับนักเรียนชั้นมัธยมศึกษาปีที่ 3 โรงเรียนพิชัย (เดิม)";
             break;
-        case "m4":
-            $results = "4";
+        case "ในเขต":
+            $results = "ห้องเรียนปกติ (ในเขตพื้นที่บริการ)";
+            break;
+        case "นอกเขต":
+            $results = "ห้องเรียนปกติ (นอกเขตพื้นที่บริการ)";
+            break;
+        case "รอบทั่วไป":
+            $results = "ห้องเรียนปกติ (รอบทั่วไป)";
             break;
         default:
             $results = "";
@@ -116,13 +122,26 @@ $html .= '<div style="position:absolute;top:15px;left:700px;font-size: 14px;font
 $html .= '<div style="position:absolute;top:40px;left:650px;font-size: 18px;font-weight: bold;">เลขที่ผู้สมัคร '. $student['numreg'] . '</div>';
 
 
+$photoPath = "";
+$stmt = $db->prepare("SELECT path FROM tbl_uploads WHERE citizenid = :citizenid AND name = 'document8'");
+$stmt->bindParam(':citizenid', $uid);
+$stmt->execute();
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($result && isset($result['path'])) {
+    $photoPath = "uploads/" . $uid . "/" . $result['path'];
+} else {
+    $photoPath = ""; // Default no-photo image
+}
+
+
 // กรอบติดรูป
 $html .= '<div style="position:absolute;top:110px;left:630px;width: 110px; height: 150px; border: 1.5px solid black;text-align: center;">
-            <div style="display: flex; justify-content: center; align-items: center;">
-            
+            <div style="width: 100%; height: 100%; overflow: hidden;">
+                <img src="' . $photoPath . '" alt="Student Photo" 
+                     style="width: 100%; min-height: 100%; object-fit: cover; object-position: center;">
             </div>
-            </div>
-            ';
+        </div>';
 
 
 $html .= '<div style="position:absolute;top:160px;left:50px;width: 570px; height: 35px; border: 0px solid black;font-weight: bold;text-align: left;">
