@@ -87,7 +87,7 @@ require_once('header.php');
                 <div class="col-md-8">
                 <div class="flex flex-wrap mt-4">
                     <div class="w-full md:w-1/2 px-2 mb-4">
-                      <!-- small box -->
+                      <!-- small box -->  
                       <div class="bg-blue-500 text-white p-4 rounded-lg shadow">
                         <div class="flex justify-between items-center">
                           <h3 class="text-3xl font-bold"><?=$Count_m1_in?></h3>
