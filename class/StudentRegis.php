@@ -579,6 +579,7 @@ class StudentRegis {
 
     public function getStudentBySearchInput($search_input) {
         $query = "SELECT 
+                        users.id,
                         users.citizenid,
                         users.typeregis,
                         users.level, 
@@ -591,7 +592,6 @@ class StudentRegis {
                         users.numreg,
                         users.status
                     FROM users
-                    INNER JOIN tbl_confirm ON users.numreg = tbl_confirm.numreg
                     WHERE 
                         users.citizenid = :search_input 
                         OR CONCAT(users.stu_prefix, users.stu_name, ' ', users.stu_lastname) LIKE :search_input_like
@@ -799,6 +799,13 @@ class StudentRegis {
 
         return $result['total_count'] ?? 0;
     }
-    // ...existing code...
+
+    public function getStudentPlans($citizenid) {
+        $query = "SELECT * FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':citizenid', $citizenid);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

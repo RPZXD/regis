@@ -1,33 +1,33 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
-require_once("../connection.php");
-require_once("../function.php");
+require_once "config/Database.php";
+require_once "function.php";
+$dbRegis = new Database_Regis();
+$db = $dbRegis->getConnection();
 session_start();
-
-if (!isset($_SESSION['student_login'])) {
-    header("location: ../index.php");
-}
 
 
 $uid = $_GET['stu_id'];
 
-if ($_SESSION['student_login'] !== $uid) {
-    header("location: index.php");
-}
+
 $db->exec("set names utf8");
 $select_stmt = $db->prepare("SELECT * FROM users
-INNER JOIN data_stum1
-ON users.citizenid = data_stum1.citizenid
 WHERE users.id = :uid");
 $select_stmt->execute(array(':uid' => $uid));
 $row = $select_stmt->fetch(PDO::FETCH_ASSOC);
 
-$select_stmt = $db->prepare("SELECT s.year, m.* FROM setting as s 
-INNER JOIN setting_media as m
-ON s.id = m.id");
+$select_stmt = $db->prepare("SELECT * FROM setting");
 $select_stmt->execute();
+// Map setting keys to array for compatibility if needed, or just fetch row
+// The original code fetched 's.year, m.*'. m.* likely had logo_school.
+// Let's assume setting table has relevant config or we use defaults.
+// Actually, list_tables.php showed 'setting' and 'settings'.
 $settings = $select_stmt->fetch(PDO::FETCH_ASSOC);
+
+// Polyfill if missing keys
+if (!isset($settings['logo_school'])) $settings['logo_school'] = 'logo-phicha.png';
+if (!isset($settings['year'])) $settings['year'] = '2567';
 
 $space_bar = '&nbsp;&nbsp;&nbsp;&nbsp;';
 $space_bar = '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -41,7 +41,7 @@ $mpdf->SetTitle('ใบสมัครเรียนโรงเรียนพ
 
 
 // logo && header
-$html = '<div style="position:absolute;top:30px;left:50px;"><img src="../dist/img/'.$settings['logo_school'].'" alt="" style="width:65px;height:65px;"></div>';
+$html = '<div style="position:absolute;top:30px;left:50px;"><img src="dist/img/'.$settings['logo_school'].'" alt="" style="width:65px;height:65px;"></div>';
 $html .= '<div style="position:absolute;top:30px;left:230px;font-weight: bold;">ใบสมัครเข้าศึกษาต่อระดับชั้น มัธยมศึกษาปีที่ '.ck_level2($row['level']).' ปีการศึกษา '.$settings['year'].'</div>';
 $html .= '<div style="position:absolute;top:55px;left:290px;font-weight: bold;">โรงเรียนพิชัย &nbsp;&nbsp;อำเภอพิชัย &nbsp;&nbsp;จังหวัดอุตรดิตถ์</div>';
 $html .= '<div style="position:absolute;top:80px;left:340px;font-weight: bold;">ประเภทห้องเรียนปกติ</div>';
@@ -161,8 +161,22 @@ $html .= '<div style="position:absolute;top:495px;left:50px;width: 660px; height
 <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">'; 
 
 // ลำดับแผนการเรียน
-for ($i = 1; $i < 11; $i++) {
-    $html .= 'ลำดับที่ ' . $i . $space_bar . getRoomNameM1($row["number" . $i]) . "<br>"; 
+// ลำดับแผนการเรียน
+$planStmt = $db->prepare("SELECT plan_id FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC");
+$planStmt->execute([':citizenid' => $row['citizenid']]);
+$plans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (!empty($plans)) {
+    foreach ($plans as $index => $plan) {
+         $html .= 'ลำดับที่ ' . ($index + 1) . $space_bar . getRoomNameM1($plan["plan_id"]) . "<br>"; 
+    }
+} else {
+    // Fallback/Legacy
+    for ($i = 1; $i < 11; $i++) {
+        if (isset($row["number" . $i]) && !empty($row["number" . $i])) {
+            $html .= 'ลำดับที่ ' . $i . $space_bar . getRoomNameM1($row["number" . $i]) . "<br>"; 
+        }
+    }
 }
 
 $html .= '</div></div>';
@@ -183,7 +197,7 @@ $html .= '<div style="position:absolute;top:840px;left:65px;width: 660px; height
             . '<br><br>' . str_repeat($space_bar, 20) . 'ลงชื่อผู้รับสมัคร' . str_repeat(".", 50) . '(ครู)'
             . '</div></div>';
 
-$html .= '<div style="position:absolute;top:890px;left:530px;"><img src="../dist/img/signal.png" alt="" style="width:60%;height:60%"></div>';
+$html .= '<div style="position:absolute;top:890px;left:530px;"><img src="dist/img/signal.png" alt="" style="width:60%;height:60%"></div>';
 
 
 

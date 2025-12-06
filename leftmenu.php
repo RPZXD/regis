@@ -1,43 +1,49 @@
 <?php
-function createNavItem($href, $iconClass, $text) {
+/**
+ * Dynamic Left Menu - reads from menu_config table
+ */
+require_once __DIR__ . '/config/Database.php';
+require_once __DIR__ . '/class/AdminConfig.php';
+
+// Get database connection and config
+$connectDB = new Database_Regis();
+$db = $connectDB->getConnection();
+$adminConfig = new AdminConfig($db);
+
+// Get active menus from config
+$menus = $adminConfig->getActiveMenus();
+
+// Helper function to create nav item
+function createNavItem($href, $iconClass, $text, $badge = null) {
+    $badgeHtml = $badge ? '&nbsp;&nbsp;<span class="badge text-white bg-red-700">' . htmlspecialchars($badge) . '</span>' : '';
     return '
     <li class="nav-item">
         <a href="' . htmlspecialchars($href) . '" class="nav-link">
             <i class="nav-icon fas ' . htmlspecialchars($iconClass) . '"></i>
-            <p>' . htmlspecialchars($text) . '</p>
+            <p>' . htmlspecialchars($text) . $badgeHtml . '</p>
         </a>
     </li>';
 }
 
-function createNavItem2($href, $iconClass, $text, $number) {
-    return '
-    <li class="nav-item">
-        <a href="' . htmlspecialchars($href) . '" class="nav-link">
-            <i class="nav-icon fas ' . htmlspecialchars($iconClass) . '"></i>
-            <p>' . htmlspecialchars($text) . '&nbsp;&nbsp;<span class="badge text-white bg-red-700"> '.htmlspecialchars($number).' </span></p>
-        </a>
-    </li>';
+// Badge mapping for certain menus (can be moved to database later)
+$badges = [
+    'register' => '1',
+    'print_form' => '2',
+    'upload' => '3',
+    'check_status' => '4',
+    'exam_card' => '6'
+];
+
+// Always show home
+echo createNavItem('index.php', 'fa-home', 'หน้าหลัก');
+
+// Dynamic menus from database
+foreach ($menus as $menu) {
+    $badge = $badges[$menu['menu_key']] ?? null;
+    echo createNavItem($menu['menu_url'], $menu['icon'], $menu['menu_name'], $badge);
 }
 
-$currentDateTime = new DateTime();
-$enableDateTime = new DateTime('2025-03-27 08:00:00');
-
-echo createNavItem('index.php', 'fas fa-home', 'หน้าหลัก');
-// echo createNavItem('annouce.php', 'fas fa-bullhorn', 'ประกาศรับสมัคร');
-// echo createNavItem('detail.php', 'fas fa-info', 'รายละเอียดการรับสมัคร');
-echo createNavItem2('regis.php', 'fas fa-user-plus', 'สมัครเรียน', '1');
-echo createNavItem('checkreg.php', 'fas fa-check', 'เช็คการสมัคร');
-echo createNavItem2('print_reg.php', 'fas fa-print', 'พิมพ์ใบสมัคร', '2'); // New menu item
-echo createNavItem2('upload.php', 'fas fa-upload', 'อัพโหลดหลักฐาน', '3'); // New menu item
-echo createNavItem2('check_uploads.php', 'fas fa-check', 'ตรวจสอบสถานะอัพโหลดหลักฐาน', '4'); // New menu item
-// echo createNavItem('login_student.php', 'fas fa-arrow-right', 'เข้าสู่ระบบ');
-if ($currentDateTime >= $enableDateTime) {
-    echo createNavItem2('print.php', 'fas fa-credit-card', 'พิมพ์บัตรสอบ', '6');
-}
-echo createNavItem('confirm.php', 'fas fa-file-signature', 'รายงานตัว');
-echo createNavItem('contact.php', 'fas fa-address-book', 'ติดต่อ-สอบถาม');
-
-// echo createNavItem('faq.php', 'fas fa-question', 'วิธีการใช้งาน');
-echo createNavItem('login.php', 'fas fa-sign-in-alt', 'ผู้ดูแลระบบ');
+// Always show contact and admin login
+echo createNavItem('contact.php', 'fa-address-book', 'ติดต่อ-สอบถาม');
+echo createNavItem('login.php', 'fa-sign-in-alt', 'ผู้ดูแลระบบ');
 ?>
-

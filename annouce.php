@@ -1,119 +1,29 @@
-<?php 
+<?php
+/**
+ * Announcement Page
+ * Uses the new MVC layout with modern UI
+ */
+session_start();
+require_once 'config/Setting.php';
+require_once 'config/Database.php';
 
-require_once('header.php');
-?>
-<body class="hold-transition sidebar-mini layout-fixed light-mode">
-<div class="wrapper">
+$setting = new Setting();
+$pageTitle = 'ประกาศรับสมัคร';
 
-    <?php require_once('warpper.php');?>
+// Get media settings if needed
+$databaseRegis = new Database_Regis();
+$db = $databaseRegis->getConnection();
+$media_sets = [];
+try {
+    $stmt = $db->query("SELECT * FROM setting WHERE config_name LIKE 'file_%'");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $media_sets[$row['config_name']] = $row['value'];
+    }
+} catch (Exception $e) {
+    // Handle error silently
+}
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-
-  <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"></h1>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-
-    <section class="content">
-      <div class="container-fluid">
-
-        <div class="row">
-
-        <div class="col-md-12">
-            <div class="card card-default">
-              <div class="card-header">
-                <h3 class="card-title">
-                <h2 class="text-center"><i class="fas fa-bullhorn"></i>
-                  &nbsp;&nbsp;ประกาศรับสมัครนักเรียนโรงเรียนพิชัย</h2>
-                </h3>
-              </div>
-
-
-
-              </div>
-
-
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
-
-          <div class="col-md-12">
-            <div class="card card-default">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-bullhorn"></i>
-                  <h5>&nbsp;&nbsp;ประกาศรับสมัคร </h5>
-                </h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                
-              <iframe src="<?=$media_sets['file_reg1']?>" class="form-control mx-auto" style="height: 800px;" allow="autoplay"></iframe>
-              
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-          
-          <!-- /.col -->
-          <!-- /.col -->
-        <!-- </div>
-          <div class="col-md-12">
-            <div class="card card-default">
-              <div class="card-header">
-                <h3 class="card-title">
-                  <i class="fas fa-bullhorn"></i>
-                  <h5>&nbsp;&nbsp;ประกาศรับสมัคร ม.4 ความสามารถพิเศษ </h5>
-                </h3>
-              </div>
-              /.card-header -->
-              <!-- <div class="card-body"> -->
-                
-              <!-- <iframe src="<?=$media_sets['file_reg4']?>" class="form-control mx-auto" style="height: 800px;" allow="autoplay"></iframe> -->
-              
-              <!-- </div> -->
-              <!-- /.card-body -->
-            <!-- </div> -->
-            <!-- /.card -->
-          <!-- </div> -->
-          
-          <!-- /.col -->
-          <!-- /.col -->
-        </div>
-        <!-- /.row -->
-
-      </div><!-- /.container-fluid -->
-
-
-
-
-          <!-- right col -->
-        </div>
-        <!-- /.row (main row) -->
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-    <?php require_once('footer.php');?>
-</div>
-<!-- ./wrapper -->
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-
-</script>
-<?php require_once('scirpt.php');?>
-</body>
-</html>
+ob_start();
+require 'views/announce/index.php';
+$content = ob_get_clean();
+require 'views/layouts/app.php';

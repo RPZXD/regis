@@ -1,8 +1,10 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
-require_once("../connection.php");
-require_once("../function.php");
+require_once "config/Database.php";
+require_once "function.php";
+$dbRegis = new Database_Regis();
+$db = $dbRegis->getConnection();
 session_start();
 
 if (!isset($_SESSION['student_login'])) {
@@ -17,17 +19,16 @@ if ($_SESSION['student_login'] !== $uid) {
 }
 $db->exec("set names utf8");
 $select_stmt = $db->prepare("SELECT * FROM users
-INNER JOIN data_stum1
-ON users.citizenid = data_stum1.citizenid
 WHERE users.id = :uid");
 $select_stmt->execute(array(':uid' => $uid));
 $row = $select_stmt->fetch(PDO::FETCH_ASSOC);
 
-$select_stmt = $db->prepare("SELECT s.year, m.* FROM setting as s 
-INNER JOIN setting_media as m
-ON s.id = m.id");
+$select_stmt = $db->prepare("SELECT * FROM setting");
 $select_stmt->execute();
 $settings = $select_stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!isset($settings['logo_school'])) $settings['logo_school'] = 'logo-phicha.png';
+if (!isset($settings['year'])) $settings['year'] = '2567';
 
 $space_bar = '&nbsp;&nbsp;&nbsp;&nbsp;';
 $space_bar = '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -161,8 +162,23 @@ $html .= '<div style="position:absolute;top:495px;left:50px;width: 660px; height
 <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">'; 
 
 // ลำดับแผนการเรียน
-for ($i = 1; $i < 6; $i++) {
-    $html .= 'ลำดับที่ ' . $i . $space_bar . getRoomNameM4($row["number" . $i]) . "<br>"; 
+// ลำดับแผนการเรียน
+// Fetch from new table
+$planStmt = $db->prepare("SELECT plan_id FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC");
+$planStmt->execute([':citizenid' => $row['citizenid']]);
+$plans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (!empty($plans)) {
+    foreach ($plans as $index => $plan) {
+        $html .= 'ลำดับที่ ' . ($index + 1) . $space_bar . getRoomNameM4($plan["plan_id"]) . "<br>"; 
+    }
+} else {
+    // Fallback/Legacy
+    for ($i = 1; $i < 6; $i++) {
+        if (!empty($row["number" . $i])) {
+            $html .= 'ลำดับที่ ' . $i . $space_bar . getRoomNameM4($row["number" . $i]) . "<br>"; 
+        }
+    }
 }
 
 $html .= '</div></div>';

@@ -277,9 +277,23 @@ $html .= '<div style="position:absolute;top:495px;left:50px;width: 660px; height
 <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">'; 
 
 // ลำดับแผนการเรียน
-$max = ($level == 4) ? 7 : 11;
-for ($i = 1; $i < $max; $i++) {
-    $html .= 'ลำดับที่ ' . $i . $space_bar . (($level == 4) ? getRoomNameM4($student["number" . $i]) : getRoomNameM1($student["number" . $i]) )  . "<br>"; 
+// ลำดับแผนการเรียน
+$plans = $studentRegis->getStudentPlans($student['citizenid']);
+
+if (!empty($plans)) {
+    foreach ($plans as $index => $plan) {
+        $planName = ($level == 4) ? getRoomNameM4($plan["plan_id"]) : getRoomNameM1($plan["plan_id"]);
+        $html .= 'ลำดับที่ ' . ($index + 1) . $space_bar . $planName . "<br>"; 
+    }
+} else {
+    // Fallback
+    $max = ($level == 4) ? 7 : 11;
+    for ($i = 1; $i < $max; $i++) {
+        if (!empty($student["number" . $i])) {
+            $planName = ($level == 4) ? getRoomNameM4($student["number" . $i]) : getRoomNameM1($student["number" . $i]);
+            $html .= 'ลำดับที่ ' . $i . $space_bar . $planName . "<br>"; 
+        }
+    }
 }
 
 $html .= '</div></div>';

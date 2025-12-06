@@ -137,10 +137,16 @@ if ($result && isset($result['path'])) {
 
 // กรอบติดรูป
 $html .= '<div style="position:absolute;top:110px;left:630px;width: 110px; height: 150px; border: 1.5px solid black;text-align: center;">
-            <div style="width: 100%; height: 100%; overflow: hidden;">
-                <img src="' . $photoPath . '" alt="Student Photo" 
-                     style="width: 100%; min-height: 100%; object-fit: cover; object-position: center;">
-            </div>
+            <div style="width: 100%; height: 100%; overflow: hidden;">';
+
+if (!empty($photoPath)) {
+    $html .= '<img src="' . $photoPath . '" alt="Student Photo" 
+                     style="width: 100%; min-height: 100%; object-fit: cover; object-position: center;">';
+} else {
+    $html .= '<div style="padding-top: 50px; font-size: 14px;">ติดรูปถ่าย<br>1.5 นิ้ว</div>';
+}
+
+$html .= '    </div>
         </div>';
 
 

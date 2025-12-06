@@ -6,7 +6,7 @@
         // private $username = "phichaia_rpz";
         // private $password = "r9u06D#e9";
         private $username = "root";
-        private $password = "";
+        private $password = "storage";
         public $conn;
 
         public function getConnection() {
@@ -30,7 +30,7 @@
         // private $username = "phichaia_rpz";
         // private $password = "r9u06D#e9";
         private $username = "root";
-        private $password = "";
+        private $password = "storage";
         public $conn;
 
         public function getConnection() {
