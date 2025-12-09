@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="text-3xl font-bold gradient-text">รับสมัครนักเรียน 2568</h1>
+            <h1 class="text-3xl font-bold gradient-text">รับสมัครนักเรียน <?php echo $academicYear; ?></h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">ยินดีต้อนรับสู่ระบบรับสมัครนักเรียนโรงเรียนพิชัย</p>
         </div>
         <div class="mt-4 md:mt-0">
@@ -15,94 +15,92 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- M.1 ในเขต -->
-        <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full -mr-16 -mt-16"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between">
-                    <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/30">
-                        <i class="fas fa-user-graduate text-2xl text-white"></i>
+    <div class="space-y-8">
+        <!-- M.1 Section -->
+        <?php if (!empty($dashboardStats['m1'])): ?>
+        <div>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center mr-2">
+                    <i class="fas fa-user-graduate text-blue-600"></i>
+                </span>
+                ระดับชั้นมัธยมศึกษาปีที่ 1
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <?php foreach ($dashboardStats['m1'] as $index => $stat): 
+                    $gradients = [
+                        'from-blue-500 to-cyan-400', 
+                        'from-indigo-500 to-purple-500', 
+                        'from-emerald-500 to-teal-400',
+                        'from-sky-500 to-blue-400'
+                    ];
+                    $grad = $gradients[$index % count($gradients)];
+                ?>
+                <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br <?php echo $grad; ?> opacity-20 rounded-full -mr-16 -mt-16"></div>
+                    <div class="relative">
+                        <div class="flex items-center justify-between">
+                            <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br <?php echo $grad; ?> rounded-xl shadow-lg text-white">
+                                <i class="fas fa-user-graduate text-2xl"></i>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-medium bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">ม.1</span>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400"><?php echo $stat['name']; ?></h3>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo number_format($stat['total']); ?></p>
+                        </div>
+                        <div class="mt-3 flex items-center text-sm">
+                            <i class="fas fa-chart-line text-green-500 mr-1"></i>
+                            <span class="text-gray-500 dark:text-gray-400">ยืนยันแล้ว <?php echo $stat['confirmed']; ?> คน</span>
+                        </div>
                     </div>
-                    <span class="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">ม.1</span>
                 </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">ยอดสมัคร ในเขต</h3>
-                    <p id="stat-m1-in" class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo $stats['m1_in'] ?? 0; ?></p>
-                </div>
-                <div class="mt-3 flex items-center text-sm">
-                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                    <span class="text-green-500 font-medium">+12%</span>
-                    <span class="text-gray-400 ml-2">จากเมื่อวาน</span>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- M.1 นอกเขต -->
-        <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-full -mr-16 -mt-16"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between">
-                    <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg shadow-purple-500/30">
-                        <i class="fas fa-user-graduate text-2xl text-white"></i>
+        <!-- M.4 Section -->
+        <?php if (!empty($dashboardStats['m4'])): ?>
+        <div>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                <span class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-2">
+                    <i class="fas fa-user-tie text-purple-600"></i>
+                </span>
+                ระดับชั้นมัธยมศึกษาปีที่ 4
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <?php foreach ($dashboardStats['m4'] as $index => $stat): 
+                    $gradients = [
+                        'from-purple-500 to-pink-500', 
+                        'from-rose-500 to-red-400', 
+                        'from-amber-500 to-orange-400',
+                        'from-fuchsia-500 to-pink-400'
+                    ];
+                    $grad = $gradients[$index % count($gradients)];
+                ?>
+                <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br <?php echo $grad; ?> opacity-20 rounded-full -mr-16 -mt-16"></div>
+                    <div class="relative">
+                        <div class="flex items-center justify-between">
+                            <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br <?php echo $grad; ?> rounded-xl shadow-lg text-white">
+                                <i class="fas fa-user-tie text-2xl"></i>
+                            </div>
+                            <span class="px-3 py-1 text-xs font-medium bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">ม.4</span>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400"><?php echo $stat['name']; ?></h3>
+                            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo number_format($stat['total']); ?></p>
+                        </div>
+                        <div class="mt-3 flex items-center text-sm">
+                            <i class="fas fa-chart-line text-green-500 mr-1"></i>
+                            <span class="text-gray-500 dark:text-gray-400">ยืนยันแล้ว <?php echo $stat['confirmed']; ?> คน</span>
+                        </div>
                     </div>
-                    <span class="px-3 py-1 text-xs font-medium bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">ม.1</span>
                 </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">ยอดสมัคร นอกเขต</h3>
-                    <p id="stat-m1-out" class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo $stats['m1_out'] ?? 0; ?></p>
-                </div>
-                <div class="mt-3 flex items-center text-sm">
-                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                    <span class="text-green-500 font-medium">+8%</span>
-                    <span class="text-gray-400 ml-2">จากเมื่อวาน</span>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
-
-        <!-- M.4 โควต้า -->
-        <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 rounded-full -mr-16 -mt-16"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between">
-                    <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/30">
-                        <i class="fas fa-user-tie text-2xl text-white"></i>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full">ม.4</span>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">ยอดสมัคร โควต้า</h3>
-                    <p id="stat-m4-quota" class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo $stats['m4_quota'] ?? 0; ?></p>
-                </div>
-                <div class="mt-3 flex items-center text-sm">
-                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                    <span class="text-green-500 font-medium">+5%</span>
-                    <span class="text-gray-400 ml-2">จากเมื่อวาน</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- M.4 รอบทั่วไป -->
-        <div class="card-hover glass rounded-2xl p-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-full -mr-16 -mt-16"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between">
-                    <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl shadow-lg shadow-amber-500/30">
-                        <i class="fas fa-user-tie text-2xl text-white"></i>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-medium bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 rounded-full">ม.4</span>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">ยอดสมัคร ทั่วไป</h3>
-                    <p id="stat-m4-normal" class="text-3xl font-bold text-gray-900 dark:text-white mt-1"><?php echo $stats['m4_normal'] ?? 0; ?></p>
-                </div>
-                <div class="mt-3 flex items-center text-sm">
-                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
-                    <span class="text-green-500 font-medium">+15%</span>
-                    <span class="text-gray-400 ml-2">จากเมื่อวาน</span>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Charts Section -->
@@ -115,7 +113,7 @@
                     ยอดผู้สมัคร ม.1
                 </h3>
                 <span class="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
-                    ปีการศึกษา 2568
+                    ปีการศึกษา <?php echo $academicYear; ?>
                 </span>
             </div>
             <div class="relative h-[300px]">
@@ -131,7 +129,7 @@
                     ยอดผู้สมัคร ม.4
                 </h3>
                 <span class="px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full">
-                    ปีการศึกษา 2568
+                    ปีการศึกษา <?php echo $academicYear; ?>
                 </span>
             </div>
             <div class="relative h-[300px]">
@@ -217,88 +215,111 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Get stats from PHP
-    const m1In = <?php echo $stats['m1_in'] ?? 0; ?>;
-    const m1Out = <?php echo $stats['m1_out'] ?? 0; ?>;
-    const m4Quota = <?php echo $stats['m4_quota'] ?? 0; ?>;
-    const m4Normal = <?php echo $stats['m4_normal'] ?? 0; ?>;
+    // Data from PHP
+    const statsM1 = <?php echo json_encode($dashboardStats['m1'] ?? []); ?>;
+    const statsM4 = <?php echo json_encode($dashboardStats['m4'] ?? []); ?>;
     
-    // Chart colors
-    const chartColors = {
-        blue: 'rgba(59, 130, 246, 0.8)',
-        purple: 'rgba(139, 92, 246, 0.8)',
-        emerald: 'rgba(16, 185, 129, 0.8)',
-        amber: 'rgba(245, 158, 11, 0.8)',
-        red: 'rgba(239, 68, 68, 0.8)',
-        cyan: 'rgba(6, 182, 212, 0.8)'
-    };
+    // Helpers
+    const getLabels = (stats) => stats.map(s => s.name);
+    const getData = (stats, key) => stats.map(s => s[key]);
+    
+    // Chart Colors
+    const palette = [
+        'rgba(59, 130, 246, 0.8)',   // Blue
+        'rgba(139, 92, 246, 0.8)',  // Purple
+        'rgba(16, 185, 129, 0.8)',  // Emerald
+        'rgba(245, 158, 11, 0.8)',  // Amber
+        'rgba(239, 68, 68, 0.8)',   // Red
+        'rgba(6, 182, 212, 0.8)',   // Cyan
+        'rgba(236, 72, 153, 0.8)',  // Pink
+        'rgba(99, 102, 241, 0.8)'   // Indigo
+    ];
     
     // Donut Chart M.1
-    new Chart(document.getElementById('donutChart1'), {
-        type: 'doughnut',
-        data: {
-            labels: ['ในเขต', 'นอกเขต'],
-            datasets: [{
-                data: [m1In, m1Out],
-                backgroundColor: [chartColors.blue, chartColors.purple],
-                borderWidth: 0,
-                hoverOffset: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                        font: { family: 'Mali', size: 14 }
+    if (statsM1.length > 0) {
+        new Chart(document.getElementById('donutChart1'), {
+            type: 'doughnut',
+            data: {
+                labels: getLabels(statsM1),
+                datasets: [{
+                    data: getData(statsM1, 'total'),
+                    backgroundColor: palette,
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: { family: 'Mali', size: 14 }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        document.getElementById('donutChart1').parentNode.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">ยังไม่มีข้อมูล</div>';
+    }
     
     // Donut Chart M.4
-    new Chart(document.getElementById('donutChart4'), {
-        type: 'doughnut',
-        data: {
-            labels: ['โควต้า', 'รอบทั่วไป'],
-            datasets: [{
-                data: [m4Quota, m4Normal],
-                backgroundColor: [chartColors.emerald, chartColors.amber],
-                borderWidth: 0,
-                hoverOffset: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 20,
-                        usePointStyle: true,
-                        font: { family: 'Mali', size: 14 }
+    if (statsM4.length > 0) {
+        new Chart(document.getElementById('donutChart4'), {
+            type: 'doughnut',
+            data: {
+                labels: getLabels(statsM4),
+                datasets: [{
+                    data: getData(statsM4, 'total'),
+                    backgroundColor: palette.slice().reverse(), // Different color order
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: { family: 'Mali', size: 14 }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        document.getElementById('donutChart4').parentNode.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">ยังไม่มีข้อมูล</div>';
+    }
     
     // Bar Chart - Daily registrations
+    const rawDailyStats = <?php echo json_encode($dailyStats ?? []); ?>;
+    
+    // Process Data (Fill missing days)
     const labels = [];
     const data = [];
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric' }));
-        data.push(Math.floor(Math.random() * 50) + 10); // Sample data
+    const days = 7;
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+        const userDateStr = d.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric' });
+        
+        // Find matching record
+        const record = rawDailyStats.find(r => r.reg_date === dateStr);
+        
+        labels.push(userDateStr);
+        data.push(record ? parseInt(record.count) : 0);
     }
     
     new Chart(document.getElementById('barChart'), {
@@ -319,23 +340,24 @@ document.addEventListener('DOMContentLoaded', function() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'สมัครทั้งหมด ' + context.raw + ' คน';
+                        }
+                    }
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        font: { family: 'Mali' }
-                    }
+                    ticks: { stepSize: 1, font: { family: 'Mali' } }, // Ensure integer ticks
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: {
-                        font: { family: 'Mali' }
-                    }
+                    ticks: { font: { family: 'Mali' } }
                 }
             }
         }

@@ -72,17 +72,17 @@
                     <div class="space-y-3">
                         <?php foreach ($gradeTypes as $type): 
                             $isActive = $type['is_active'];
-                            $typeUrl = $type['url'] ?? '';
-                            $startDate = $type['start_datetime'] ? new DateTime($type['start_datetime']) : null;
-                            $endDate = $type['end_datetime'] ? new DateTime($type['end_datetime']) : null;
+                            $typeUrl = 'register.php?type=' . $type['id'];
+                            $registerStart = !empty($type['register_start']) ? new DateTime($type['register_start']) : null;
+                            $registerEnd = !empty($type['register_end']) ? new DateTime($type['register_end']) : null;
                             $now = new DateTime();
                             
-                            // Check schedule if enabled
+                            // Check if within registration schedule
                             $withinSchedule = true;
-                            if ($type['use_schedule'] && $startDate && $endDate) {
-                                $withinSchedule = ($now >= $startDate && $now <= $endDate);
+                            if ($registerStart && $registerEnd) {
+                                $withinSchedule = ($now >= $registerStart && $now <= $registerEnd);
                             }
-                            $canRegister = $isActive && $withinSchedule && !empty($typeUrl);
+                            $canRegister = $isActive && $withinSchedule;
                             
                             $btnClass = $canRegister 
                                 ? 'bg-gradient-to-r from-'.$color['from'].' to-'.$color['to'].' hover:shadow-lg cursor-pointer' 
@@ -95,9 +95,9 @@
                             data-type-id="<?php echo $type['id']; ?>">
                             <i class="fas fa-<?php echo $canRegister ? 'arrow-right' : 'lock'; ?> mr-2"></i>
                             สมัคร <?php echo $type['name']; ?>
-                            <?php if ($type['use_schedule'] && $startDate): ?>
+                            <?php if ($registerStart && $registerEnd): ?>
                             <span class="block text-xs font-normal mt-1 opacity-75">
-                                <?php echo $startDate->format('d/m') . ' - ' . $endDate->format('d/m/Y'); ?>
+                                <?php echo $registerStart->format('d/m') . ' - ' . $registerEnd->format('d/m/Y'); ?>
                             </span>
                             <?php endif; ?>
                         </button>
@@ -111,14 +111,74 @@
 
     <?php endif; ?>
 
-    <!-- Calendar Image -->
+    <!-- Calendar / Schedule Section -->
     <div class="glass rounded-2xl p-6 overflow-hidden">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">
             <i class="fas fa-calendar-alt text-primary-500 mr-2"></i>
-            ปฏิทินการรับสมัคร
+            ปฏิทินการรับสมัคร ปีการศึกษา <?php echo $academicYear; ?>
         </h3>
-        <div class="rounded-xl overflow-hidden">
-            <img src="dist/img/calendarregis.jpg" alt="Calendar" class="w-full h-auto">
+        
+        <?php if (!empty($registrationTypes)): ?>
+        <div class="space-y-6">
+            <?php 
+            // Define schedule types with their properties
+            $scheduleTypes = [
+                ['key' => 'register', 'name' => 'สมัครเรียน', 'icon' => 'fa-user-plus', 'color' => 'blue'],
+                ['key' => 'print_form', 'name' => 'พิมพ์ใบสมัคร', 'icon' => 'fa-print', 'color' => 'purple'],
+                ['key' => 'upload', 'name' => 'อัพโหลดหลักฐาน', 'icon' => 'fa-upload', 'color' => 'amber'],
+                ['key' => 'exam_card', 'name' => 'พิมพ์บัตรสอบ', 'icon' => 'fa-id-card', 'color' => 'cyan'],
+                ['key' => 'report', 'name' => 'รายงานตัว', 'icon' => 'fa-check-circle', 'color' => 'green'],
+                ['key' => 'announce', 'name' => 'ประกาศผล', 'icon' => 'fa-bullhorn', 'color' => 'rose'],
+            ];
+            
+            foreach ($registrationTypes as $type): 
+                if (!$type['is_active']) continue;
+            ?>
+            <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <!-- Type Header -->
+                <div class="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 text-xs font-bold rounded bg-<?php echo $type['grade_code'] == 'm1' ? 'blue' : 'purple'; ?>-100 text-<?php echo $type['grade_code'] == 'm1' ? 'blue' : 'purple'; ?>-600 dark:bg-<?php echo $type['grade_code'] == 'm1' ? 'blue' : 'purple'; ?>-900/30 dark:text-<?php echo $type['grade_code'] == 'm1' ? 'blue' : 'purple'; ?>-400">
+                            <?php echo $type['grade_name']; ?>
+                        </span>
+                        <h4 class="font-bold text-gray-900 dark:text-white"><?php echo htmlspecialchars($type['name']); ?></h4>
+                    </div>
+                </div>
+                
+                <!-- Schedule Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-200 dark:divide-gray-700">
+                    <?php foreach ($scheduleTypes as $schedule): 
+                        $startField = $schedule['key'] . '_start';
+                        $endField = $schedule['key'] . '_end';
+                        $startDate = !empty($type[$startField]) ? new DateTime($type[$startField]) : null;
+                        $endDate = !empty($type[$endField]) ? new DateTime($type[$endField]) : null;
+                        $hasSchedule = $startDate && $endDate;
+                        $color = $schedule['color'];
+                    ?>
+                    <div class="p-3 text-center <?php echo $hasSchedule ? 'bg-'.$color.'-50 dark:bg-'.$color.'-900/10' : 'bg-gray-50 dark:bg-slate-800'; ?>">
+                        <div class="flex items-center justify-center gap-1 mb-2">
+                            <i class="fas <?php echo $schedule['icon']; ?> text-<?php echo $hasSchedule ? $color.'-500' : 'gray-400'; ?> text-sm"></i>
+                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400"><?php echo $schedule['name']; ?></span>
+                        </div>
+                        <?php if ($hasSchedule): ?>
+                        <div class="text-xs text-<?php echo $color; ?>-600 dark:text-<?php echo $color; ?>-400 font-medium">
+                            <?php echo $startDate->format('d/m'); ?> - <?php echo $endDate->format('d/m'); ?>
+                        </div>
+                        <?php else: ?>
+                        <div class="text-xs text-gray-400">-</div>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
         </div>
+        <?php else: ?>
+        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <i class="fas fa-calendar-times text-4xl mb-3 opacity-50"></i>
+            <p>ยังไม่มีข้อมูลปฏิทิน</p>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
+

@@ -42,16 +42,27 @@ if (!$registrationType['is_active']) {
     exit;
 }
 
-// Check schedule if enabled
-if ($registrationType['use_schedule']) {
-    $now = new DateTime();
-    $start = $registrationType['start_datetime'] ? new DateTime($registrationType['start_datetime']) : null;
-    $end = $registrationType['end_datetime'] ? new DateTime($registrationType['end_datetime']) : null;
-    
-    if ($start && $end && ($now < $start || $now > $end)) {
-        header('Location: regis.php?error=schedule');
-        exit;
-    }
+// Check registration schedule (using register_start and register_end)
+$now = new DateTime();
+$registerStart = !empty($registrationType['register_start']) ? new DateTime($registrationType['register_start']) : null;
+$registerEnd = !empty($registrationType['register_end']) ? new DateTime($registrationType['register_end']) : null;
+
+// If schedule is not set, block access (must configure schedule first)
+if (!$registerStart || !$registerEnd) {
+    header('Location: regis.php?error=no_schedule');
+    exit;
+}
+
+// Check if within registration period
+if ($now < $registerStart) {
+    // Registration hasn't started yet
+    header('Location: regis.php?error=not_started');
+    exit;
+}
+if ($now > $registerEnd) {
+    // Registration has ended
+    header('Location: regis.php?error=ended');
+    exit;
 }
 
 // Get study plans for this type

@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class="text-center">
         <h1 class="text-3xl font-bold gradient-text">ประกาศรับสมัครนักเรียน</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">โรงเรียนพิชัย ปีการศึกษา 2568</p>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">โรงเรียนพิชัย ปีการศึกษา <?php echo $academicYear; ?></p>
     </div>
 
     <!-- Main Announcement -->

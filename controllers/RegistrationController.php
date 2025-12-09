@@ -270,5 +270,12 @@ class RegistrationController extends Controller {
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute($data);
+        
+        // Send notification for new registration
+        require_once __DIR__ . '/../class/NotificationHelper.php';
+        $notifier = new NotificationHelper($this->db);
+        $studentName = ($data['stu_prefix'] ?? '') . ($data['stu_name'] ?? '') . ' ' . ($data['stu_lastname'] ?? '');
+        $level = ($data['level'] ?? '') == '1' ? 'ม.1' : 'ม.4';
+        $notifier->notifyNewRegistration($studentName, $level, $data['typeregis'] ?? '', $data['citizenid'] ?? '');
     }
 }

@@ -6,9 +6,9 @@
 session_start();
 require_once 'config/Setting.php';
 $setting = new Setting();
-$pageTitle = 'พิมพ์ใบสมัคร';
+$pageTitle = 'พิมพ์บัตรประจำตัวสอบ';
 
 ob_start();
-require 'views/print/registration.php';
+require 'views/print/card.php';
 $content = ob_get_clean();
 require 'views/layouts/app.php';

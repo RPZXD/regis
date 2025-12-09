@@ -104,6 +104,16 @@ class AdminConfig {
         $stmt->execute([$gradeCode, $now, $now]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getRegistrationTypeById($id) {
+        $sql = "SELECT rt.*, gl.name as grade_name, gl.code as grade_code 
+                FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE rt.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
     
     public function addRegistrationType($data) {
         $sql = "INSERT INTO registration_types (grade_level_id, code, name, description, url, is_active, use_schedule, start_datetime, end_datetime, sort_order) 
@@ -227,6 +237,37 @@ class AdminConfig {
     
     public function deleteFormField($id) {
         $stmt = $this->db->prepare("DELETE FROM form_fields WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    // ============ FEES MANAGEMENT ============
+    public function getPlanFees($planId) {
+        $stmt = $this->db->prepare("SELECT * FROM study_plan_fees WHERE plan_id = ? ORDER BY sort_order ASC, created_at DESC");
+        $stmt->execute([$planId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function addPlanFee($data) {
+        $sql = "INSERT INTO study_plan_fees (plan_id, category, item_name, term1_amount, term2_amount, sort_order) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['plan_id'], $data['category'], $data['item_name'], 
+            $data['term1_amount'], $data['term2_amount'], $data['sort_order']
+        ]);
+    }
+
+    public function updatePlanFee($id, $data) {
+        $sql = "UPDATE study_plan_fees SET category = ?, item_name = ?, term1_amount = ?, term2_amount = ?, sort_order = ? WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['category'], $data['item_name'], 
+            $data['term1_amount'], $data['term2_amount'], 
+            $data['sort_order'], $id
+        ]);
+    }
+
+    public function deletePlanFee($id) {
+        $stmt = $this->db->prepare("DELETE FROM study_plan_fees WHERE id = ?");
         return $stmt->execute([$id]);
     }
 }

@@ -47,22 +47,24 @@ try {
     $db->exec("SET NAMES utf8");
     
     // Get current academic year
-    $stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
+    $stmt = $db->prepare("SELECT value FROM settings WHERE key_name = 'academic_year'");
     $stmt->execute();
     $yearSetting = $stmt->fetch(PDO::FETCH_ASSOC);
     $currentYear = $yearSetting['value'] ?? (date('Y') + 543);
     
     // Check in users table
-    $stmt = $db->prepare("SELECT id, stu_name, stu_lastname, level FROM users WHERE citizenid = ? AND reg_pee = ?");
+    $stmt = $db->prepare("SELECT id, stu_name, stu_lastname, level, typeregis FROM users WHERE citizenid = ? AND reg_pee = ?");
     $stmt->execute([$citizenId, $currentYear]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($existing) {
-        $levelName = $existing['level'] == '1' ? 'ม.1' : 'ม.4';
+        $level = strtolower($existing['level']);
+        $levelName = (in_array($level, ['1', 'm1'])) ? 'ม.1' : 'ม.4';
+        $typeregis = $existing['typeregis'] ?? '';
         echo json_encode([
             'valid' => false,
             'registered' => true,
-            'error' => "เลขบัตรประชาชนนี้ได้สมัครแล้ว ({$existing['stu_name']} {$existing['stu_lastname']} - {$levelName})"
+            'error' => "เลขบัตรประชาชนนี้ได้สมัครแล้ว ({$existing['stu_name']} {$existing['stu_lastname']} - {$levelName} {$typeregis})"
         ]);
         exit;
     }
@@ -77,4 +79,4 @@ try {
         'valid' => false,
         'error' => 'เกิดข้อผิดพลาดในการตรวจสอบ: ' . $e->getMessage()
     ]);
-}
+}   

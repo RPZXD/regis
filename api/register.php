@@ -1,180 +1,270 @@
 <?php
 /**
- * Main Registration Submission API
- * Handles data from dynamic-form.php
+ * Registration API Endpoint
+ * Handles student registration form submission
  */
-header('Content-Type: application/json');
+
+header('Content-Type: application/json; charset=utf-8');
 require_once '../config/Database.php';
+require_once '../class/AdminConfig.php';
+require_once '../class/NotificationHelper.php';
+
+// Error handling
+set_error_handler(function($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
 try {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('Invalid request method');
-    }
-
-    $dbRegis = new Database_Regis();
-    $db = $dbRegis->getConnection();
-    $db->exec("set names utf8");
-
-    // Get current academic year
-    $settings_stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
-    $settings_stmt->execute();
-    $yearSetting = $settings_stmt->fetch(PDO::FETCH_ASSOC);
-    $currentYear = $yearSetting['value'] ?? (date('Y') + 543);
-
-    // Basic Data Cleaning
-    $citizenId = isset($_POST['citizenid']) ? preg_replace('/[^0-9]/', '', $_POST['citizenid']) : '';
+    $db = (new Database_Regis())->getConnection();
+    $db->exec("SET NAMES utf8");
     
-    // Validate Citizen ID again (server-side safety)
+    $adminConfig = new AdminConfig($db);
+    
+    // Helper function to get province name from code
+    function getProvinceName($db, $code) {
+        if (empty($code)) return '';
+        $stmt = $db->prepare("SELECT name_th FROM province WHERE code = ? LIMIT 1");
+        $stmt->execute([$code]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['name_th'] ?? $code;
+    }
+    
+    // Helper function to get district name from code
+    function getDistrictName($db, $code) {
+        if (empty($code)) return '';
+        $stmt = $db->prepare("SELECT name_th FROM district WHERE code = ? LIMIT 1");
+        $stmt->execute([$code]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['name_th'] ?? $code;
+    }
+    
+    // Helper function to get subdistrict name from code
+    function getSubdistrictName($db, $code) {
+        if (empty($code)) return '';
+        $stmt = $db->prepare("SELECT name_th FROM subdistrict WHERE code = ? LIMIT 1");
+        $stmt->execute([$code]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['name_th'] ?? $code;
+    }
+    
+    // Get POST data
+    $citizenId = preg_replace('/[^0-9]/', '', $_POST['citizenid'] ?? '');
+    $registrationTypeId = intval($_POST['registration_type_id'] ?? 0);
+    $gradeLevel = intval($_POST['grade_level'] ?? 0);
+    $typeCode = $_POST['type_code'] ?? '';
+    
+    // Validate required fields
     if (strlen($citizenId) !== 13) {
         throw new Exception('เลขบัตรประชาชนไม่ถูกต้อง');
     }
-
-    // Check Duplicate
-    $check_stmt = $db->prepare("SELECT citizenid FROM users WHERE citizenid = :citizenid AND reg_pee = :year");
-    $check_stmt->execute([':citizenid' => $citizenId, ':year' => $currentYear]);
-    if ($check_stmt->fetch()) {
-        throw new Exception('เลขบัตรประชาชนนี้ได้สมัครในปีการศึกษานี้แล้ว');
-    }
-
-    // Helper to get name by code
-    function getNameByCode($db, $table, $code) {
-        if (empty($code)) return '';
-        $stmt = $db->prepare("SELECT name_th FROM $table WHERE code = :code");
-        $stmt->execute([':code' => $code]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $row['name_th'] : '';
-    }
-
-    // Study plans are now handled via student_study_plans table (see below)
-
-
-    // Prepare Data for Insertion
-    $data = [
-        // Personal
-        'citizenid' => $citizenId,
-        'date_birth' => $_POST['date_birth'] ?? '',
-        'month_birth' => $_POST['month_birth'] ?? '',
-        'year_birth' => $_POST['year_birth'] ?? '',
-        'stu_prefix' => $_POST['stu_prefix'] ?? '',
-        'stu_name' => $_POST['stu_name'] ?? '',
-        'stu_lastname' => $_POST['stu_lastname'] ?? '',
-        'stu_sex' => $_POST['stu_sex'] ?? '',
-        'stu_blood_group' => $_POST['stu_blood_group'] ?? '',
-        'stu_religion' => $_POST['stu_religion'] ?? '',
-        'stu_ethnicity' => $_POST['stu_ethnicity'] ?? '',
-        'stu_nationality' => $_POST['stu_nationality'] ?? '',
-        
-        // Registration Meta
-        'typeregis' => $_POST['type_id'] ?? '', // Registration Type ID
-        'zone_type' => $_POST['zone_type'] ?? '', // In-Area / Out-Area choice
-        'level' => $_POST['grade_level'] ?? '1', // Grade Level (1 or 4)
-        'reg_pee' => $currentYear,
-        'create_at' => date('Y-m-d H:i:s'),
-        'roles' => 0,
-
-        // Previous School
-        'old_school' => $_POST['old_school'] ?? '',
-        'old_school_province' => getNameByCode($db, 'province', $_POST['oldSchoolProvince'] ?? ''),
-        'old_school_district' => getNameByCode($db, 'district', $_POST['oldSchoolDistrict'] ?? ''),
-        
-        // Current Address
-        'now_addr' => $_POST['now_addr'] ?? '',
-        'now_moo' => $_POST['now_moo'] ?? '',
-        'now_soy' => $_POST['now_soy'] ?? '',
-        'now_street' => $_POST['now_street'] ?? '',
-        'now_province' => getNameByCode($db, 'province', $_POST['nowProvince'] ?? ''),
-        'now_district' => getNameByCode($db, 'district', $_POST['nowDistrict'] ?? ''),
-        'now_subdistrict' => getNameByCode($db, 'subdistrict', $_POST['nowSubdistrict'] ?? ''),
-        'now_post' => $_POST['now_postcode'] ?? '',
-        'now_tel' => $_POST['now_tel'] ?? '',
-        
-        // Registered Address
-        'old_addr' => $_POST['reg_hno'] ?? '',
-        'old_moo' => $_POST['reg_moo'] ?? '',
-        'old_soy' => $_POST['reg_soi'] ?? '',
-        'old_street' => $_POST['reg_road'] ?? '',
-        'old_province' => getNameByCode($db, 'province', $_POST['regProvince'] ?? ''),
-        'old_district' => getNameByCode($db, 'district', $_POST['regDistrict'] ?? ''),
-        'old_subdistrict' => getNameByCode($db, 'subdistrict', $_POST['regSubdistrict'] ?? ''),
-        'old_post' => $_POST['reg_postcode'] ?? '',
-        'old_tel' => $_POST['now_tel'] ?? '', // Default to mobile
-
-        // Parents info (Dad/Mom fields are in DB but form primarily collects Guardian now)
-        // If Dad/Mom not provided, we leave empty or could map Guardian if selected as Dad/Mom?
-        // Form allows setting Guardian Relation.
-        'dad_prefix' => $_POST['dad_prefix'] ?? '',
-        'dad_name' => $_POST['dad_name'] ?? '',
-        'dad_lastname' => $_POST['dad_surname'] ?? '',
-        'dad_job' => $_POST['dad_occupation'] ?? '',
-        'dad_tel' => $_POST['dad_tel'] ?? '',
-        
-        'mom_prefix' => $_POST['mom_prefix'] ?? '',
-        'mom_name' => $_POST['mom_name'] ?? '',
-        'mom_lastname' => $_POST['mom_surname'] ?? '',
-        'mom_job' => $_POST['mom_occupation'] ?? '',
-        'mom_tel' => $_POST['mom_tel'] ?? '',
-        
-        // Guardian Info
-        'parent_prefix' => $_POST['parent_prefix'] ?? '',
-        'parent_name' => $_POST['parent_name'] ?? '',
-        'parent_lastname' => $_POST['parent_lastname'] ?? '',
-        'parent_tel' => $_POST['parent_tel'] ?? '',
-        'parent_relation' => $_POST['parent_relation'] ?? '',
-        'parent_job' => $_POST['parent_occupation'] ?? '', // New column
-        
-        // Academic / Talent
-        'gpa_total' => $_POST['gpa_total'] ?? '0.00',
-        'talent_skill' => $_POST['talent_skill'] ?? '', // New column
-        
-        // Study Plans
-        // Study Plans - Moved to student_study_plans table
-
-    ];
-
-    // Construct SQL
-    $fields = array_keys($data);
-    $placeholders = array_map(function($f) { return ":$f"; }, $fields);
     
-    $sql = "INSERT INTO users (" . implode(', ', $fields) . ") VALUES (" . implode(', ', $placeholders) . ")";
+    if (!$registrationTypeId) {
+        throw new Exception('ไม่พบประเภทการสมัคร');
+    }
+    
+    // Get registration type info
+    $typeSql = "SELECT rt.*, gl.name as grade_name, gl.code as grade_code 
+                FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE rt.id = ?";
+    $typeStmt = $db->prepare($typeSql);
+    $typeStmt->execute([$registrationTypeId]);
+    $regType = $typeStmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$regType) {
+        throw new Exception('ประเภทการสมัครไม่ถูกต้อง');
+    }
+    
+    // Get current academic year
+    $academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
+    
+    // Check for duplicate registration
+    $checkSql = "SELECT id FROM users WHERE citizenid = ? AND reg_pee = ? AND level = ?";
+    $checkStmt = $db->prepare($checkSql);
+    $checkStmt->execute([$citizenId, $academicYear, $regType['grade_code']]);
+    
+    if ($checkStmt->fetch()) {
+        throw new Exception('เลขบัตรประชาชนนี้ได้สมัครแล้วในปีการศึกษานี้');
+    }
+    
+    // Prepare data for insert
+    $level = $regType['grade_code']; // m1 or m4
+    $typeRegis = $regType['name'];
+    
+    // Generate registration number
+    $regNumber = generateRegNumber($db, $level, $academicYear);
+    
+    // Build INSERT SQL - using actual column names from users table
+    $sql = "INSERT INTO users (
+        citizenid, reg_pee, level, typeregis, numreg,
+        stu_prefix, stu_name, stu_lastname,
+        date_birth, month_birth, year_birth,
+        stu_sex, stu_blood_group, stu_religion, stu_ethnicity, stu_nationality,
+        now_tel, gpa_total, zone_type, talent_skill,
+        old_school, old_school_province, old_school_district,
+        now_addr, now_moo, now_soy, now_street, now_province, now_district, now_subdistrict, now_post,
+        old_addr, old_moo, old_soy, old_street, old_province, old_district, old_subdistrict, old_post, old_tel,
+        dad_prefix, dad_name, dad_lastname, dad_job, dad_tel,
+        mom_prefix, mom_name, mom_lastname, mom_job, mom_tel,
+        parent_prefix, parent_name, parent_lastname, parent_relation, parent_tel, parent_job,
+        status, create_at
+    ) VALUES (
+        :citizenid, :reg_pee, :level, :typeregis, :numreg,
+        :stu_prefix, :stu_name, :stu_lastname,
+        :date_birth, :month_birth, :year_birth,
+        :stu_sex, :stu_blood_group, :stu_religion, :stu_ethnicity, :stu_nationality,
+        :now_tel, :gpa_total, :zone_type, :talent_skill,
+        :old_school, :old_school_province, :old_school_district,
+        :now_addr, :now_moo, :now_soy, :now_street, :now_province, :now_district, :now_subdistrict, :now_post,
+        :old_addr, :old_moo, :old_soy, :old_street, :old_province, :old_district, :old_subdistrict, :old_post, :old_tel,
+        :dad_prefix, :dad_name, :dad_lastname, :dad_job, :dad_tel,
+        :mom_prefix, :mom_name, :mom_lastname, :mom_job, :mom_tel,
+        :parent_prefix, :parent_name, :parent_lastname, :parent_relation, :parent_tel, :parent_job,
+        0, NOW()
+    )";
     
     $stmt = $db->prepare($sql);
-    foreach ($data as $key => $value) {
-        $stmt->bindValue(":$key", $value);
+    
+    $params = [
+        ':citizenid' => $citizenId,
+        ':reg_pee' => $academicYear,
+        ':level' => $level,
+        ':typeregis' => $typeRegis,
+        ':numreg' => $regNumber,
+        ':stu_prefix' => $_POST['stu_prefix'] ?? '',
+        ':stu_name' => $_POST['stu_name'] ?? '',
+        ':stu_lastname' => $_POST['stu_lastname'] ?? '',
+        ':date_birth' => $_POST['date_birth'] ?? '',
+        ':month_birth' => $_POST['month_birth'] ?? '',
+        ':year_birth' => $_POST['year_birth'] ?? '',
+        ':stu_sex' => $_POST['stu_sex'] ?? '',
+        ':stu_blood_group' => $_POST['stu_blood_group'] ?? '',
+        ':stu_religion' => $_POST['stu_religion'] ?? '',
+        ':stu_ethnicity' => $_POST['stu_ethnicity'] ?? '',
+        ':stu_nationality' => $_POST['stu_nationality'] ?? '',
+        ':now_tel' => $_POST['now_tel'] ?? '',
+        ':gpa_total' => !empty($_POST['gpa_total']) ? $_POST['gpa_total'] : 0,
+        ':zone_type' => $_POST['zone_type'] ?? '',
+        ':talent_skill' => $_POST['talent_skill'] ?? '',
+        ':old_school' => $_POST['old_school_name'] ?? '',
+        ':old_school_province' => getProvinceName($db, $_POST['old_school_province'] ?? ''),
+        ':old_school_district' => getDistrictName($db, $_POST['old_school_district'] ?? ''),
+        ':now_addr' => $_POST['now_hno'] ?? '',
+        ':now_moo' => $_POST['now_moo'] ?? '',
+        ':now_soy' => $_POST['now_soi'] ?? '',
+        ':now_street' => $_POST['now_road'] ?? '',
+        ':now_province' => getProvinceName($db, $_POST['now_province'] ?? ''),
+        ':now_district' => getDistrictName($db, $_POST['now_district'] ?? ''),
+        ':now_subdistrict' => getSubdistrictName($db, $_POST['now_subdistrict'] ?? ''),
+        ':now_post' => $_POST['now_postcode'] ?? '',
+        ':old_addr' => $_POST['reg_hno'] ?? '',
+        ':old_moo' => $_POST['reg_moo'] ?? '',
+        ':old_soy' => $_POST['reg_soi'] ?? '',
+        ':old_street' => $_POST['reg_road'] ?? '',
+        ':old_province' => getProvinceName($db, $_POST['reg_province'] ?? ''),
+        ':old_district' => getDistrictName($db, $_POST['reg_district'] ?? ''),
+        ':old_subdistrict' => getSubdistrictName($db, $_POST['reg_subdistrict'] ?? ''),
+        ':old_post' => $_POST['reg_postcode'] ?? '',
+        ':old_tel' => $_POST['old_tel'] ?? '',
+        ':dad_prefix' => $_POST['dad_prefix'] ?? '',
+        ':dad_name' => $_POST['dad_name'] ?? '',
+        ':dad_lastname' => $_POST['dad_lastname'] ?? '',
+        ':dad_job' => $_POST['dad_job'] ?? '',
+        ':dad_tel' => $_POST['dad_tel'] ?? '',
+        ':mom_prefix' => $_POST['mom_prefix'] ?? '',
+        ':mom_name' => $_POST['mom_name'] ?? '',
+        ':mom_lastname' => $_POST['mom_lastname'] ?? '',
+        ':mom_job' => $_POST['mom_job'] ?? '',
+        ':mom_tel' => $_POST['mom_tel'] ?? '',
+        ':parent_prefix' => $_POST['parent_prefix'] ?? '',
+        ':parent_name' => $_POST['parent_name'] ?? '',
+        ':parent_lastname' => $_POST['parent_lastname'] ?? '',
+        ':parent_relation' => $_POST['parent_relation'] ?? '',
+        ':parent_tel' => $_POST['parent_tel'] ?? '',
+        ':parent_job' => $_POST['parent_occupation'] ?? '',
+    ];
+    
+    $stmt->execute($params);
+    $insertId = $db->lastInsertId();
+    
+    // Save study plan selections
+    saveStudyPlans($db, $citizenId, $_POST);
+    
+    // Send notification (Discord/Telegram)
+    try {
+        $notifier = new NotificationHelper($db);
+        $studentName = ($_POST['stu_prefix'] ?? '') . ($_POST['stu_name'] ?? '') . ' ' . ($_POST['stu_lastname'] ?? '');
+        $levelText = ($level == 'm1' || $level == '1') ? 'ม.1' : 'ม.4';
+        $notifier->notifyNewRegistration($studentName, $levelText, $typeRegis, $citizenId);
+    } catch (Exception $e) {
+        // Notification failure should not affect registration
     }
     
-    if ($stmt->execute()) {
-        // Insert Study Plans into new table
-        $planStmt = $db->prepare("INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (:citizenid, :plan_id, :priority)");
+    echo json_encode([
+        'success' => true,
+        'message' => 'ลงทะเบียนสำเร็จ',
+        'reg_number' => $regNumber,
+        'citizen_id' => $citizenId,
+        'id' => $insertId
+    ], JSON_UNESCAPED_UNICODE);
+    
+} catch (Exception $e) {
+    http_response_code(200); // Keep 200 for frontend handling
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+}
+
+/**
+ * Generate registration number
+ * Format: YYLL-XXXX (Year + Level + Sequence)
+ */
+function generateRegNumber($db, $level, $year) {
+    $yearShort = substr($year, -2);
+    $levelNum = str_replace('m', '', $level);
+    $prefix = $yearShort . $levelNum;
+    
+    // Get next sequence
+    $sql = "SELECT MAX(CAST(SUBSTRING(numreg, 5) AS UNSIGNED)) as max_seq 
+            FROM users 
+            WHERE numreg LIKE ? AND reg_pee = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$prefix . '%', $year]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $nextSeq = ($result['max_seq'] ?? 0) + 1;
+    
+    return $prefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Save student study plan selections
+ */
+function saveStudyPlans($db, $citizenId, $postData) {
+    // Check if table exists first
+    try {
+        $checkTable = $db->query("SHOW TABLES LIKE 'student_study_plans'");
+        if ($checkTable->rowCount() == 0) {
+            return; // Table doesn't exist, skip
+        }
         
-        // Loop through all potential study plan inputs (allowing more than 10)
-        // Adjust the loop limit if more plans are expected in the future, e.g. 20
-        for ($i = 1; $i <= 20; $i++) {
-            $key = "study_plan_$i";
-            if (!empty($_POST[$key])) {
-                $planStmt->execute([
-                    ':citizenid' => $citizenId,
-                    ':plan_id' => $_POST[$key],
-                    ':priority' => $i
-                ]);
-            } elseif ($i === 1 && !empty($_POST['study_plan_id'])) {
-                // Legacy fallback for single plan input
-                $planStmt->execute([
-                    ':citizenid' => $citizenId,
-                    ':plan_id' => $_POST['study_plan_id'],
-                    ':priority' => 1
-                ]);
+        // Clear existing plans
+        $clearSql = "DELETE FROM student_study_plans WHERE citizenid = ?";
+        $clearStmt = $db->prepare($clearSql);
+        $clearStmt->execute([$citizenId]);
+        
+        // Insert new plans
+        $insertSql = "INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (?, ?, ?)";
+        $insertStmt = $db->prepare($insertSql);
+        
+        for ($i = 1; $i <= 5; $i++) {
+            $planId = $postData["study_plan_{$i}"] ?? '';
+            if (!empty($planId)) {
+                $insertStmt->execute([$citizenId, intval($planId), $i]);
             }
         }
-
-        echo json_encode(['success' => true, 'message' => 'สมัครเรียนสำเร็จ', 'citizen_id' => $citizenId]);
-    } else {
-        throw new Exception('บันทึกข้อมูลไม่สำเร็จ');
+    } catch (Exception $e) {
+        // Silently fail if table doesn't exist
     }
-
-} catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Database Error: ' . $e->getMessage()]);
 }

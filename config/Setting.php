@@ -48,9 +48,6 @@ class Setting {
         return $this->uploadDir_profile;
     }
 
-    public function getYear() {
-        return $this->year;
-    }
 
 }
 ?>

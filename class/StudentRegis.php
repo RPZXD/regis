@@ -114,6 +114,158 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getStudentsByCriteria($level, $typeName) {
+        // Prepare Level Criteria (support both '1' and 'm1')
+        $levels = [$level];
+        if ($level == '1') $levels[] = 'm1';
+        if ($level == '4') $levels[] = 'm4';
+        $levelStr = "'" . implode("','", $levels) . "'";
+
+    // Select ALL user columns + calculated fields
+    $sql = "SELECT u.*, CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+            CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
+            GROUP_CONCAT(CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
+            FROM users u
+            LEFT JOIN student_study_plans ssp ON u.citizenid = ssp.citizenid 
+                AND ssp.id IN (
+                    SELECT MAX(id) 
+                    FROM student_study_plans 
+                    GROUP BY citizenid, priority
+                )
+            WHERE u.level IN ($levelStr)";
+        
+        // Special case for M.1 General (Zone)
+        if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
+            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
+        } else {
+            $sql .= " AND u.typeregis = :typeName";
+        }
+        
+        $sql .= " GROUP BY u.id ORDER BY u.create_at DESC";
+        
+        $stmt = $this->conn->prepare($sql);
+        // $stmt->bindParam(':level', $level); // Removed in favor of IN clause
+        if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
+            $stmt->bindParam(':typeName', $typeName);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countStudentsByCriteria($level, $typeName) {
+        // Prepare Level
+        $levels = [$level];
+        if ($level == '1') $levels[] = 'm1';
+        if ($level == '4') $levels[] = 'm4';
+        $levelStr = "'" . implode("','", $levels) . "'";
+    
+        $sql = "SELECT COUNT(*) as total,
+                SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as confirmed,
+                SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending
+                FROM users 
+                WHERE level IN ($levelStr)";
+        
+        if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
+            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
+        } else {
+            $sql .= " AND typeregis = :typeName";
+        }
+        
+        $stmt = $this->conn->prepare($sql);
+        if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
+            $stmt->bindParam(':typeName', $typeName);
+        }
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getDailyRegistrations($days = 7) {
+        $sql = "SELECT DATE_FORMAT(create_at, '%Y-%m-%d') as reg_date, COUNT(*) as count 
+                FROM users 
+                WHERE create_at >= DATE_SUB(CURDATE(), INTERVAL :days DAY)
+                GROUP BY DATE_FORMAT(create_at, '%Y-%m-%d')
+                ORDER BY reg_date ASC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':days', $days, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Returns array like [['reg_date'=>'...', 'count'=>...], ...]
+    }
+
+    public function getStudentsWithDocuments($level, $typeName) {
+        // Prepare Level Criteria
+        $levels = [$level];
+        if ($level == '1') $levels[] = 'm1';
+        if ($level == '4') $levels[] = 'm4';
+        $levelStr = "'" . implode("','", $levels) . "'";
+
+        $sql = "SELECT 
+                    u.id, 
+                    u.citizenid, 
+                    CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+                    CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname, 
+                    u.level, 
+                    u.create_at, 
+                    u.typeregis, 
+                    u.old_school, 
+                    u.old_school_province, 
+                    u.now_tel, 
+                    u.parent_tel,
+                    u.gpa_total, 
+                    u.status,
+                    -- document1
+                    COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.path END), '') AS upload_path1,
+                    COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.error_detail END), '') AS error_detail1,
+                    COALESCE(MAX(CASE WHEN t.name = 'document1' THEN t.status END), '') AS status1,
+                    -- document2
+                    COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.path END), '') AS upload_path2,
+                    COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.error_detail END), '') AS error_detail2,
+                    COALESCE(MAX(CASE WHEN t.name = 'document2' THEN t.status END), '') AS status2,
+                    -- document3
+                    COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.path END), '') AS upload_path3,
+                    COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.error_detail END), '') AS error_detail3,
+                    COALESCE(MAX(CASE WHEN t.name = 'document3' THEN t.status END), '') AS status3,
+                    -- document4
+                    COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.path END), '') AS upload_path4,
+                    COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.error_detail END), '') AS error_detail4,
+                    COALESCE(MAX(CASE WHEN t.name = 'document4' THEN t.status END), '') AS status4,
+                    -- document5
+                    COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.path END), '') AS upload_path5,
+                    COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.error_detail END), '') AS error_detail5,
+                    COALESCE(MAX(CASE WHEN t.name = 'document5' THEN t.status END), '') AS status5,
+                    -- document6
+                    COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.path END), '') AS upload_path6,
+                    COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.error_detail END), '') AS error_detail6,
+                    COALESCE(MAX(CASE WHEN t.name = 'document6' THEN t.status END), '') AS status6,
+                    -- document7
+                    COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.path END), '') AS upload_path7,
+                    COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.error_detail END), '') AS error_detail7,
+                    COALESCE(MAX(CASE WHEN t.name = 'document7' THEN t.status END), '') AS status7,
+                    -- document8
+                    COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.path END), '') AS upload_path8,
+                    COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.error_detail END), '') AS error_detail8,
+                    COALESCE(MAX(CASE WHEN t.name = 'document8' THEN t.status END), '') AS status8
+                FROM users u
+                LEFT JOIN tbl_uploads t ON u.citizenid = t.citizenid
+                WHERE u.level IN ($levelStr)";
+
+        // Special case for M.1 General (Zone)
+        if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
+            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
+        } else {
+            $sql .= " AND u.typeregis = :typeName";
+        }
+
+        $sql .= " GROUP BY u.id ORDER BY u.create_at ASC";
+
+        $stmt = $this->conn->prepare($sql);
+        // $stmt->bindParam(':level', $level); // Removed
+        if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
+            $stmt->bindParam(':typeName', $typeName);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getM1NomalStudents_Check() {
         $query = "SELECT 
                         u.id, 
@@ -326,34 +478,36 @@ class StudentRegis {
     }
 
     public function getStudentById($id) {
-        $query = "SELECT 
-                        id, 
-                        citizenid, 
-                        CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
-                        stu_prefix,
-                        typeregis,
-                        stu_name,
-                        stu_lastname, 
-                        now_tel,
-                        gpa_total, 
-                        old_school_stuid, 
-                        number1,
-                        number2,
-                        number3,
-                        number4,
-                        number5,
-                        number6, 
-                        number7, 
-                        number8, 
-                        number9, 
-                        number10, 
-                        parent_tel 
-                    FROM users 
-                    WHERE id = :id";
+        $query = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            // Fetch plans
+            $planQuery = "SELECT plan_id, priority FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC";
+            $planStmt = $this->conn->prepare($planQuery);
+            $planStmt->bindParam(':citizenid', $row['citizenid']);
+            $planStmt->execute();
+            $plans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Map plans to numberX keys
+            for ($i = 1; $i <= 10; $i++) {
+                $row['number' . $i] = '';
+            }
+            foreach ($plans as $plan) {
+                if ($plan['priority'] >= 1 && $plan['priority'] <= 10) {
+                    $row['number' . $plan['priority']] = $plan['plan_id'];
+                }
+            }
+        
+            // Format birthday for frontend if needed (it was using CONCAT previously)
+            if ($row['date_birth'] && $row['month_birth'] && $row['year_birth']) {
+                $row['birthday'] = $row['date_birth'] . '-' . $row['month_birth'] . '-' . $row['year_birth'];
+            }
+        }
+        return $row;
     }
 
 
@@ -369,66 +523,140 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateStudent($id, $citizenid, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $old_school_stuid, $number1, $number2, $number3, $number4, $number5, $number6) {
-        $query = "UPDATE users 
-                    SET 
-                        citizenid = :citizenid, 
-                        stu_prefix = :stu_prefix, 
-                        stu_name = :stu_name, 
-                        stu_lastname = :stu_lastname, 
-                        date_birth = :date_birth, 
-                        month_birth = :month_birth, 
-                        year_birth = :year_birth, 
-                        now_tel = :now_tel, 
-                        parent_tel = :parent_tel,
-                        gpa_total = :gpa_total,
-                        old_school_stuid = :old_school_stuid,
-                        number1 = :number1,
-                        number2 = :number2,
-                        number3 = :number3,
-                        number4 = :number4,
-                        number5 = :number5,
-                        number6 = :number6
-                    WHERE id = :id";
-        
-        // Prepare the query
-        $stmt = $this->conn->prepare($query);
-    
-        // Bind parameters
-        $stmt->bindParam(':citizenid', $citizenid);
-        $stmt->bindParam(':stu_prefix', $stu_prefix);
-        $stmt->bindParam(':stu_name', $stu_name);
-        $stmt->bindParam(':stu_lastname', $stu_lastname);
-        $stmt->bindParam(':date_birth', $date_birth);
-        $stmt->bindParam(':month_birth', $month_birth);
-        $stmt->bindParam(':year_birth', $year_birth);
-        $stmt->bindParam(':now_tel', $now_tel);
-        $stmt->bindParam(':parent_tel', $parent_tel);
-        $stmt->bindParam(':gpa_total', $gpa_total);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':old_school_stuid', $old_school_stuid);
-        $stmt->bindParam(':number1', $number1);
-        $stmt->bindParam(':number2', $number2);
-        $stmt->bindParam(':number3', $number3);
-        $stmt->bindParam(':number4', $number4);
-        $stmt->bindParam(':number5', $number5);
-        $stmt->bindParam(':number6', $number6);
-    
+    public function updateStudent($id, $data, $plans = []) {
         try {
-            // Execute the query
-            if ($stmt->execute()) {
-                return true; // Successfully updated
-            } else {
-                // Log the error and return false
-                error_log("Update failed: " . implode(", ", $stmt->errorInfo()));
-                return false;
+            $this->conn->beginTransaction();
+
+            $query = "UPDATE users 
+                SET 
+                    citizenid = :citizenid, 
+                    stu_prefix = :stu_prefix, 
+                    stu_name = :stu_name, 
+                    stu_lastname = :stu_lastname, 
+                    stu_sex = :stu_sex,
+                    stu_blood_group = :stu_blood_group,
+                    stu_religion = :stu_religion,
+                    stu_ethnicity = :stu_ethnicity,
+                    stu_nationality = :stu_nationality,
+                    date_birth = :date_birth, 
+                    month_birth = :month_birth, 
+                    year_birth = :year_birth, 
+                    now_tel = :now_tel, 
+                    
+                    old_school = :old_school,
+                    old_school_province = :old_school_province,
+                    old_school_district = :old_school_district,
+                    old_school_stuid = :old_school_stuid,
+                    
+                    now_addr = :now_addr,
+                    now_moo = :now_moo,
+                    now_soy = :now_soy,
+                    now_street = :now_street,
+                    now_subdistrict = :now_subdistrict,
+                    now_district = :now_district,
+                    now_province = :now_province,
+                    now_post = :now_post,
+                    
+                    dad_prefix = :dad_prefix,
+                    dad_name = :dad_name,
+                    dad_lastname = :dad_lastname,
+                    dad_job = :dad_job,
+                    dad_tel = :dad_tel,
+                    
+                    mom_prefix = :mom_prefix,
+                    mom_name = :mom_name,
+                    mom_lastname = :mom_lastname,
+                    mom_job = :mom_job,
+                    mom_tel = :mom_tel,
+                    
+                    parent_prefix = :parent_prefix,
+                    parent_name = :parent_name,
+                    parent_lastname = :parent_lastname,
+                    parent_relation = :parent_relation,
+                    parent_job = :parent_job,
+                    parent_tel = :parent_tel,
+                    
+                    gpa_total = :gpa_total,
+                    gpa_sci = :gpa_sci,
+                    gpa_math = :gpa_math,
+                    gpa_eng = :gpa_eng,
+                    
+                    seat_number = :seat_number,
+                    exam_room = :exam_room,
+                    exam_date = :exam_date";
+
+            if (isset($data['typeregis'])) {
+                $query .= ", typeregis = :typeregis";
             }
-        } catch (PDOException $e) {
-            // Log any exception
-            error_log("PDOException: " . $e->getMessage());
-            return false;
+            
+            $query .= " WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($query);
+
+            // Bind all parameters from $data array
+            $params = [
+                ':citizenid', ':stu_prefix', ':stu_name', ':stu_lastname', 
+                ':stu_sex', ':stu_blood_group', ':stu_religion', ':stu_ethnicity', ':stu_nationality',
+                ':date_birth', ':month_birth', ':year_birth', ':now_tel',
+                ':old_school', ':old_school_province', ':old_school_district', ':old_school_stuid',
+                ':now_addr', ':now_moo', ':now_soy', ':now_street', ':now_subdistrict', ':now_district', ':now_province', ':now_post',
+                ':dad_prefix', ':dad_name', ':dad_lastname', ':dad_job', ':dad_tel',
+                ':mom_prefix', ':mom_name', ':mom_lastname', ':mom_job', ':mom_tel',
+                ':parent_prefix', ':parent_name', ':parent_lastname', ':parent_relation', ':parent_job', ':parent_tel',
+                ':gpa_total', ':gpa_sci', ':gpa_math', ':gpa_eng', 
+                ':seat_number', ':exam_room', ':exam_date',
+                ':id'
+            ];
+            
+            foreach ($params as $param) {
+                $key = ltrim($param, ':');
+                $val = isset($data[$key]) ? $data[$key] : null;
+                
+                // Convert empty strings to NULL for numeric/decimal fields
+                $numericFields = ['gpa_total', 'gpa_sci', 'gpa_math', 'gpa_eng', 'old_school_stuid'];
+                if (in_array($key, $numericFields) && $val === '') {
+                    $val = null;
+                }
+                
+                $stmt->bindValue($param, $val);
+            }
+            
+            if (isset($data['typeregis'])) {
+                $stmt->bindValue(':typeregis', $data['typeregis']);
+            }
+
+            if (!$stmt->execute()) {
+                throw new Exception("Update users failed");
+            }
+
+            // Update Plans
+            if (!empty($plans)) {
+                $delQuery = "DELETE FROM student_study_plans WHERE citizenid = :citizenid";
+                $delStmt = $this->conn->prepare($delQuery);
+                $delStmt->bindValue(':citizenid', $data['citizenid']);
+                $delStmt->execute();
+
+                $insQuery = "INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (:citizenid, :plan_id, :priority)";
+                $insStmt = $this->conn->prepare($insQuery);
+
+                foreach ($plans as $priority => $plan_id) {
+                    if (!empty($plan_id)) {
+                        $insStmt->bindValue(':citizenid', $data['citizenid']);
+                        $insStmt->bindValue(':plan_id', $plan_id);
+                        $insStmt->bindValue(':priority', $priority);
+                        $insStmt->execute();
+                    }
+                }
+            }
+
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            // Return error message for debugging
+            return $e->getMessage();
         }
-    }
+    }    
     public function updateStudentM1($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6, $number7, $number8, $number9, $number10) {
         $query = "UPDATE users 
                     SET 
@@ -560,6 +788,7 @@ class StudentRegis {
     
     public function getStudentByCitizenId($citizen_id) {
         $query = "SELECT 
+                        id,
                         citizenid,
                         typeregis,
                         level, 
@@ -568,7 +797,9 @@ class StudentRegis {
                         stu_name,
                         stu_lastname, 
                         now_tel, 
-                        parent_tel 
+                        parent_tel,
+                        final_plan_id,
+                        status
                     FROM users 
                     WHERE citizenid = :citizen_id";
         $stmt = $this->conn->prepare($query);
@@ -804,6 +1035,56 @@ class StudentRegis {
         $query = "SELECT * FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':citizenid', $citizenid);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getStudentsPassed($level, $typeName, $date = null) {
+        // Prepare Level Criteria
+        $levels = [$level];
+        if ($level == '1') $levels[] = 'm1';
+        if ($level == '4') $levels[] = 'm4';
+        $levelStr = "'" . implode("','", $levels) . "'";
+
+        $sql = "SELECT 
+                    id, 
+                    citizenid, 
+                    CONCAT_WS('/', date_birth, month_birth, year_birth) AS birthday, 
+                    CONCAT(stu_prefix, stu_name, ' ', stu_lastname) AS fullname, 
+                    level, 
+                    create_at, 
+                    typeregis, 
+                    old_school, 
+                    old_school_province, 
+                    now_tel, 
+                    parent_tel,
+                    gpa_total, 
+                    status,
+                    update_at,
+                    final_plan_id
+                FROM users 
+                WHERE level IN ($levelStr) AND status = 1";
+        
+        // Special case for M.1 General (Zone)
+        if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
+            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
+        } else {
+            $sql .= " AND typeregis = :typeName";
+        }
+
+        if ($date) {
+            $sql .= " AND DATE(update_at) = :date";
+        }
+        
+        $sql .= " ORDER BY update_at ASC";
+        
+        $stmt = $this->conn->prepare($sql);
+        // $stmt->bindParam(':level', $level); // Removed
+        if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
+            $stmt->bindParam(':typeName', $typeName);
+        }
+        if ($date) {
+            $stmt->bindParam(':date', $date);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

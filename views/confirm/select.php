@@ -8,7 +8,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         <!-- M.1 Confirm Card -->
-        <a href="#" class="group glass rounded-2xl p-6 hover:shadow-xl transition-all transform hover:-translate-y-2">
+        <a href="confirm_report.php" class="group glass rounded-2xl p-6 hover:shadow-xl transition-all transform hover:-translate-y-2">
             <div class="text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg shadow-emerald-500/30 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-file-signature text-3xl text-white"></i>
@@ -23,7 +23,7 @@
         </a>
 
         <!-- M.4 Confirm Card -->
-        <a href="confirm_before4.php" class="group glass rounded-2xl p-6 hover:shadow-xl transition-all transform hover:-translate-y-2">
+        <a href="confirm_report.php" class="group glass rounded-2xl p-6 hover:shadow-xl transition-all transform hover:-translate-y-2">
             <div class="text-center">
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 mb-4 group-hover:scale-110 transition-transform">
                     <i class="fas fa-file-signature text-3xl text-white"></i>

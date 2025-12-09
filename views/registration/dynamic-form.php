@@ -30,16 +30,16 @@ $prefixOptions = ($grade == '1')
 
     <!-- Progress Steps -->
     <div class="glass rounded-2xl p-4">
-        <div class="flex items-center justify-between max-w-3xl mx-auto">
+        <div class="flex items-center justify-between max-w-4xl mx-auto">
             <?php 
-            $steps = ['ข้อมูลส่วนตัว', 'โรงเรียนเดิม', 'ที่อยู่ปัจจุบัน', 'ทะเบียนบ้าน', 'ผู้ปกครอง', 'ยืนยัน'];
+            $steps = ['ข้อมูลส่วนตัว', 'โรงเรียนเดิม', 'ที่อยู่ปัจจุบัน', 'ทะเบียนบ้าน', 'บิดา-มารดา', 'ผู้ปกครอง', 'ยืนยัน'];
             foreach ($steps as $i => $step): 
             ?>
             <div class="step-indicator flex flex-col items-center <?php echo $i > 0 ? 'flex-1' : ''; ?>">
-                <div class="step-circle w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-bold text-sm transition-all" data-step="<?php echo $i; ?>">
+                <div class="step-circle w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-bold text-xs md:text-sm transition-all" data-step="<?php echo $i; ?>">
                     <?php echo $i + 1; ?>
                 </div>
-                <span class="hidden md:block text-xs mt-2 text-gray-500 dark:text-gray-400 text-center"><?php echo $step; ?></span>
+                <span class="hidden lg:block text-xs mt-2 text-gray-500 dark:text-gray-400 text-center whitespace-nowrap"><?php echo $step; ?></span>
             </div>
             <?php endforeach; ?>
         </div>
@@ -126,7 +126,7 @@ $prefixOptions = ($grade == '1')
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fas fa-user mr-2 text-primary-500"></i>คำนำหน้า *
                         </label>
-                        <select name="stu_prefix" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
+                        <select name="stu_prefix" id="stuPrefix" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required onchange="autoSetGender(this.value)">
                             <option value="">เลือก</option>
                             <?php foreach ($prefixOptions as $prefix): ?>
                             <option value="<?php echo $prefix; ?>"><?php echo $prefix; ?></option>
@@ -182,7 +182,8 @@ $prefixOptions = ($grade == '1')
                             <?php 
                             $currentYear = date('Y') + 543;
                             $startAge = ($grade == '1') ? 12 : 15;
-                            for($i = $currentYear - $startAge; $i >= $currentYear - ($startAge + 8); $i--): ?>
+                            // Expanded range: ±5 years from expected age
+                            for($i = $currentYear - ($startAge - 3); $i >= $currentYear - ($startAge + 7); $i--): ?>
                             <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
                             <?php endfor; ?>
                         </select>
@@ -191,7 +192,7 @@ $prefixOptions = ($grade == '1')
                     <!-- Sex -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">เพศ *</label>
-                        <select name="stu_sex" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
+                        <select name="stu_sex" id="stuSex" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
                             <option value="">เลือก</option>
                             <option value="ชาย">ชาย</option>
                             <option value="หญิง">หญิง</option>
@@ -238,7 +239,7 @@ $prefixOptions = ($grade == '1')
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fas fa-phone mr-2 text-primary-500"></i>เบอร์โทรศัพท์ *
                         </label>
-                        <input type="text" name="now_tel" maxlength="10" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx" required>
+                        <input type="text" name="now_tel" maxlength="10" value="0" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx" required>
                     </div>
                     
                     <!-- GPA (for special, general, quota types) -->
@@ -418,27 +419,194 @@ $prefixOptions = ($grade == '1')
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">รหัสไปรษณีย์ *</label>
                         <input type="text" name="reg_postcode" id="regPostcode" maxlength="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-phone mr-2 text-primary-500"></i>เบอร์โทรศัพท์บ้าน
+                        </label>
+                        <input type="text" name="old_tel" maxlength="10" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx">
+                    </div>
                 </div>
             </div>
             
-            <!-- Step 5: Guardian Info -->
+            <!-- Step 5: Father & Mother Info -->
             <div class="tab animate-fade-in hidden" data-step="4">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3">5</span>
+                    ข้อมูลบิดา-มารดา
+                </h3>
+                
+                <!-- Father Info Section -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4 flex items-center">
+                        <i class="fas fa-male mr-2"></i>ข้อมูลบิดา
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">คำนำหน้า</label>
+                            <div class="relative">
+                                <select name="dad_prefix" id="dadPrefixSelect" onchange="toggleCustomPrefix('dad')" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                                    <option value="">เลือกคำนำหน้า</option>
+                                    <option value="นาย">นาย</option>
+                                    <option value="ดร.">ดร.</option>
+                                    <option value="ศ.">ศ.</option>
+                                    <option value="รศ.">รศ.</option>
+                                    <option value="ผศ.">ผศ.</option>
+                                    <option value="นพ.">นพ.</option>
+                                    <option value="ทพ.">ทพ.</option>
+                                    <option value="ว่าที่ร้อยตรี">ว่าที่ร้อยตรี</option>
+                                    <option value="ร.ต.">ร.ต.</option>
+                                    <option value="ร.ท.">ร.ท.</option>
+                                    <option value="ร.อ.">ร.อ.</option>
+                                    <option value="พ.ต.">พ.ต.</option>
+                                    <option value="พ.ท.">พ.ท.</option>
+                                    <option value="พ.อ.">พ.อ.</option>
+                                    <option value="ร.ต.ต.">ร.ต.ต.</option>
+                                    <option value="ร.ต.ท.">ร.ต.ท.</option>
+                                    <option value="ร.ต.อ.">ร.ต.อ.</option>
+                                    <option value="พ.ต.ต.">พ.ต.ต.</option>
+                                    <option value="พ.ต.ท.">พ.ต.ท.</option>
+                                    <option value="พ.ต.อ.">พ.ต.อ.</option>
+                                    <option value="other">ระบุเอง</option>
+                                </select>
+                                <input type="text" id="dadPrefixCustom" class="hidden mt-2 w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="ระบุคำนำหน้า" onchange="updateCustomPrefix('dad')">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ชื่อบิดา</label>
+                            <input type="text" name="dad_name" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="ชื่อ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">นามสกุลบิดา</label>
+                            <input type="text" name="dad_lastname" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="นามสกุล">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อาชีพ</label>
+                            <input type="text" name="dad_job" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="อาชีพ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-phone mr-2 text-blue-500"></i>เบอร์โทรศัพท์
+                            </label>
+                            <input type="text" name="dad_tel" maxlength="10" value="0" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mother Info Section -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold text-pink-600 dark:text-pink-400 mb-4 flex items-center">
+                        <i class="fas fa-female mr-2"></i>ข้อมูลมารดา
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 bg-pink-50 dark:bg-pink-900/20 rounded-xl">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">คำนำหน้า</label>
+                            <div class="relative">
+                                <select name="mom_prefix" id="momPrefixSelect" onchange="toggleCustomPrefix('mom')" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                                    <option value="">เลือกคำนำหน้า</option>
+                                    <option value="นาง">นาง</option>
+                                    <option value="นางสาว">นางสาว</option>
+                                    <option value="ดร.">ดร.</option>
+                                    <option value="ศ.">ศ.</option>
+                                    <option value="รศ.">รศ.</option>
+                                    <option value="ผศ.">ผศ.</option>
+                                    <option value="พญ.">พญ.</option>
+                                    <option value="ทพญ.">ทพญ.</option>
+                                    <option value="ว่าที่ร้อยตรี">ว่าที่ร้อยตรี</option>
+                                    <option value="ร.ต.หญิง">ร.ต.หญิง</option>
+                                    <option value="ร.ท.หญิง">ร.ท.หญิง</option>
+                                    <option value="ร.อ.หญิง">ร.อ.หญิง</option>
+                                    <option value="พ.ต.หญิง">พ.ต.หญิง</option>
+                                    <option value="พ.ท.หญิง">พ.ท.หญิง</option>
+                                    <option value="พ.อ.หญิง">พ.อ.หญิง</option>
+                                    <option value="ร.ต.ต.หญิง">ร.ต.ต.หญิง</option>
+                                    <option value="ร.ต.ท.หญิง">ร.ต.ท.หญิง</option>
+                                    <option value="ร.ต.อ.หญิง">ร.ต.อ.หญิง</option>
+                                    <option value="other">ระบุเอง</option>
+                                </select>
+                                <input type="text" id="momPrefixCustom" class="hidden mt-2 w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="ระบุคำนำหน้า" onchange="updateCustomPrefix('mom')">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ชื่อมารดา</label>
+                            <input type="text" name="mom_name" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="ชื่อ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">นามสกุลมารดา</label>
+                            <input type="text" name="mom_lastname" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="นามสกุล">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อาชีพ</label>
+                            <input type="text" name="mom_job" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="อาชีพ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-phone mr-2 text-pink-500"></i>เบอร์โทรศัพท์
+                            </label>
+                            <input type="text" name="mom_tel" maxlength="10" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 6: Guardian Info -->
+            <div class="tab animate-fade-in hidden" data-step="5">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                    <span class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3">6</span>
                     ข้อมูลผู้ปกครอง
                 </h3>
+                
+                <div class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 mb-6">
+                    <p class="text-amber-700 dark:text-amber-400 text-sm">
+                        <i class="fas fa-info-circle mr-2"></i>ผู้ปกครองคือผู้ที่มีอำนาจปกครองตามกฎหมาย หรือผู้ที่ได้รับมอบอำนาจให้ดูแลนักเรียน
+                    </p>
+                </div>
+                
+                <!-- Quick Fill from Father/Mother -->
+                <div class="mb-6 flex flex-wrap gap-3">
+                    <button type="button" id="fillFromDad" class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors">
+                        <i class="fas fa-male mr-2"></i>ใช้ข้อมูลบิดา
+                    </button>
+                    <button type="button" id="fillFromMom" class="px-4 py-2 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-lg hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors">
+                        <i class="fas fa-female mr-2"></i>ใช้ข้อมูลมารดา
+                    </button>
+                </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fas fa-user-tie mr-2 text-primary-500"></i>คำนำหน้า *
                         </label>
-                        <select name="parent_prefix" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
-                            <option value="">เลือก</option>
-                            <option value="นาย">นาย</option>
-                            <option value="นาง">นาง</option>
-                            <option value="นางสาว">นางสาว</option>
-                        </select>
+                        <div class="relative">
+                            <select name="parent_prefix" id="parentPrefixSelect" onchange="toggleCustomPrefix('parent')" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" required>
+                                <option value="">เลือกคำนำหน้า</option>
+                                <option value="นาย">นาย</option>
+                                <option value="นาง">นาง</option>
+                                <option value="นางสาว">นางสาว</option>
+                                <option value="ดร.">ดร.</option>
+                                <option value="ศ.">ศ.</option>
+                                <option value="รศ.">รศ.</option>
+                                <option value="ผศ.">ผศ.</option>
+                                <option value="นพ.">นพ.</option>
+                                <option value="พญ.">พญ.</option>
+                                <option value="ทพ.">ทพ.</option>
+                                <option value="ทพญ.">ทพญ.</option>
+                                <option value="ว่าที่ร้อยตรี">ว่าที่ร้อยตรี</option>
+                                <option value="ร.ต.">ร.ต.</option>
+                                <option value="ร.ท.">ร.ท.</option>
+                                <option value="ร.อ.">ร.อ.</option>
+                                <option value="พ.ต.">พ.ต.</option>
+                                <option value="พ.ท.">พ.ท.</option>
+                                <option value="พ.อ.">พ.อ.</option>
+                                <option value="ร.ต.ต.">ร.ต.ต.</option>
+                                <option value="ร.ต.ท.">ร.ต.ท.</option>
+                                <option value="ร.ต.อ.">ร.ต.อ.</option>
+                                <option value="พ.ต.ต.">พ.ต.ต.</option>
+                                <option value="พ.ต.ท.">พ.ต.ท.</option>
+                                <option value="พ.ต.อ.">พ.ต.อ.</option>
+                                <option value="other">ระบุเอง</option>
+                            </select>
+                            <input type="text" id="parentPrefixCustom" class="hidden mt-2 w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="ระบุคำนำหน้า" onchange="updateCustomPrefix('parent')">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ชื่อผู้ปกครอง *</label>
@@ -467,7 +635,7 @@ $prefixOptions = ($grade == '1')
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fas fa-phone mr-2 text-primary-500"></i>เบอร์โทรศัพท์ *
                         </label>
-                        <input type="text" name="parent_tel" maxlength="10" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx" required>
+                        <input type="text" name="parent_tel" maxlength="10" value="0" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500" placeholder="0xxxxxxxxx" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อาชีพ</label>
@@ -476,8 +644,8 @@ $prefixOptions = ($grade == '1')
                 </div>
             </div>
             
-            <!-- Step 6: Confirmation -->
-            <div class="tab animate-fade-in hidden" data-step="5">
+            <!-- Step 7: Confirmation -->
+            <div class="tab animate-fade-in hidden" data-step="6">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span class="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl mr-3">
                         <i class="fas fa-check"></i>
@@ -490,6 +658,7 @@ $prefixOptions = ($grade == '1')
                     <ul class="space-y-2 text-green-700 dark:text-green-400">
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลส่วนตัวให้ถูกต้อง</li>
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบที่อยู่และข้อมูลติดต่อ</li>
+                        <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลบิดา-มารดา</li>
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลผู้ปกครอง</li>
                     </ul>
                 </div>
@@ -571,26 +740,83 @@ function nextPrev(n) {
 
 function validateForm() {
     var valid = true;
-    var inputs = document.getElementsByClassName("tab")[currentTab].querySelectorAll("input[required], select[required], textarea[required]");
+    var tabs = document.getElementsByClassName("tab");
+    var currentTabEl = tabs[currentTab];
+    var inputs = currentTabEl.querySelectorAll("input[required], select[required], textarea[required]");
+    var errorMessages = [];
+    
+    // Remove previous error styling
+    currentTabEl.querySelectorAll('.border-red-500').forEach(el => {
+        el.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+    });
     
     inputs.forEach(function(input) {
         if (input.type === 'checkbox' && !input.checked) {
             input.closest('label').classList.add('text-red-500');
             valid = false;
-        } else if (input.value === "") {
+            errorMessages.push('กรุณายอมรับเงื่อนไข');
+        } else if (input.value === "" || input.value === null) {
             input.classList.add('border-red-500', 'ring-2', 'ring-red-500');
             valid = false;
-        } else {
-            input.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+            // Get label text
+            var label = input.closest('div')?.querySelector('label');
+            var fieldName = label ? label.textContent.replace('*', '').trim() : 'ข้อมูล';
+            errorMessages.push('กรุณากรอก ' + fieldName);
+        }
+    });
+    
+    // Additional Validation for specific fields
+    // Phone number validation (10 digits starting with 0)
+    var phoneInputs = currentTabEl.querySelectorAll('input[name*="_tel"], input[name*="phone"]');
+    phoneInputs.forEach(function(input) {
+        if (input.value) {
+            var phoneValue = input.value.replace(/\D/g, '');
+            if (phoneValue.length > 0 && (phoneValue.length !== 10 || !phoneValue.startsWith('0'))) {
+                input.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                valid = false;
+                errorMessages.push('เบอร์โทรศัพท์ต้องมี 10 หลัก และขึ้นต้นด้วย 0');
+            }
+        }
+    });
+    
+    // GPA validation (0.00 - 4.00)
+    var gpaInput = currentTabEl.querySelector('input[name="gpa_total"]');
+    if (gpaInput && gpaInput.value) {
+        var gpa = parseFloat(gpaInput.value);
+        if (isNaN(gpa) || gpa < 0 || gpa > 4) {
+            gpaInput.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+            valid = false;
+            errorMessages.push('GPA ต้องอยู่ระหว่าง 0.00 - 4.00');
+        }
+    }
+    
+    // Postcode validation (5 digits)
+    var postcodeInputs = currentTabEl.querySelectorAll('input[name*="postcode"], input[name*="_post"]');
+    postcodeInputs.forEach(function(input) {
+        if (input.value && input.hasAttribute('required')) {
+            var postcode = input.value.replace(/\D/g, '');
+            if (postcode.length !== 5) {
+                input.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                valid = false;
+                errorMessages.push('รหัสไปรษณีย์ต้องมี 5 หลัก');
+            }
         }
     });
     
     if (!valid) {
+        // Remove duplicate messages
+        var uniqueMessages = [...new Set(errorMessages)];
         Swal.fire({
             icon: 'warning',
             title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-            text: 'โปรดตรวจสอบข้อมูลที่จำเป็นต้องกรอก',
-            confirmButtonColor: '#3b82f6'
+            html: '<ul class="text-left text-sm mt-2">' + 
+                  uniqueMessages.slice(0, 5).map(m => '<li class="mb-1">• ' + m + '</li>').join('') + 
+                  (uniqueMessages.length > 5 ? '<li class="text-gray-500">และอื่นๆ อีก ' + (uniqueMessages.length - 5) + ' รายการ</li>' : '') +
+                  '</ul>',
+            confirmButtonColor: '#3b82f6',
+            customClass: {
+                popup: 'rounded-2xl'
+            }
         });
     }
     return valid;
@@ -666,6 +892,43 @@ citizenInput.addEventListener('input', function(e) {
         citizenInput.classList.remove('border-red-500', 'focus:ring-red-500');
     }
 });
+
+// Toggle custom prefix input
+function toggleCustomPrefix(type) {
+    const select = document.getElementById(type + 'PrefixSelect');
+    const customInput = document.getElementById(type + 'PrefixCustom');
+    
+    if (select.value === 'other') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+        select.name = ''; // Disable select name so custom input is used
+        customInput.name = type === 'parent' ? 'parent_prefix' : (type + '_prefix');
+        customInput.required = type === 'parent';
+    } else {
+        customInput.classList.add('hidden');
+        customInput.value = '';
+        customInput.name = '';
+        select.name = type === 'parent' ? 'parent_prefix' : (type + '_prefix');
+    }
+}
+
+// Update custom prefix value
+function updateCustomPrefix(type) {
+    // Custom input value is already set, nothing additional needed
+}
+function autoSetGender(prefix) {
+    const sexSelect = document.getElementById('stuSex');
+    if (!sexSelect) return;
+    
+    const malePrefix = ['นาย', 'เด็กชาย', 'ด.ช.'];
+    const femalePrefix = ['นางสาว', 'นาง', 'เด็กหญิง', 'ด.ญ.'];
+    
+    if (malePrefix.includes(prefix)) {
+        sexSelect.value = 'ชาย';
+    } else if (femalePrefix.includes(prefix)) {
+        sexSelect.value = 'หญิง';
+    }
+}
 
 function checkCitizenId(id) {
     const formData = new FormData();
@@ -745,7 +1008,7 @@ function submitForm() {
                 icon: 'success',
                 title: 'สมัครเรียนสำเร็จ!',
                 text: 'ระบบได้บันทึกข้อมูลเรียบร้อยแล้ว',
-                confirmButtonText: 'พิมพ์ใบสมัคร',
+                confirmButtonText: 'ตรวจวสอบการสมัครและพิมพ์บัตร',
                 allowOutsideClick: false,
                 customClass: {
                     popup: 'rounded-2xl',
@@ -754,7 +1017,7 @@ function submitForm() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Redirect to print page
-                    window.location.href = 'print_card.php?citizenid=' + data.citizen_id; 
+                    window.location.href = 'print.php?citizenid=' + data.citizen_id; 
                 }
             });
         } else {
@@ -776,21 +1039,155 @@ function submitForm() {
 }
 
 
-// Same address checkbox
+// Same address checkbox - Copy all address fields including province/district/subdistrict
 document.getElementById('sameAddress')?.addEventListener('change', function() {
     if (this.checked) {
+        // Copy text fields
         document.querySelector('[name="reg_hno"]').value = document.querySelector('[name="now_hno"]').value;
         document.querySelector('[name="reg_moo"]').value = document.querySelector('[name="now_moo"]').value;
         document.querySelector('[name="reg_soi"]').value = document.querySelector('[name="now_soi"]').value;
         document.querySelector('[name="reg_road"]').value = document.querySelector('[name="now_road"]').value;
         document.querySelector('[name="reg_postcode"]').value = document.querySelector('[name="now_postcode"]').value;
-        // Province/District/Subdistrict would need AJAX handling
+        
+        // Copy province/district/subdistrict selections
+        const nowProvince = document.getElementById('nowProvince');
+        const nowDistrict = document.getElementById('nowDistrict');
+        const nowSubdistrict = document.getElementById('nowSubdistrict');
+        const regProvince = document.getElementById('regProvince');
+        const regDistrict = document.getElementById('regDistrict');
+        const regSubdistrict = document.getElementById('regSubdistrict');
+        
+        if (nowProvince && regProvince) {
+            // Copy province
+            regProvince.value = nowProvince.value;
+            
+            // Load districts for reg address, then copy district value
+            if (nowProvince.value) {
+                const formData = new FormData();
+                formData.append('id', nowProvince.value);
+                
+                fetch('services/ajax.district.php', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        let options = '<option value="">เลือกอำเภอ</option>';
+                        data.forEach(d => {
+                            options += `<option value="${d.code}">${d.name}</option>`;
+                        });
+                        regDistrict.innerHTML = options;
+                        regDistrict.value = nowDistrict.value;
+                        
+                        // Then load subdistricts
+                        if (nowDistrict.value) {
+                            const formData2 = new FormData();
+                            formData2.append('id', nowDistrict.value);
+                            
+                            fetch('services/ajax.subdistrict.php', { method: 'POST', body: formData2 })
+                                .then(res => res.json())
+                                .then(data => {
+                                    let options = '<option value="">เลือกตำบล</option>';
+                                    data.forEach(s => {
+                                        options += `<option value="${s.code}">${s.name}</option>`;
+                                    });
+                                    regSubdistrict.innerHTML = options;
+                                    regSubdistrict.value = nowSubdistrict.value;
+                                });
+                        }
+                    });
+            }
+        }
     }
+});
+
+// Fill guardian info from father
+document.getElementById('fillFromDad')?.addEventListener('click', function() {
+    const dadPrefix = document.querySelector('[name="dad_prefix"]')?.value || '';
+    const dadName = document.querySelector('[name="dad_name"]')?.value || '';
+    const dadLastname = document.querySelector('[name="dad_lastname"]')?.value || '';
+    const dadTel = document.querySelector('[name="dad_tel"]')?.value || '';
+    const dadJob = document.querySelector('[name="dad_job"]')?.value || '';
+    
+    document.querySelector('[name="parent_prefix"]').value = dadPrefix;
+    document.querySelector('[name="parent_name"]').value = dadName;
+    document.querySelector('[name="parent_lastname"]').value = dadLastname;
+    document.querySelector('[name="parent_tel"]').value = dadTel;
+    document.querySelector('[name="parent_occupation"]').value = dadJob;
+    document.querySelector('[name="parent_relation"]').value = 'บิดา';
+    
+    // Show success feedback
+    this.classList.add('ring-2', 'ring-green-500');
+    setTimeout(() => this.classList.remove('ring-2', 'ring-green-500'), 1000);
+});
+
+// Fill guardian info from mother
+document.getElementById('fillFromMom')?.addEventListener('click', function() {
+    const momPrefix = document.querySelector('[name="mom_prefix"]')?.value || '';
+    const momName = document.querySelector('[name="mom_name"]')?.value || '';
+    const momLastname = document.querySelector('[name="mom_lastname"]')?.value || '';
+    const momTel = document.querySelector('[name="mom_tel"]')?.value || '';
+    const momJob = document.querySelector('[name="mom_job"]')?.value || '';
+    
+    document.querySelector('[name="parent_prefix"]').value = momPrefix;
+    document.querySelector('[name="parent_name"]').value = momName;
+    document.querySelector('[name="parent_lastname"]').value = momLastname;
+    document.querySelector('[name="parent_tel"]').value = momTel;
+    document.querySelector('[name="parent_occupation"]').value = momJob;
+    document.querySelector('[name="parent_relation"]').value = 'มารดา';
+    
+    // Show success feedback
+    this.classList.add('ring-2', 'ring-green-500');
+    setTimeout(() => this.classList.remove('ring-2', 'ring-green-500'), 1000);
+});
+
+// Phone number input - only allow digits
+document.querySelectorAll('input[name*="_tel"], input[name*="phone"]').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+        // Remove non-digits
+        let value = e.target.value.replace(/\D/g, '');
+        // Limit to 10 digits
+        if (value.length > 10) value = value.substr(0, 10);
+        e.target.value = value;
+        
+        // Visual feedback for valid phone
+        if (value.length === 10 && value.startsWith('0')) {
+            e.target.classList.remove('border-red-500', 'ring-red-500');
+            e.target.classList.add('border-green-500');
+        } else if (value.length > 0) {
+            e.target.classList.remove('border-green-500');
+        }
+    });
+});
+
+// Postcode input - only allow 5 digits
+document.querySelectorAll('input[name*="postcode"]').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 5) value = value.substr(0, 5);
+        e.target.value = value;
+    });
+});
+
+// GPA input - format as decimal
+document.querySelectorAll('input[name="gpa_total"]').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^0-9.]/g, '');
+        // Allow only one decimal point
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        // Limit to 4.00
+        if (parseFloat(value) > 4) value = '4.00';
+        e.target.value = value;
+    });
 });
 
 // Load provinces on page load (would need AJAX endpoint)
 document.addEventListener('DOMContentLoaded', function() {
-    // Load provinces here if needed
+    // Re-attach phone validation after DOM is ready
+    document.querySelectorAll('input[name*="_tel"]').forEach(function(input) {
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('pattern', '[0-9]*');
+    });
     
     // Study Plan Priority Selection - Prevent Duplicates
     const planSelects = document.querySelectorAll('.study-plan-select');

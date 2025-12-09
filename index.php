@@ -21,14 +21,37 @@ $db = $databaseRegis->getConnection();
 $studentRegis = new StudentRegis($db);
 $year = date('Y') + 543; // Buddhist year
 
-$stats = [
-    'm1_in' => $studentRegis->countRegis(1, 'ในเขต', $year),
-    'm1_out' => $studentRegis->countRegis(1, 'นอกเขต', $year),
-    'm4_quota' => $studentRegis->countRegis(4, 'โควต้า', $year),
-    'm4_normal' => $studentRegis->countRegis(4, 'รอบทั่วไป', $year),
-];
+require_once 'class/AdminConfig.php';
 
-$pageTitle = 'รับสมัครนักเรียน 2568';
+// Initialize classes
+$adminConfig = new AdminConfig($db);
+
+// Fetch Dynamic Stats
+$regisTypes = $adminConfig->getRegistrationTypes(); // Get all types
+$dashboardStats = [];
+
+foreach ($regisTypes as $type) {
+    if (!$type['is_active']) continue; // Show only active types
+
+    $gradeCode = $type['grade_code']; // 'm1' or 'm4'
+    $stats = $studentRegis->countStudentsByCriteria($gradeCode == 'm1' ? '1' : '4', $type['name']);
+    
+    $dashboardStats[$gradeCode][] = [
+        'id' => $type['id'],
+        'name' => $type['name'],
+        'total' => $stats['total'] ?? 0,
+        'confirmed' => $stats['confirmed'] ?? 0,
+        'pending' => $stats['pending'] ?? 0
+    ];
+}
+
+// Fetch Daily Stats (Last 7 Days)
+$dailyStats = $studentRegis->getDailyRegistrations(7);
+
+// Get academic year from settings
+$academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
+
+$pageTitle = 'รับสมัครนักเรียน ' . $academicYear;
 
 // Render view with layout
 ob_start();

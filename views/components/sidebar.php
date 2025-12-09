@@ -21,6 +21,7 @@ $menuStyles = [
     'exam_card' => ['from' => 'rose-500', 'to' => 'pink-600', 'icon' => 'fa-id-card'],
     'confirm' => ['from' => 'indigo-500', 'to' => 'indigo-600', 'icon' => 'fa-file-signature'],
     'announce' => ['from' => 'red-500', 'to' => 'red-600', 'icon' => 'fa-bullhorn'],
+    'results' => ['from' => 'green-500', 'to' => 'teal-600', 'icon' => 'fa-trophy'],
 ];
 
 // Badge numbers for menus
@@ -29,7 +30,8 @@ $badges = [
     'print_form' => '2',
     'upload' => '3',
     'check_status' => '4',
-    'exam_card' => '6'
+    'exam_card' => '5',
+    'confirm' => '6'
 ];
 ?>
 <!-- Sidebar Overlay (Mobile) -->
@@ -110,12 +112,6 @@ $badges = [
             </ul>
         </nav>
         
-        <!-- Footer -->
-        <div class="absolute bottom-0 left-0 right-0 p-4">
-            <div class="glass rounded-xl p-4 text-center">
-                <p class="text-xs text-gray-400">Version 2.0</p>
-                <p class="text-xs text-gray-500 mt-1">© <?php echo date('Y') + 543; ?> โรงเรียนพิชัย</p>
-            </div>
-        </div>
+       
     </div>
 </aside>

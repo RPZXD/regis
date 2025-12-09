@@ -21,6 +21,9 @@ $registrationOpen = $adminConfig->getSetting('registration_open') ?? 1;
 $gradeLevels = $adminConfig->getGradeLevels();
 $registrationTypes = $adminConfig->getRegistrationTypes();
 
+// Get menu config for calendar display
+$menuConfig = $adminConfig->getMenus();
+
 $pageTitle = 'เลือกประเภทการสมัคร';
 
 // Render view with layout

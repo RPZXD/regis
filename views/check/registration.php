@@ -1,91 +1,185 @@
-<!-- Check Registration Status View -->
-<div class="space-y-6">
-    <!-- Page Header -->
-    <div class="text-center">
-        <h1 class="text-3xl font-bold gradient-text">ค้นหาสถานะการสมัคร</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">ตรวจสอบสถานะการสมัครของคุณ</p>
+<!-- Check Registration Status View - Enhanced -->
+<div class="space-y-8">
+    <!-- Page Header with Gradient -->
+    <div class="text-center relative">
+        <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-teal-500/10 rounded-3xl blur-3xl -z-10"></div>
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl shadow-2xl shadow-emerald-500/40 mb-6 animate-bounce-slow">
+            <i class="fas fa-search text-3xl text-white"></i>
+        </div>
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
+            ค้นหาสถานะการสมัคร
+        </h1>
+        <p class="mt-3 text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+            ตรวจสอบข้อมูลการสมัครและสถานะเอกสารของคุณ
+        </p>
     </div>
 
     <!-- Search Card -->
-    <div class="max-w-2xl mx-auto">
-        <div class="glass rounded-2xl p-8">
+    <div class="max-w-xl mx-auto">
+        <div class="glass rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <form id="searchForm" class="space-y-6">
-                <div class="text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg shadow-primary-500/30 mb-4">
-                        <i class="fas fa-search text-2xl text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">กรอกข้อมูลเพื่อค้นหา</h3>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">เลขบัตรประชาชน หรือ ชื่อ-นามสกุล</label>
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-id-card mr-2 text-emerald-500"></i>เลขบัตรประชาชน หรือ ชื่อ-นามสกุล
+                    </label>
                     <input type="text" id="search_input" name="search_input" 
-                           class="w-full px-4 py-3 text-center text-lg rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                           placeholder="กรอกเลขบัตรประชาชน 13 หลัก หรือ ชื่อ" required>
+                           class="w-full px-5 py-4 text-center text-xl font-mono tracking-widest rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                           placeholder="X-XXXX-XXXXX-XX-X" 
+                           maxlength="13" required>
                 </div>
                 
-                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1">
-                    <i class="fas fa-search mr-2"></i>ค้นหา
+                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 hover:from-emerald-600 hover:via-green-600 hover:to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-1 hover:scale-[1.02] group">
+                    <i class="fas fa-search mr-3 group-hover:animate-pulse"></i>ค้นหาข้อมูล
                 </button>
                 
-                <p class="text-center text-sm text-red-500">*** กรุณากรอกเลขบัตรประชาชน 13 หลัก หรือ ชื่อเพื่อค้นหาสถานะการสมัคร ***</p>
+                <p class="text-center text-xs text-gray-400">กรุณากรอกเลขบัตรประชาชน 13 หลัก หรือ ชื่อเพื่อค้นหา</p>
             </form>
         </div>
     </div>
 
-    <!-- Student Info Result Card -->
-    <div id="studentInfo" class="max-w-2xl mx-auto hidden">
-        <div class="glass rounded-2xl p-6 border-l-4 border-green-500">
-            <div class="flex items-start space-x-4">
-                <div class="flex-shrink-0">
-                    <div class="w-12 h-12 flex items-center justify-center bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-xl">
-                        <i class="fas fa-user-check text-xl"></i>
+    <!-- Student Info Result -->
+    <div id="studentInfo" class="max-w-3xl mx-auto hidden animate-fade-in">
+        <!-- Student Card -->
+        <div class="glass rounded-3xl overflow-hidden shadow-xl mb-6">
+            <div class="bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 p-6">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 flex items-center justify-center bg-white/20 backdrop-blur rounded-2xl">
+                        <i class="fas fa-user-graduate text-3xl text-white"></i>
+                    </div>
+                    <div class="text-white">
+                        <h3 class="text-xl font-bold" id="studentName">-</h3>
+                        <p class="text-emerald-100" id="studentTypeLevel">-</p>
                     </div>
                 </div>
-                <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3">ข้อมูลผู้สมัคร</h3>
-                    <pre id="studentDetails" class="text-gray-600 dark:text-gray-300 whitespace-pre-line font-mali"></pre>
+            </div>
+            
+            <div class="p-6">
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
+                        <i class="fas fa-id-card text-2xl text-emerald-500 mb-2"></i>
+                        <p class="text-xs text-gray-500">เลขบัตร</p>
+                        <p class="font-mono font-bold text-gray-900 dark:text-white text-sm" id="val_citizenid">-</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
+                        <i class="fas fa-birthday-cake text-2xl text-pink-500 mb-2"></i>
+                        <p class="text-xs text-gray-500">วันเกิด</p>
+                        <p class="font-bold text-gray-900 dark:text-white text-sm" id="val_birthday">-</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center">
+                        <i class="fas fa-phone text-2xl text-blue-500 mb-2"></i>
+                        <p class="text-xs text-gray-500">โทรศัพท์</p>
+                        <p class="font-bold text-gray-900 dark:text-white text-sm" id="val_tel">-</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4 text-center" id="statusCard">
+                        <i class="fas fa-clipboard-check text-2xl text-amber-500 mb-2" id="statusIcon"></i>
+                        <p class="text-xs text-gray-500">สถานะเอกสาร</p>
+                        <p class="font-bold text-sm" id="statusText">-</p>
+                    </div>
+                </div>
+
+                <!-- Registration Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-2xl border border-blue-100 dark:border-blue-800">
+                        <p class="text-xs text-blue-600 dark:text-blue-400 mb-1">ประเภทการสมัคร</p>
+                        <p id="val_type" class="text-xl font-bold text-blue-700 dark:text-blue-300">-</p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800">
+                        <p class="text-xs text-purple-600 dark:text-purple-400 mb-1">ระดับชั้น</p>
+                        <p id="val_level" class="text-xl font-bold text-purple-700 dark:text-purple-300">-</p>
+                    </div>
+                </div>
+
+                <!-- Plans -->
+                <div class="bg-gray-50 dark:bg-slate-800/50 rounded-2xl p-5">
+                    <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                        <i class="fas fa-list-ol text-orange-500 mr-2"></i>แผนการเรียนที่เลือก
+                    </h4>
+                    <ul id="val_plans" class="space-y-2"></ul>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <a id="uploadLink" href="#" class="flex items-center justify-center px-4 py-3 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 rounded-xl transition-colors">
+                        <i class="fas fa-upload mr-2"></i>อัพโหลดเอกสาร
+                    </a>
+                    <a id="printLink" href="#" class="flex items-center justify-center px-4 py-3 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 rounded-xl transition-colors">
+                        <i class="fas fa-print mr-2"></i>พิมพ์ใบสมัคร
+                    </a>
+                    <a id="checkDocsLink" href="#" class="flex items-center justify-center px-4 py-3 bg-teal-100 dark:bg-teal-900/30 hover:bg-teal-200 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-400 rounded-xl transition-colors">
+                        <i class="fas fa-clipboard-check mr-2"></i>สถานะเอกสาร
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+@keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.animate-bounce-slow { animation: bounce-slow 3s infinite; }
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
 <script>
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
     var searchInput = document.getElementById('search_input').value;
 
-    Swal.fire({
-        title: 'กำลังค้นหา...',
-        text: 'กรุณารอสักครู่',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+    Swal.fire({ title: 'กำลังค้นหา...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-    fetch('api/fetch_reg.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ search_input: searchInput })
-    })
+    fetch('api/fetch_reg.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ search_input: searchInput }) })
     .then(response => response.json())
     .then(data => {
         Swal.close();
         if (data.exists) {
-            Swal.fire({
-                icon: 'success',
-                title: 'พบข้อมูล',
-                text: 'ข้อมูลผู้สมัครที่ค้นหา',
-                confirmButtonColor: '#3b82f6'
-            });
-            let plansText = '';
+            Swal.fire({ icon: 'success', title: 'พบข้อมูล', timer: 1500, showConfirmButton: false });
+
+            // Populate Data
+            document.getElementById('studentName').textContent = data.fullname;
+            document.getElementById('studentTypeLevel').textContent = data.typeregis + ' | ม.' + data.level;
+            document.getElementById('val_citizenid').textContent = data.citizenid;
+            document.getElementById('val_birthday').textContent = data.birthday || '-';
+            document.getElementById('val_tel').textContent = data.now_tel || '-';
+            document.getElementById('val_type').textContent = data.typeregis;
+            document.getElementById('val_level').textContent = 'มัธยมศึกษาปีที่ ' + data.level;
+
+            // Status
+            let statusText = data.docStatusText || 'รอดำเนินการ';
+            let statusClass = 'text-gray-500';
+            let iconClass = 'text-gray-500';
+            
+            if (data.docStatus === 'complete') { statusClass = 'text-green-600'; iconClass = 'text-green-500'; }
+            else if (data.docStatus === 'pending') { statusClass = 'text-amber-600'; iconClass = 'text-amber-500'; }
+            else if (data.docStatus === 'rejected') { statusClass = 'text-red-600'; iconClass = 'text-red-500'; }
+            else if (data.docStatus === 'incomplete') { statusClass = 'text-blue-600'; iconClass = 'text-blue-500'; }
+            
+            document.getElementById('statusText').textContent = statusText;
+            document.getElementById('statusText').className = 'font-bold text-sm ' + statusClass;
+            document.getElementById('statusIcon').className = 'fas fa-clipboard-check text-2xl mb-2 ' + iconClass;
+
+            // Plans
+            const plansList = document.getElementById('val_plans');
+            plansList.innerHTML = '';
             if (data.plans && data.plans.length > 0) {
-                plansText = '\n\nแผนการเรียนที่เลือก:\n' + data.plans.map((p, index) => `   ${index + 1}. ${p}`).join('\n');
+                data.plans.forEach((plan, index) => {
+                    plansList.innerHTML += `<li class="flex items-center text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm">
+                        <span class="w-7 h-7 flex items-center justify-center bg-orange-100 dark:bg-orange-900/30 text-orange-600 rounded-full text-sm font-bold mr-3">${index + 1}</span>${plan}
+                    </li>`;
+                });
+            } else {
+                plansList.innerHTML = '<li class="text-gray-400 italic text-sm">ไม่พบข้อมูลแผนการเรียน</li>';
             }
-            document.getElementById('studentDetails').innerText = `ชื่อ: ${data.fullname}\nประเภทการสมัคร: ${data.typeregis}\nระดับชั้นที่สมัคร: ชั้นมัธยมศึกษาปีที่ ${data.level}\nวันเกิด: ${data.birthday}\nเบอร์โทร: ${data.now_tel}\nเบอร์โทรผู้ปกครอง: ${data.parent_tel}${plansText}`;
+
+            // Quick action links
+            document.getElementById('uploadLink').href = 'upload.php?citizenid=' + data.citizenid;
+            document.getElementById('printLink').href = 'print.php?citizenid=' + data.citizenid;
+            document.getElementById('checkDocsLink').href = 'check_uploads.php?citizenid=' + data.citizenid;
+
             document.getElementById('studentInfo').classList.remove('hidden');
+            document.getElementById('studentInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
         } else {
             Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: 'ไม่พบข้อมูลผู้สมัครที่ค้นหา', confirmButtonColor: '#ef4444' });
             document.getElementById('studentInfo').classList.add('hidden');
@@ -93,8 +187,7 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     })
     .catch(error => {
         Swal.close();
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถตรวจสอบข้อมูลได้', confirmButtonColor: '#ef4444' });
-        document.getElementById('studentInfo').classList.add('hidden');
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', confirmButtonColor: '#ef4444' });
     });
 });
 </script>
