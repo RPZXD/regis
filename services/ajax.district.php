@@ -17,11 +17,9 @@ $sql = "SELECT
 
 $stmt = $conn->prepare($sql);
 
-// Bind the value for the `id_prefix`
-$stmt->bindParam(':id_prefix', substr($_POST['id'], 0, 2), PDO::PARAM_STR);
-
-// Execute the query
-$stmt->execute();
+// Execute the query with parameter
+$id_prefix = substr($_POST['id'] ?? '', 0, 2);
+$stmt->execute([':id_prefix' => $id_prefix]);
 
 // Fetch the results
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

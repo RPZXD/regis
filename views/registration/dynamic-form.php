@@ -23,7 +23,8 @@ $prefixOptions = ($grade == '1')
     <div class="text-center">
         <h1 class="text-3xl font-bold gradient-text">สมัครเรียนมัธยมศึกษาปีที่ <?php echo $grade; ?></h1>
         <p class="mt-2 text-lg text-gray-600 dark:text-gray-400"><?php echo $type['name']; ?> - ปีการศึกษา
-            <?php echo $academicYear; ?></p>
+            <?php echo $academicYear; ?>
+        </p>
         <span
             class="inline-block mt-2 px-4 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full text-sm font-medium">
             <i class="fas fa-tag mr-1"></i><?php echo $type['grade_name']; ?> / <?php echo $type['name']; ?>
@@ -110,7 +111,8 @@ $prefixOptions = ($grade == '1')
                                             class="study-plan-select w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                                             data-choice="<?php echo $choice; ?>" <?php echo $choice === 1 ? 'required' : ''; ?>>
                                             <option value="">
-                                                <?php echo $choice === 1 ? 'เลือกแผน (จำเป็น)' : 'ว่าง (ไม่บังคับ)'; ?></option>
+                                                <?php echo $choice === 1 ? 'เลือกแผน (จำเป็น)' : 'ว่าง (ไม่บังคับ)'; ?>
+                                            </option>
                                             <?php foreach ($plans as $plan): ?>
                                                 <option value="<?php echo $plan['id']; ?>"
                                                     data-quota="<?php echo $plan['quota']; ?>">
@@ -258,7 +260,7 @@ $prefixOptions = ($grade == '1')
                             class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                             required>
                             <option value="">เลือก</option>
-                            <option value="พุทธ">พุทธ</option>
+                            <option value="พุทธ" selected>พุทธ</option>
                             <option value="คริสต์">คริสต์</option>
                             <option value="อิสลาม">อิสลาม</option>
                             <option value="อื่นๆ">อื่นๆ</option>
@@ -297,6 +299,34 @@ $prefixOptions = ($grade == '1')
                                 <i class="fas fa-star mr-2 text-amber-500"></i>เกรดเฉลี่ยสะสม *
                             </label>
                             <input type="text" name="gpa_total"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                placeholder="0.00" required>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Subject Grades (for special classroom only) -->
+                    <?php if ($typeCode === 'special'): ?>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-calculator mr-2 text-blue-500"></i>เกรดคณิตศาสตร์ *
+                            </label>
+                            <input type="text" name="grade_math"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                placeholder="0.00" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-flask mr-2 text-green-500"></i>เกรดวิทยาศาสตร์/เทคโนโลยี *
+                            </label>
+                            <input type="text" name="grade_science"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                placeholder="0.00" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-globe mr-2 text-purple-500"></i>เกรดภาษาอังกฤษ *
+                            </label>
+                            <input type="text" name="grade_english"
                                 class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                                 placeholder="0.00" required>
                         </div>

@@ -30,7 +30,8 @@ if ($uid) {
 }
 
 $row = $select_stmt->fetch(PDO::FETCH_ASSOC);
-if (!$row) die('ไม่พบข้อมูลนักเรียน');
+if (!$row)
+    die('ไม่พบข้อมูลนักเรียน');
 
 // Settings - Handle both key-value and column-based settings table
 $settings = [];
@@ -38,7 +39,7 @@ try {
     $select_stmt = $db->prepare("SELECT * FROM settings");
     $select_stmt->execute();
     $settingsRows = $select_stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     if (!empty($settingsRows)) {
         if (isset($settingsRows[0]['key_name'])) {
             foreach ($settingsRows as $sRow) {
@@ -48,9 +49,12 @@ try {
             $settings = $settingsRows[0];
         }
     }
-} catch (Exception $e) {}
-if (!isset($settings['logo_school'])) $settings['logo_school'] = 'logo-phicha.png';
-if (!isset($settings['year'])) $settings['year'] = '2568';
+} catch (Exception $e) {
+}
+if (!isset($settings['logo_school']))
+    $settings['logo_school'] = 'logo-phicha.png';
+if (!isset($settings['year']))
+    $settings['year'] = '2568';
 
 // Logic
 $level = $row['level'];
@@ -74,7 +78,7 @@ $fontData = $defaultFontConfig['fontdata'];
 $mpdf = new \Mpdf\Mpdf([
     'tempDir' => defined('MPDF_TEMP_DIR') ? MPDF_TEMP_DIR : __DIR__ . '/tmp',
     'default_font_size' => 14, // Sarabun usually needs larger size
-    'default_font' => 'sarabun', 
+    'default_font' => 'sarabun',
     'margin_left' => 10,
     'margin_right' => 10,
     'margin_top' => 10,
@@ -89,12 +93,12 @@ $mpdf = new \Mpdf\Mpdf([
     ],
 ]);
 
-$mpdf->SetTitle('ใบสมัครเรียน ม.'.$levelText.' - '.$row["stu_name"]);
+$mpdf->SetTitle('ใบสมัครเรียน ม.' . $levelText . ' - ' . $row["stu_name"]);
 
 // Helpers
 $formattedCitizen = substr($row["citizenid"], 0, 1) . "-" . substr($row["citizenid"], 1, 4) . "-" . substr($row["citizenid"], 5, 5) . "-" . substr($row["citizenid"], 10, 2) . "-" . substr($row["citizenid"], 12, 1);
 $months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-$birthDate = $row['date_birth'].' '.$months[intval($row['month_birth'])].' '.$row['year_birth'];
+$birthDate = $row['date_birth'] . ' ' . $months[intval($row['month_birth'])] . ' ' . $row['year_birth'];
 
 // Fetch Plans
 // 1. Get Student's Selected Plans
@@ -111,9 +115,12 @@ $gradeLevelId = $isM1 ? 1 : 2;
 $typeCode = 'general';
 
 // Determine type code (Check specific types first)
-if (strpos($typeregis, 'ความสามารถพิเศษ') !== false) $typeCode = 'talent';
-elseif (strpos($typeregis, 'พิเศษ') !== false) $typeCode = 'special';
-elseif (strpos($typeregis, 'โควต้า') !== false) $typeCode = 'quota';
+if (strpos($typeregis, 'ความสามารถพิเศษ') !== false)
+    $typeCode = 'talent';
+elseif (strpos($typeregis, 'พิเศษ') !== false)
+    $typeCode = 'special';
+elseif (strpos($typeregis, 'โควต้า') !== false)
+    $typeCode = 'quota';
 
 $stmt = $db->prepare("SELECT id FROM registration_types WHERE grade_level_id = :gid AND code = :code");
 $stmt->execute([':gid' => $gradeLevelId, ':code' => $typeCode]);
@@ -155,19 +162,19 @@ if (empty($allPlans)) {
 }
 
 // Checkbox Symbols
-$chk = '<span style="font-family: dejavusans; color: '.$primaryColor.';">&#9745;</span>';
+$chk = '<span style="font-family: dejavusans; color: ' . $primaryColor . ';">&#9745;</span>';
 $unchk = '<span style="font-family: dejavusans; color: #ccc;">&#9744;</span>';
 
 // CSS
 $css = '
 <style>
-    body { font-family: sarabun; font-size: 12pt; color: '.$textColor.'; line-height: 1.3; }
+    body { font-family: sarabun; font-size: 12pt; color: ' . $textColor . '; line-height: 1.3; }
     
     /* Header */
-    .header-table { width: 100%; border-bottom: 2px solid '.$primaryColor.'; padding-bottom: 10px; margin-bottom: 15px; }
+    .header-table { width: 100%; border-bottom: 2px solid ' . $primaryColor . '; padding-bottom: 10px; margin-bottom: 15px; }
     .logo { width: 65px; }
-    .school-name { font-size: 12pt; font-weight: bold; color: '.$textColor.'; }
-    .doc-title { font-size: 20pt; font-weight: bold; color: '.$primaryColor.'; text-transform: uppercase; }
+    .school-name { font-size: 12pt; font-weight: bold; color: ' . $textColor . '; }
+    .doc-title { font-size: 20pt; font-weight: bold; color: ' . $primaryColor . '; text-transform: uppercase; }
     .doc-subtitle { font-size: 11pt; color: #666; }
     
     /* Photo Box: 1 x 1.5 inch (approx 25.4mm x 38.1mm) */
@@ -195,7 +202,7 @@ $css = '
         font-size: 12pt;
         font-weight: bold;
         color: #fff;
-        background-color: '.$primaryColor.';
+        background-color: ' . $primaryColor . ';
         padding: 4px 10px;
         border-radius: 4px;
         margin-top: 10px;
@@ -217,8 +224,8 @@ $css = '
     
     /* Type Box */
     .type-container {
-        background-color: '.$accentColor.';
-        border: 1px solid '.$primaryColor.';
+        background-color: ' . $accentColor . ';
+        border: 1px solid ' . $primaryColor . ';
         border-radius: 5px;
         padding: 8px;
         text-align: center;
@@ -254,23 +261,25 @@ $html = $css;
 // --- Header Section ---
 $html .= '<table class="header-table"><tr>';
 // Logo
-$html .= '<td width="80"><img src="dist/img/'.$settings['logo_school'].'" class="logo"></td>';
+$logo_file = __DIR__ . '/dist/img/' . $settings['logo_school'];
+$html .= '<td width="80"><img src="' . $logo_file . '" class="logo"></td>';
 // Title
 $html .= '<td valign="middle">';
 $html .= '<div class="school-name">โรงเรียนพิชัย อำเภอพิชัย จังหวัดอุตรดิตถ์</div>';
-$html .= '<div class="doc-title">ใบสมัครเข้าศึกษาต่อมัธยมศึกษาปีที่ '.$levelText.'</div>';
-$html .= '<div class="doc-subtitle">ปีการศึกษา '.$settings['year'].' | ระบบรับสมัครนักเรียนออนไลน์</div>';
+$html .= '<div class="doc-title">ใบสมัครเข้าศึกษาต่อมัธยมศึกษาปีที่ ' . $levelText . '</div>';
+$html .= '<div class="doc-subtitle">ปีการศึกษา ' . $settings['year'] . ' | ระบบรับสมัครนักเรียนออนไลน์</div>';
 $html .= '</td>';
 // Photo
+$numreg = $row['numreg'] ?? '';
 $html .= '<td width="100" align="right" valign="top">';
-$html .= '<div style="font-size: 9pt; margin-bottom: 5px; text-align: center;">เลขประจำตัวผู้สมัคร<br>...................................</div>';
+$html .= '<div style="font-size: 9pt; margin-bottom: 5px; text-align: center;">เลขประจำตัวผู้สมัคร<br><span style="font-weight:bold; font-size:12pt;">' . ($numreg ?: '...................') . '</span></div>';
 $html .= '<table class="photo-frame-table"><tr><td class="photo-frame-td">รูปถ่าย<br>1 x 1.5 นิ้ว</td></tr></table>';
 $html .= '</td>';
 $html .= '</tr></table>';
 
 // --- Registration Type (Dynamic from DB) ---
 $html .= '<div class="type-container">';
-$html .= '<span style="font-weight:bold; color:'.$primaryColor.'">ประเภทการสมัคร : </span>';
+$html .= '<span style="font-weight:bold; color:' . $primaryColor . '">ประเภทการสมัคร : </span>';
 
 // Fetch registration types from database based on grade level
 $regTypesStmt = $db->prepare("SELECT name FROM registration_types WHERE grade_level_id = ? AND is_active = 1 ORDER BY id ASC");
@@ -281,19 +290,19 @@ if (!empty($regTypes)) {
     foreach ($regTypes as $typeName) {
         // Check if this type matches the student's typeregis (case-insensitive, partial match)
         $isChecked = (strcasecmp($typeregis, $typeName) === 0) || (stripos($typeregis, $typeName) !== false) || (stripos($typeName, $typeregis) !== false);
-        $html .= '<span class="checkbox-item">'.($isChecked ? $chk : $unchk).' '.$typeName.'</span>';
+        $html .= '<span class="checkbox-item">' . ($isChecked ? $chk : $unchk) . ' ' . $typeName . '</span>';
     }
 } else {
     // Fallback if no types in database
-    $html .= '<span class="checkbox-item">'.$chk.' '.$typeregis.'</span>';
+    $html .= '<span class="checkbox-item">' . $chk . ' ' . $typeregis . '</span>';
 }
 
 // Show zone_type if typeregis is รอบทั่วไป
 if (stripos($typeregis, 'รอบทั่วไป') !== false || stripos($typeregis, 'ทั่วไป') !== false) {
     $zoneType = $row['zone_type'] ?? '';
-    $html .= '<br><span style="font-weight:bold; color:'.$primaryColor.'; margin-left: 10px;">พื้นที่บริการ : </span>';
-    $html .= '<span class="checkbox-item">'.(stripos($zoneType, 'ในเขต') !== false ? $chk : $unchk).' ในเขตพื้นที่บริการ</span>';
-    $html .= '<span class="checkbox-item">'.(stripos($zoneType, 'นอกเขต') !== false ? $chk : $unchk).' นอกเขตพื้นที่บริการ</span>';
+    $html .= '<br><span style="font-weight:bold; color:' . $primaryColor . '; margin-left: 10px;">พื้นที่บริการ : </span>';
+    $html .= '<span class="checkbox-item">' . (stripos($zoneType, 'ในเขต') !== false ? $chk : $unchk) . ' ในเขตพื้นที่บริการ</span>';
+    $html .= '<span class="checkbox-item">' . (stripos($zoneType, 'นอกเขต') !== false ? $chk : $unchk) . ' นอกเขตพื้นที่บริการ</span>';
 }
 
 $html .= '</div>';
@@ -303,26 +312,54 @@ $html .= '<div class="section-head">1. ข้อมูลผู้สมัค�
 $html .= '<table class="form-table">';
 $html .= '<tr>
     <td width="10%" class="label">ชื่อ-สกุล</td>
-    <td width="10%" class="value">'.$row['stu_prefix'].$row['stu_name'].' '.$row['stu_lastname'].'</td>
+    <td width="10%" class="value">' . $row['stu_prefix'] . $row['stu_name'] . ' ' . $row['stu_lastname'] . '</td>
     <td width="10%" class="label">เลข ปชช.</td>
-    <td width="10%" class="value">'.$formattedCitizen.'</td>
+    <td width="10%" class="value">' . $formattedCitizen . '</td>
 </tr>';
 $html .= '<tr>
     <td class="label">วันเกิด</td>
-    <td class="value">'.$birthDate.'</td>
+    <td class="value">' . $birthDate . '</td>
     <td class="label">เพศ/เลือด</td>
-    <td class="value">'.$row['stu_sex'].' / กรุ๊ป '.$row['stu_blood_group'].'</td>
+    <td class="value">' . $row['stu_sex'] . ' / กรุ๊ป ' . $row['stu_blood_group'] . '</td>
 </tr>';
 $html .= '<tr>
     <td class="label">ศาสนา</td>
-    <td class="value">'.$row['stu_religion'].'</td>
+    <td class="value">' . $row['stu_religion'] . '</td>
     <td class="label">เชื้อชาติ</td>
-    <td class="value">'.$row['stu_ethnicity'].' / สัญชาติ '.$row['stu_nationality'].'</td>
+    <td class="value">' . $row['stu_ethnicity'] . ' / สัญชาติ ' . $row['stu_nationality'] . '</td>
 </tr>';
 $html .= '<tr>
     <td class="label">โรงเรียนเดิม</td>
-    <td class="value" colspan="3">'.$row['old_school'].' (อ.'.$row['old_school_district'].' จ.'.$row['old_school_province'].') '.(!empty($row['gpa_total']) ? 'GPA: '.$row['gpa_total'] : '').'</td>
+    <td class="value" colspan="3">' . $row['old_school'] . ' (อ.' . $row['old_school_district'] . ' จ.' . $row['old_school_province'] . ') ' . (!empty($row['gpa_total']) ? 'GPA: ' . $row['gpa_total'] : '') . '</td>
 </tr>';
+
+// Type-specific information
+if ($typeCode === 'special') {
+    // ห้องเรียนพิเศษ - แสดงเกรด 3 วิชา
+    $html .= '<tr>
+        <td class="label">เกรดรายวิชา</td>
+        <td class="value" colspan="3">คณิตศาสตร์: ' . ($row['grade_math'] ?? '-') . ' | วิทยาศาสตร์/เทคโนโลยี: ' . ($row['grade_science'] ?? '-') . ' | ภาษาอังกฤษ: ' . ($row['grade_english'] ?? '-') . '</td>
+    </tr>';
+} elseif ($typeCode === 'talent') {
+    // ความสามารถพิเศษ
+    $html .= '<tr>
+        <td class="label">ความสามารถพิเศษ</td>
+        <td class="value" colspan="3">' . ($row['talent_skill'] ?? '-') . '</td>
+    </tr>';
+    if (!empty($row['talent_awards'])) {
+        $html .= '<tr>
+            <td class="label">ผลงาน/รางวัล</td>
+            <td class="value" colspan="3">' . $row['talent_awards'] . '</td>
+        </tr>';
+    }
+} elseif ($typeCode === 'quota') {
+    // โควต้า ม.3 เดิม
+    $html .= '<tr>
+        <td class="label">เลขประจำตัว ม.3</td>
+        <td class="value" colspan="3">' . ($row['old_student_id'] ?? '-') . '</td>
+    </tr>';
+}
+
 $html .= '</table>';
 
 // --- Address ---
@@ -330,15 +367,15 @@ $html .= '<div class="section-head">2. ข้อมูลการติดต�
 $html .= '<table class="form-table">';
 $html .= '<tr>
     <td width="15%" class="label">ที่อยู่ปัจจุบัน</td>
-    <td class="value">บ้านเลขที่ '.$row['now_addr'].' หมู่ '.$row['now_moo'].' '.($row['now_soy'] ? 'ซ.'.$row['now_soy'] : '').' '.($row['now_street'] ? 'ถ.'.$row['now_street'] : '').'</td>
+    <td class="value">บ้านเลขที่ ' . $row['now_addr'] . ' หมู่ ' . $row['now_moo'] . ' ' . ($row['now_soy'] ? 'ซ.' . $row['now_soy'] : '') . ' ' . ($row['now_street'] ? 'ถ.' . $row['now_street'] : '') . '</td>
 </tr>';
 $html .= '<tr>
     <td class="label"></td>
-    <td class="value">ต.'.$row['now_subdistrict'].' อ.'.$row['now_district'].' จ.'.$row['now_province'].' '.$row['now_post'].'</td>
+    <td class="value">ต.' . $row['now_subdistrict'] . ' อ.' . $row['now_district'] . ' จ.' . $row['now_province'] . ' ' . $row['now_post'] . '</td>
 </tr>';
 $html .= '<tr>
     <td class="label">โทรศัพท์</td>
-    <td class="value">'.$row['now_tel'].'</td>
+    <td class="value">' . $row['now_tel'] . '</td>
 </tr>';
 $html .= '</table>';
 
@@ -347,21 +384,21 @@ $html .= '<div class="section-head">3. ข้อมูลผู้ปกคร�
 $html .= '<table class="form-table">';
 $html .= '<tr>
     <td width="10%" class="label">บิดา</td>
-    <td width="10%" class="value">'.$row['dad_prefix'].$row['dad_name'].' '.$row['dad_lastname'].'</td>
+    <td width="10%" class="value">' . $row['dad_prefix'] . $row['dad_name'] . ' ' . $row['dad_lastname'] . '</td>
     <td width="15%" class="label">อาชีพ/โทร</td>
-    <td width="35%" class="value">'.$row['dad_job'].' ('.$row['dad_tel'].')</td>
+    <td width="35%" class="value">' . $row['dad_job'] . ' (' . $row['dad_tel'] . ')</td>
 </tr>';
 $html .= '<tr>
     <td class="label">มารดา</td>
-    <td class="value">'.$row['mom_prefix'].$row['mom_name'].' '.$row['mom_lastname'].'</td>
+    <td class="value">' . $row['mom_prefix'] . $row['mom_name'] . ' ' . $row['mom_lastname'] . '</td>
     <td class="label">อาชีพ/โทร</td>
-    <td class="value">'.$row['mom_job'].' ('.$row['mom_tel'].')</td>
+    <td class="value">' . $row['mom_job'] . ' (' . $row['mom_tel'] . ')</td>
 </tr>';
 $html .= '<tr>
     <td class="label">ผู้ปกครอง</td>
-    <td class="value">'.$row['parent_prefix'].$row['parent_name'].' '.$row['parent_lastname'].'</td>
+    <td class="value">' . $row['parent_prefix'] . $row['parent_name'] . ' ' . $row['parent_lastname'] . '</td>
     <td class="label">ความสัมพันธ์</td>
-    <td class="value">'.$row['parent_relation'].' (โทร: '.$row['parent_tel'].')</td>
+    <td class="value">' . $row['parent_relation'] . ' (โทร: ' . $row['parent_tel'] . ')</td>
 </tr>';
 $html .= '</table>';
 
@@ -376,24 +413,25 @@ $html .= '<tr>
 $totalPlans = count($displayPlans);
 $minSlots = 6; // Show at least 6 slots (3 rows)
 $displaySlots = max($totalPlans, $minSlots);
-if ($displaySlots % 2 != 0) $displaySlots++; // Ensure even number for 2 columns
+if ($displaySlots % 2 != 0)
+    $displaySlots++; // Ensure even number for 2 columns
 $totalRows = $displaySlots / 2;
 
 for ($r = 0; $r < $totalRows; $r++) {
     $idx1 = $r * 2;
     $idx2 = $r * 2 + 1;
-    
+
     $plan1 = $displayPlans[$idx1] ?? null;
     $plan2 = $displayPlans[$idx2] ?? null;
-    
+
     $html .= '<tr>';
     // Column 1
-    $html .= '<td class="plan-index">'.($plan1 ? $plan1['rank'] : '').'</td>';
-    $html .= '<td>'.($plan1 ? $plan1['name'] : '&nbsp;').'</td>';
-    
+    $html .= '<td class="plan-index">' . ($plan1 ? $plan1['rank'] : '') . '</td>';
+    $html .= '<td>' . ($plan1 ? $plan1['name'] : '&nbsp;') . '</td>';
+
     // Column 2
-    $html .= '<td class="plan-index">'.($plan2 ? $plan2['rank'] : '').'</td>';
-    $html .= '<td>'.($plan2 ? $plan2['name'] : '&nbsp;').'</td>';
+    $html .= '<td class="plan-index">' . ($plan2 ? $plan2['rank'] : '') . '</td>';
+    $html .= '<td>' . ($plan2 ? $plan2['name'] : '&nbsp;') . '</td>';
     $html .= '</tr>';
 }
 $html .= '</table>';
@@ -403,13 +441,13 @@ $html .= '<table class="footer-table"><tr>';
 $html .= '<td width="50%" class="sign-box">';
 $html .= 'ลงชื่อ <span class="sign-line"></span> ผู้สมัคร<br>';
 $html .= '<br>';
-$html .= '('.$row['stu_prefix'].$row['stu_name'].' '.$row['stu_lastname'].')<br>';
+$html .= '(' . $row['stu_prefix'] . $row['stu_name'] . ' ' . $row['stu_lastname'] . ')<br>';
 $html .= 'วันที่ ........./........./.........';
 $html .= '</td>';
 $html .= '<td width="50%" class="sign-box">';
 $html .= 'ลงชื่อ <span class="sign-line"></span> ผู้ปกครอง<br>';
 $html .= '<br>';
-$html .= '('.$row['parent_prefix'].$row['parent_name'].' '.$row['parent_lastname'].')<br>';
+$html .= '(' . $row['parent_prefix'] . $row['parent_name'] . ' ' . $row['parent_lastname'] . ')<br>';
 $html .= 'วันที่ ........./........./.........';
 $html .= '</td>';
 $html .= '</tr></table>';
@@ -419,8 +457,9 @@ $html .= '<div class="staff-area">';
 $html .= '<div class="staff-header">ส่วนสำหรับเจ้าหน้าที่รับสมัคร</div>';
 $html .= '<table width="100%"><tr>';
 $html .= '<td width="50%">';
-$html .= '<div>เลขที่ใบสมัคร: <span style="border-bottom: 1px dotted #000; padding: 0 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>';
-$html .= '<div style="margin-top:5px;">เอกสารหลักฐาน: '.$unchk.' ครบถ้วน '.$unchk.' ไม่ครบ</div>';
+$numreg = $row['numreg'] ?? '';
+$html .= '<div>เลขประจำตัวผู้สมัคร: <span style="border-bottom: 1px dotted #000; padding: 0 20px; font-weight: bold;">' . ($numreg ?: '..................') . '</span></div>';
+$html .= '<div style="margin-top:5px;">เอกสารหลักฐาน: ' . $unchk . ' ครบถ้วน ' . $unchk . ' ไม่ครบ</div>';
 $html .= '</td>';
 $html .= '<td width="50%" align="center">';
 $html .= 'ลงชื่อ ....................................................... เจ้าหน้าที่<br>';
