@@ -271,11 +271,16 @@ function saveStudyPlans($db, $citizenId, $postData)
         $insertSql = "INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (?, ?, ?)";
         $insertStmt = $db->prepare($insertSql);
 
-        for ($i = 1; $i <= 5; $i++) {
-            $planId = $postData["study_plan_{$i}"] ?? '';
+        // Loop through all possible plan choices sent from the form
+        $choiceIndex = 1;
+        while (isset($postData["study_plan_{$choiceIndex}"])) {
+            $planId = $postData["study_plan_{$choiceIndex}"];
             if (!empty($planId)) {
-                $insertStmt->execute([$citizenId, intval($planId), $i]);
+                $insertStmt->execute([$citizenId, intval($planId), $choiceIndex]);
             }
+            $choiceIndex++;
+            if ($choiceIndex > 20)
+                break; // Safety break
         }
     } catch (Exception $e) {
         // Silently fail if table doesn't exist

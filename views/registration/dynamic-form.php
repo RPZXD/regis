@@ -89,7 +89,7 @@ $prefixOptions = ($grade == '1')
 
                     <!-- Study Plan Priority Selection (if multiple plans available) -->
                     <?php if (count($plans) > 0):
-                        $maxChoices = min(count($plans), 5); // Max 5 choices or total plans
+                        $maxChoices = count($plans); // Show all available plans as choices
                         ?>
                         <div class="lg:col-span-3">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
