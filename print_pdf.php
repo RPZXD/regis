@@ -53,8 +53,8 @@ try {
 }
 if (!isset($settings['logo_school']))
     $settings['logo_school'] = 'logo-phicha.png';
-if (!isset($settings['year']))
-    $settings['year'] = '2568';
+if (!isset($settings['academic_year']))
+    $settings['academic_year'] = '2568';
 
 // Logic
 $level = $row['level'];
@@ -267,7 +267,7 @@ $html .= '<td width="80"><img src="' . $logo_file . '" class="logo"></td>';
 $html .= '<td valign="middle">';
 $html .= '<div class="school-name">โรงเรียนพิชัย อำเภอพิชัย จังหวัดอุตรดิตถ์</div>';
 $html .= '<div class="doc-title">ใบสมัครเข้าศึกษาต่อมัธยมศึกษาปีที่ ' . $levelText . '</div>';
-$html .= '<div class="doc-subtitle">ปีการศึกษา ' . $settings['year'] . ' | ระบบรับสมัครนักเรียนออนไลน์</div>';
+$html .= '<div class="doc-subtitle">ปีการศึกษา ' . $settings['academic_year'] . ' | ระบบรับสมัครนักเรียนออนไลน์</div>';
 $html .= '</td>';
 // Photo
 $numreg = $row['numreg'] ?? '';
@@ -411,10 +411,9 @@ $html .= '<tr>
 </tr>';
 
 $totalPlans = count($displayPlans);
-$minSlots = 6; // Show at least 6 slots (3 rows)
-$displaySlots = max($totalPlans, $minSlots);
-if ($displaySlots % 2 != 0)
-    $displaySlots++; // Ensure even number for 2 columns
+$displaySlots = $totalPlans; // Show exactly what is available for this type
+if ($displaySlots % 2 != 0 && $displaySlots > 0)
+    $displaySlots++; // Ensure even number for 2 columns if not empty
 $totalRows = $displaySlots / 2;
 
 for ($r = 0; $r < $totalRows; $r++) {
@@ -438,16 +437,10 @@ $html .= '</table>';
 
 // --- Signatures ---
 $html .= '<table class="footer-table"><tr>';
-$html .= '<td width="50%" class="sign-box">';
+$html .= '<td width="100%" class="sign-box" align="center">';
 $html .= 'ลงชื่อ <span class="sign-line"></span> ผู้สมัคร<br>';
 $html .= '<br>';
 $html .= '(' . $row['stu_prefix'] . $row['stu_name'] . ' ' . $row['stu_lastname'] . ')<br>';
-$html .= 'วันที่ ........./........./.........';
-$html .= '</td>';
-$html .= '<td width="50%" class="sign-box">';
-$html .= 'ลงชื่อ <span class="sign-line"></span> ผู้ปกครอง<br>';
-$html .= '<br>';
-$html .= '(' . $row['parent_prefix'] . $row['parent_name'] . ' ' . $row['parent_lastname'] . ')<br>';
 $html .= 'วันที่ ........./........./.........';
 $html .= '</td>';
 $html .= '</tr></table>';

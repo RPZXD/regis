@@ -395,7 +395,8 @@ $prefixOptions = ($grade == '1')
                         </label>
                         <input type="text" name="old_school_name"
                             class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            placeholder="ชื่อโรงเรียน" required>
+                            placeholder="ชื่อโรงเรียน"
+                            value="<?php echo $typeCode === 'quota' ? 'โรงเรียนพิชัย' : ''; ?>" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">จังหวัด *</label>
@@ -1466,10 +1467,22 @@ $prefixOptions = ($grade == '1')
                         });
                         select.innerHTML = options;
                     });
+
+                    // Auto-fill for quota
+                    if ('<?php echo $typeCode; ?>' === 'quota') {
+                        const oldSchoolProv = document.getElementById('oldSchoolProvince');
+                        if (oldSchoolProv) {
+                            const pTarget = data.find(p => p.name.includes('อุตรดิตถ์'));
+                            if (pTarget) {
+                                oldSchoolProv.value = pTarget.code;
+                                loadDistricts(pTarget.code, 'oldSchoolDistrict', 'พิชัย');
+                            }
+                        }
+                    }
                 });
         }
 
-        function loadDistricts(provinceCode, districtSelectId) {
+        function loadDistricts(provinceCode, districtSelectId, defaultKey = null) {
             const districtSelect = document.getElementById(districtSelectId);
             const subdistrictSelectId = districtSelectId.replace('District', 'Subdistrict');
             const subdistrictSelect = document.getElementById(subdistrictSelectId);
@@ -1499,10 +1512,20 @@ $prefixOptions = ($grade == '1')
                         options += `<option value="${d.code}">${d.name}</option>`;
                     });
                     districtSelect.innerHTML = options;
+
+                    if (defaultKey) {
+                        const dTarget = data.find(d => d.name.includes(defaultKey) || d.code === defaultKey);
+                        if (dTarget) {
+                            districtSelect.value = dTarget.code;
+                            if ('<?php echo $typeCode; ?>' === 'quota' && districtSelectId === 'oldSchoolDistrict') {
+                                loadSubdistricts(dTarget.code, subdistrictSelectId, 'ในเมือง');
+                            }
+                        }
+                    }
                 });
         }
 
-        function loadSubdistricts(districtCode, subdistrictSelectId) {
+        function loadSubdistricts(districtCode, subdistrictSelectId, defaultKey = null) {
             const subdistrictSelect = document.getElementById(subdistrictSelectId);
 
             subdistrictSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
@@ -1526,12 +1549,19 @@ $prefixOptions = ($grade == '1')
                         options += `<option value="${s.code}">${s.name}</option>`;
                     });
                     subdistrictSelect.innerHTML = options;
+
+                    if (defaultKey) {
+                        const sTarget = data.find(s => s.name.includes(defaultKey) || s.code === defaultKey);
+                        if (sTarget) {
+                            subdistrictSelect.value = sTarget.code;
+                        }
+                    }
                 });
         }
 
         // Old School Address
         document.getElementById('oldSchoolProvince')?.addEventListener('change', function () {
-            loadDistricts(this.value, 'oldSchoolDistrict');
+   loadDistricts(this.value, 'oldSchoolDistrict');
         });
         document.getElementById('oldSchoolDistrict')?.addEventListener('change', function () {
             loadSubdistricts(this.value, 'oldSchoolSubdistrict');
