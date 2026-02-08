@@ -1,14 +1,17 @@
 <?php
-class StudentRegis {
+class StudentRegis
+{
     private $conn;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
     // ...existing code...
 
-    public function getM4QuotaStudents() {
+    public function getM4QuotaStudents()
+    {
         $query = "SELECT 
                         id, 
                         citizenid, 
@@ -40,7 +43,8 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getM4QuotaStudentsConfirm() {
+    public function getM4QuotaStudentsConfirm()
+    {
         $query = "SELECT 
                         u.id, 
                         u.citizenid, 
@@ -79,7 +83,8 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getM1NomalStudents() {
+    public function getM1NomalStudents()
+    {
         $query = "SELECT 
                         id, 
                         citizenid, 
@@ -114,15 +119,18 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentsByCriteria($level, $typeName) {
+    public function getStudentsByCriteria($level, $typeName)
+    {
         // Prepare Level Criteria (support both '1' and 'm1')
         $levels = [$level];
-        if ($level == '1') $levels[] = 'm1';
-        if ($level == '4') $levels[] = 'm4';
+        if ($level == '1')
+            $levels[] = 'm1';
+        if ($level == '4')
+            $levels[] = 'm4';
         $levelStr = "'" . implode("','", $levels) . "'";
 
-    // Select ALL user columns + calculated fields
-    $sql = "SELECT u.*, CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+        // Select ALL user columns + calculated fields
+        $sql = "SELECT u.*, CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
             GROUP_CONCAT(CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
             FROM users u
@@ -133,16 +141,16 @@ class StudentRegis {
                     GROUP BY citizenid, priority
                 )
             WHERE u.level IN ($levelStr)";
-        
+
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
             $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
         } else {
             $sql .= " AND u.typeregis = :typeName";
         }
-        
+
         $sql .= " GROUP BY u.id ORDER BY u.create_at DESC";
-        
+
         $stmt = $this->conn->prepare($sql);
         // $stmt->bindParam(':level', $level); // Removed in favor of IN clause
         if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
@@ -152,25 +160,28 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function countStudentsByCriteria($level, $typeName) {
+    public function countStudentsByCriteria($level, $typeName)
+    {
         // Prepare Level
         $levels = [$level];
-        if ($level == '1') $levels[] = 'm1';
-        if ($level == '4') $levels[] = 'm4';
+        if ($level == '1')
+            $levels[] = 'm1';
+        if ($level == '4')
+            $levels[] = 'm4';
         $levelStr = "'" . implode("','", $levels) . "'";
-    
+
         $sql = "SELECT COUNT(*) as total,
                 SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as confirmed,
                 SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending
                 FROM users 
                 WHERE level IN ($levelStr)";
-        
+
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
             $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
         } else {
             $sql .= " AND typeregis = :typeName";
         }
-        
+
         $stmt = $this->conn->prepare($sql);
         if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
             $stmt->bindParam(':typeName', $typeName);
@@ -179,7 +190,8 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getDailyRegistrations($days = 7) {
+    public function getDailyRegistrations($days = 7)
+    {
         $sql = "SELECT DATE_FORMAT(create_at, '%Y-%m-%d') as reg_date, COUNT(*) as count 
                 FROM users 
                 WHERE create_at >= DATE_SUB(CURDATE(), INTERVAL :days DAY)
@@ -191,11 +203,14 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Returns array like [['reg_date'=>'...', 'count'=>...], ...]
     }
 
-    public function getStudentsWithDocuments($level, $typeName) {
+    public function getStudentsWithDocuments($level, $typeName)
+    {
         // Prepare Level Criteria
         $levels = [$level];
-        if ($level == '1') $levels[] = 'm1';
-        if ($level == '4') $levels[] = 'm4';
+        if ($level == '1')
+            $levels[] = 'm1';
+        if ($level == '4')
+            $levels[] = 'm4';
         $levelStr = "'" . implode("','", $levels) . "'";
 
         $sql = "SELECT 
@@ -266,7 +281,8 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getM1NomalStudents_Check() {
+    public function getM1NomalStudents_Check()
+    {
         $query = "SELECT 
                         u.id, 
                         u.citizenid, 
@@ -330,7 +346,8 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getM1NomalStudents_Pass($date) {
+    public function getM1NomalStudents_Pass($date)
+    {
         $query = "SELECT 
                         id, 
                         citizenid, 
@@ -357,7 +374,8 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getM4NomalStudents_Pass($date) {
+    public function getM4NomalStudents_Pass($date)
+    {
         $query = "SELECT 
                         id, 
                         citizenid, 
@@ -384,9 +402,10 @@ class StudentRegis {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
 
-    public function getM4NomalStudents_Check() {
+
+    public function getM4NomalStudents_Check()
+    {
         $query = "SELECT 
                         u.id, 
                         u.citizenid, 
@@ -446,7 +465,8 @@ class StudentRegis {
     }
 
 
-    public function getM4NomalStudents() {
+    public function getM4NomalStudents()
+    {
         $query = "SELECT 
                         id, 
                         citizenid, 
@@ -477,7 +497,8 @@ class StudentRegis {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentById($id) {
+    public function getStudentById($id)
+    {
         $query = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
@@ -501,7 +522,7 @@ class StudentRegis {
                     $row['number' . $plan['priority']] = $plan['plan_id'];
                 }
             }
-        
+
             // Format birthday for frontend if needed (it was using CONCAT previously)
             if ($row['date_birth'] && $row['month_birth'] && $row['year_birth']) {
                 $row['birthday'] = $row['date_birth'] . '-' . $row['month_birth'] . '-' . $row['year_birth'];
@@ -511,7 +532,8 @@ class StudentRegis {
     }
 
 
-    public function getStudentByCitizId($id) {
+    public function getStudentByCitizId($id)
+    {
         $query = "SELECT 
                         *,
                         CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday
@@ -523,106 +545,94 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function updateStudent($id, $data, $plans = []) {
+    public function updateStudent($id, $data, $plans = [])
+    {
         try {
             $this->conn->beginTransaction();
 
-            $query = "UPDATE users 
-                SET 
-                    citizenid = :citizenid, 
-                    stu_prefix = :stu_prefix, 
-                    stu_name = :stu_name, 
-                    stu_lastname = :stu_lastname, 
-                    stu_sex = :stu_sex,
-                    stu_blood_group = :stu_blood_group,
-                    stu_religion = :stu_religion,
-                    stu_ethnicity = :stu_ethnicity,
-                    stu_nationality = :stu_nationality,
-                    date_birth = :date_birth, 
-                    month_birth = :month_birth, 
-                    year_birth = :year_birth, 
-                    now_tel = :now_tel, 
-                    
-                    old_school = :old_school,
-                    old_school_province = :old_school_province,
-                    old_school_district = :old_school_district,
-                    old_school_stuid = :old_school_stuid,
-                    
-                    now_addr = :now_addr,
-                    now_moo = :now_moo,
-                    now_soy = :now_soy,
-                    now_street = :now_street,
-                    now_subdistrict = :now_subdistrict,
-                    now_district = :now_district,
-                    now_province = :now_province,
-                    now_post = :now_post,
-                    
-                    dad_prefix = :dad_prefix,
-                    dad_name = :dad_name,
-                    dad_lastname = :dad_lastname,
-                    dad_job = :dad_job,
-                    dad_tel = :dad_tel,
-                    
-                    mom_prefix = :mom_prefix,
-                    mom_name = :mom_name,
-                    mom_lastname = :mom_lastname,
-                    mom_job = :mom_job,
-                    mom_tel = :mom_tel,
-                    
-                    parent_prefix = :parent_prefix,
-                    parent_name = :parent_name,
-                    parent_lastname = :parent_lastname,
-                    parent_relation = :parent_relation,
-                    parent_job = :parent_job,
-                    parent_tel = :parent_tel,
-                    
-                    gpa_total = :gpa_total,
-                    gpa_sci = :gpa_sci,
-                    gpa_math = :gpa_math,
-                    gpa_eng = :gpa_eng,
-                    
-                    seat_number = :seat_number,
-                    exam_room = :exam_room,
-                    exam_date = :exam_date";
+            // Define all possible updatable fields
+            $allFields = [
+                'citizenid',
+                'stu_prefix',
+                'stu_name',
+                'stu_lastname',
+                'stu_sex',
+                'stu_blood_group',
+                'stu_religion',
+                'stu_ethnicity',
+                'stu_nationality',
+                'date_birth',
+                'month_birth',
+                'year_birth',
+                'now_tel',
+                'old_school',
+                'old_school_province',
+                'old_school_district',
+                'old_school_stuid',
+                'now_addr',
+                'now_moo',
+                'now_soy',
+                'now_street',
+                'now_subdistrict',
+                'now_district',
+                'now_province',
+                'now_post',
+                'dad_prefix',
+                'dad_name',
+                'dad_lastname',
+                'dad_job',
+                'dad_tel',
+                'mom_prefix',
+                'mom_name',
+                'mom_lastname',
+                'mom_job',
+                'mom_tel',
+                'parent_prefix',
+                'parent_name',
+                'parent_lastname',
+                'parent_relation',
+                'parent_job',
+                'parent_tel',
+                'gpa_total',
+                'grade_science',
+                'grade_math',
+                'grade_english',
+                'seat_number',
+                'exam_room',
+                'exam_date',
+                'typeregis'
+            ];
 
-            if (isset($data['typeregis'])) {
-                $query .= ", typeregis = :typeregis";
+            // Build dynamic query with only fields that exist in $data
+            $setClauses = [];
+            $params = [];
+
+            foreach ($allFields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $setClauses[] = "$field = :$field";
+                    $val = $data[$field];
+
+                    // Convert empty strings to NULL for numeric/decimal fields
+                    $numericFields = ['gpa_total', 'grade_science', 'grade_math', 'grade_english', 'old_school_stuid'];
+                    if (in_array($field, $numericFields) && $val === '') {
+                        $val = null;
+                    }
+
+                    $params[":$field"] = $val;
+                }
             }
-            
-            $query .= " WHERE id = :id";
-            
+
+            if (empty($setClauses)) {
+                throw new Exception("No valid fields to update");
+            }
+
+            $query = "UPDATE users SET " . implode(", ", $setClauses) . " WHERE id = :id";
+            $params[':id'] = $id;
+
             $stmt = $this->conn->prepare($query);
 
-            // Bind all parameters from $data array
-            $params = [
-                ':citizenid', ':stu_prefix', ':stu_name', ':stu_lastname', 
-                ':stu_sex', ':stu_blood_group', ':stu_religion', ':stu_ethnicity', ':stu_nationality',
-                ':date_birth', ':month_birth', ':year_birth', ':now_tel',
-                ':old_school', ':old_school_province', ':old_school_district', ':old_school_stuid',
-                ':now_addr', ':now_moo', ':now_soy', ':now_street', ':now_subdistrict', ':now_district', ':now_province', ':now_post',
-                ':dad_prefix', ':dad_name', ':dad_lastname', ':dad_job', ':dad_tel',
-                ':mom_prefix', ':mom_name', ':mom_lastname', ':mom_job', ':mom_tel',
-                ':parent_prefix', ':parent_name', ':parent_lastname', ':parent_relation', ':parent_job', ':parent_tel',
-                ':gpa_total', ':gpa_sci', ':gpa_math', ':gpa_eng', 
-                ':seat_number', ':exam_room', ':exam_date',
-                ':id'
-            ];
-            
-            foreach ($params as $param) {
-                $key = ltrim($param, ':');
-                $val = isset($data[$key]) ? $data[$key] : null;
-                
-                // Convert empty strings to NULL for numeric/decimal fields
-                $numericFields = ['gpa_total', 'gpa_sci', 'gpa_math', 'gpa_eng', 'old_school_stuid'];
-                if (in_array($key, $numericFields) && $val === '') {
-                    $val = null;
-                }
-                
+            foreach ($params as $param => $val) {
                 $stmt->bindValue($param, $val);
-            }
-            
-            if (isset($data['typeregis'])) {
-                $stmt->bindValue(':typeregis', $data['typeregis']);
             }
 
             if (!$stmt->execute()) {
@@ -656,8 +666,9 @@ class StudentRegis {
             // Return error message for debugging
             return $e->getMessage();
         }
-    }    
-    public function updateStudentM1($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6, $number7, $number8, $number9, $number10) {
+    }
+    public function updateStudentM1($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6, $number7, $number8, $number9, $number10)
+    {
         $query = "UPDATE users 
                     SET 
                         citizenid = :citizenid, 
@@ -682,10 +693,10 @@ class StudentRegis {
                         number9 = :number9,
                         number10 = :number10
                     WHERE id = :id";
-        
+
         // Prepare the query
         $stmt = $this->conn->prepare($query);
-    
+
         // Bind parameters
         $stmt->bindParam(':citizenid', $citizenid);
         $stmt->bindParam(':typeregis', $typeregis);
@@ -709,7 +720,7 @@ class StudentRegis {
         $stmt->bindParam(':number8', $number8);
         $stmt->bindParam(':number9', $number9);
         $stmt->bindParam(':number10', $number10);
-    
+
         try {
             // Execute the query
             if ($stmt->execute()) {
@@ -725,7 +736,8 @@ class StudentRegis {
             return false;
         }
     }
-    public function updateStudentM4($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6) {
+    public function updateStudentM4($id, $citizenid, $typeregis, $stu_prefix, $stu_name, $stu_lastname, $date_birth, $month_birth, $year_birth, $now_tel, $parent_tel, $gpa_total, $number1, $number2, $number3, $number4, $number5, $number6)
+    {
         $query = "UPDATE users 
                     SET 
                         citizenid = :citizenid, 
@@ -746,10 +758,10 @@ class StudentRegis {
                         number5 = :number5,
                         number6 = :number6
                     WHERE id = :id";
-        
+
         // Prepare the query
         $stmt = $this->conn->prepare($query);
-    
+
         // Bind parameters
         $stmt->bindParam(':citizenid', $citizenid);
         $stmt->bindParam(':typeregis', $typeregis);
@@ -769,7 +781,7 @@ class StudentRegis {
         $stmt->bindParam(':number4', $number4);
         $stmt->bindParam(':number5', $number5);
         $stmt->bindParam(':number6', $number6);
-    
+
         try {
             // Execute the query
             if ($stmt->execute()) {
@@ -785,8 +797,9 @@ class StudentRegis {
             return false;
         }
     }
-    
-    public function getStudentByCitizenId($citizen_id) {
+
+    public function getStudentByCitizenId($citizen_id)
+    {
         $query = "SELECT 
                         id,
                         citizenid,
@@ -808,7 +821,8 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentBySearchInput($search_input) {
+    public function getStudentBySearchInput($search_input)
+    {
         $query = "SELECT 
                         users.id,
                         users.citizenid,
@@ -835,7 +849,8 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentBySearchInputM1($search_input) {
+    public function getStudentBySearchInputM1($search_input)
+    {
         $query = "SELECT 
                         citizenid,
                         typeregis,
@@ -858,7 +873,8 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentBySearchInputM4($search_input) {
+    public function getStudentBySearchInputM4($search_input)
+    {
         $query = "SELECT 
                         citizenid,
                         typeregis,
@@ -881,7 +897,8 @@ class StudentRegis {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getStudentBySearchInputConfirm($search_input) {
+    public function getStudentBySearchInputConfirm($search_input)
+    {
         $query = "SELECT 
                     u.citizenid,
                     u.typeregis,
@@ -903,18 +920,19 @@ class StudentRegis {
                 INNER JOIN tbl_confirm t ON u.numreg = t.numreg
                 WHERE u.citizenid = :search_input 
                    OR CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) LIKE :search_input_like";
-        
+
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':search_input', $search_input);
         $search_input_like = '%' . $search_input . '%';
         $stmt->bindParam(':search_input_like', $search_input_like);
         $stmt->execute();
-        
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    
 
-    public function deleteStudent($id) {
+
+    public function deleteStudent($id)
+    {
         $query = "DELETE FROM users WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id);
@@ -932,7 +950,8 @@ class StudentRegis {
         }
     }
 
-    public function getDailyRegistrationCounts($startDate, $endDate) {
+    public function getDailyRegistrationCounts($startDate, $endDate)
+    {
         $query = "SELECT DATE(create_at) as date, COUNT(*) as count 
                   FROM users 
                   WHERE create_at BETWEEN :start_date AND :end_date 
@@ -952,7 +971,8 @@ class StudentRegis {
         return $dailyCounts;
     }
 
-    public function updateConfirmStatus($numreg, $status) {
+    public function updateConfirmStatus($numreg, $status)
+    {
         $query = "UPDATE tbl_confirm 
                   SET status = :status 
                   WHERE numreg = :numreg";
@@ -972,7 +992,8 @@ class StudentRegis {
             return false;
         }
     }
-    public function updateStatus($id, $status) {
+    public function updateStatus($id, $status)
+    {
         $query = "UPDATE users 
                   SET status = :status,
                       update_at = NOW() 
@@ -994,7 +1015,8 @@ class StudentRegis {
         }
     }
 
-    public function countConfirm($status, $level, $typeregis, $year) {
+    public function countConfirm($status, $level, $typeregis, $year)
+    {
         $sql = "SELECT COUNT(*) AS total_count 
                 FROM users u
                 INNER JOIN tbl_confirm t ON u.numreg = t.numreg
@@ -1014,7 +1036,8 @@ class StudentRegis {
         return $result['total_count'] ?? 0;
     }
     // ...existing code...
-    public function countRegis($level, $typeregis, $year) {
+    public function countRegis($level, $typeregis, $year)
+    {
         $sql = "SELECT COUNT(*) AS total_count 
                 FROM users
                 WHERE level = :level
@@ -1031,18 +1054,22 @@ class StudentRegis {
         return $result['total_count'] ?? 0;
     }
 
-    public function getStudentPlans($citizenid) {
+    public function getStudentPlans($citizenid)
+    {
         $query = "SELECT * FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':citizenid', $citizenid);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function getStudentsPassed($level, $typeName, $date = null) {
+    public function getStudentsPassed($level, $typeName, $date = null)
+    {
         // Prepare Level Criteria
         $levels = [$level];
-        if ($level == '1') $levels[] = 'm1';
-        if ($level == '4') $levels[] = 'm4';
+        if ($level == '1')
+            $levels[] = 'm1';
+        if ($level == '4')
+            $levels[] = 'm4';
         $levelStr = "'" . implode("','", $levels) . "'";
 
         $sql = "SELECT 
@@ -1063,7 +1090,7 @@ class StudentRegis {
                     final_plan_id
                 FROM users 
                 WHERE level IN ($levelStr) AND status = 1";
-        
+
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
             $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
@@ -1074,9 +1101,9 @@ class StudentRegis {
         if ($date) {
             $sql .= " AND DATE(update_at) = :date";
         }
-        
+
         $sql .= " ORDER BY update_at ASC";
-        
+
         $stmt = $this->conn->prepare($sql);
         // $stmt->bindParam(':level', $level); // Removed
         if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {

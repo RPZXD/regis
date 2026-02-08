@@ -362,38 +362,48 @@ if ($typeCode === 'special') {
 
 $html .= '</table>';
 
-// --- Address ---
-$html .= '<div class="section-head">2. ข้อมูลการติดต่อ</div>';
-$html .= '<table class="form-table">';
-$html .= '<tr>
-    <td width="15%" class="label">ที่อยู่ปัจจุบัน</td>
-    <td class="value">บ้านเลขที่ ' . $row['now_addr'] . ' หมู่ ' . $row['now_moo'] . ' ' . ($row['now_soy'] ? 'ซ.' . $row['now_soy'] : '') . ' ' . ($row['now_street'] ? 'ถ.' . $row['now_street'] : '') . '</td>
-</tr>';
-$html .= '<tr>
-    <td class="label"></td>
-    <td class="value">ต.' . $row['now_subdistrict'] . ' อ.' . $row['now_district'] . ' จ.' . $row['now_province'] . ' ' . $row['now_post'] . '</td>
-</tr>';
-$html .= '<tr>
-    <td class="label">โทรศัพท์</td>
-    <td class="value">' . $row['now_tel'] . '</td>
-</tr>';
-$html .= '</table>';
+// For special type, use dynamic section numbering since we skip some sections
+$sectionNum = 2;
+
+// --- Address (skip for special type) ---
+if ($typeCode !== 'special') {
+    $html .= '<div class="section-head">' . $sectionNum++ . '. ข้อมูลการติดต่อ</div>';
+    $html .= '<table class="form-table">';
+    $html .= '<tr>
+        <td width="15%" class="label">ที่อยู่ปัจจุบัน</td>
+        <td class="value">บ้านเลขที่ ' . $row['now_addr'] . ' หมู่ ' . $row['now_moo'] . ' ' . ($row['now_soy'] ? 'ซ.' . $row['now_soy'] : '') . ' ' . ($row['now_street'] ? 'ถ.' . $row['now_street'] : '') . '</td>
+    </tr>';
+    $html .= '<tr>
+        <td class="label"></td>
+        <td class="value">ต.' . $row['now_subdistrict'] . ' อ.' . $row['now_district'] . ' จ.' . $row['now_province'] . ' ' . $row['now_post'] . '</td>
+    </tr>';
+    $html .= '<tr>
+        <td class="label">โทรศัพท์</td>
+        <td class="value">' . $row['now_tel'] . '</td>
+    </tr>';
+    $html .= '</table>';
+}
 
 // --- Parents ---
-$html .= '<div class="section-head">3. ข้อมูลผู้ปกครอง</div>';
+$html .= '<div class="section-head">' . $sectionNum++ . '. ข้อมูลผู้ปกครอง</div>';
 $html .= '<table class="form-table">';
-$html .= '<tr>
-    <td width="10%" class="label">บิดา</td>
-    <td width="10%" class="value">' . $row['dad_prefix'] . $row['dad_name'] . ' ' . $row['dad_lastname'] . '</td>
-    <td width="15%" class="label">อาชีพ/โทร</td>
-    <td width="35%" class="value">' . $row['dad_job'] . ' (' . $row['dad_tel'] . ')</td>
-</tr>';
-$html .= '<tr>
-    <td class="label">มารดา</td>
-    <td class="value">' . $row['mom_prefix'] . $row['mom_name'] . ' ' . $row['mom_lastname'] . '</td>
-    <td class="label">อาชีพ/โทร</td>
-    <td class="value">' . $row['mom_job'] . ' (' . $row['mom_tel'] . ')</td>
-</tr>';
+
+// For special type, show only guardian info (no father/mother)
+if ($typeCode !== 'special') {
+    $html .= '<tr>
+        <td width="10%" class="label">บิดา</td>
+        <td width="10%" class="value">' . $row['dad_prefix'] . $row['dad_name'] . ' ' . $row['dad_lastname'] . '</td>
+        <td width="15%" class="label">อาชีพ/โทร</td>
+        <td width="35%" class="value">' . $row['dad_job'] . ' (' . $row['dad_tel'] . ')</td>
+    </tr>';
+    $html .= '<tr>
+        <td class="label">มารดา</td>
+        <td class="value">' . $row['mom_prefix'] . $row['mom_name'] . ' ' . $row['mom_lastname'] . '</td>
+        <td class="label">อาชีพ/โทร</td>
+        <td class="value">' . $row['mom_job'] . ' (' . $row['mom_tel'] . ')</td>
+    </tr>';
+}
+
 $html .= '<tr>
     <td class="label">ผู้ปกครอง</td>
     <td class="value">' . $row['parent_prefix'] . $row['parent_name'] . ' ' . $row['parent_lastname'] . '</td>
@@ -403,7 +413,7 @@ $html .= '<tr>
 $html .= '</table>';
 
 // --- Study Plans ---
-$html .= '<div class="section-head">4. แผนการเรียนที่ต้องการสมัคร</div>';
+$html .= '<div class="section-head">' . $sectionNum . '. แผนการเรียนที่ต้องการสมัคร</div>';
 $html .= '<table class="plan-table">';
 $html .= '<tr>
     <th width="8%">ลำดับ</th><th width="42%">แผนการเรียน</th>

@@ -11,6 +11,7 @@ $showGPA = in_array($typeCode, ['special', 'general', 'quota']);
 $showTalent = ($typeCode === 'talent');
 $showQuotaConfirm = ($typeCode === 'quota');
 $showZoneSelect = ($grade == '1' && $typeCode === 'general'); // ม.1 ทั่วไป มีในเขต/นอกเขต
+$isSpecialType = ($typeCode === 'special'); // ห้องเรียนพิเศษ - ข้ามขั้นตอน 3-5
 
 // Prefix options based on grade
 $prefixOptions = ($grade == '1')
@@ -35,7 +36,12 @@ $prefixOptions = ($grade == '1')
     <div class="glass rounded-2xl p-4">
         <div class="flex items-center justify-between max-w-4xl mx-auto">
             <?php
-            $steps = ['ข้อมูลส่วนตัว', 'โรงเรียนเดิม', 'ที่อยู่ปัจจุบัน', 'ทะเบียนบ้าน', 'บิดา-มารดา', 'ผู้ปกครอง', 'ยืนยัน'];
+            // ห้องเรียนพิเศษ ใช้ 4 steps แทน 7 steps
+            if ($isSpecialType) {
+                $steps = ['ข้อมูลส่วนตัว', 'โรงเรียนเดิม', 'ผู้ปกครอง', 'ยืนยัน'];
+            } else {
+                $steps = ['ข้อมูลส่วนตัว', 'โรงเรียนเดิม', 'ที่อยู่ปัจจุบัน', 'ทะเบียนบ้าน', 'บิดา-มารดา', 'ผู้ปกครอง', 'ยืนยัน'];
+            }
             foreach ($steps as $i => $step):
                 ?>
                 <div class="step-indicator flex flex-col items-center <?php echo $i > 0 ? 'flex-1' : ''; ?>">
@@ -425,72 +431,75 @@ $prefixOptions = ($grade == '1')
                 </div>
             </div>
 
-            <!-- Step 3: Current Address -->
-            <div class="tab animate-fade-in hidden" data-step="2">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                    <span
-                        class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3">3</span>
-                    ที่อยู่ปัจจุบัน
-                </h3>
+            <!-- Step 3: Current Address - Hidden for Special Classroom -->
+            <?php if (!$isSpecialType): ?>
+                <div class="tab animate-fade-in hidden" data-step="2">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                        <span
+                            class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3">3</span>
+                        ที่อยู่ปัจจุบัน
+                    </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">บ้านเลขที่
-                            *</label>
-                        <input type="text" name="now_hno"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">หมู่ที่</label>
-                        <input type="text" name="now_moo"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ซอย</label>
-                        <input type="text" name="now_soi"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ถนน</label>
-                        <input type="text" name="now_road"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">จังหวัด *</label>
-                        <select name="now_province" id="nowProvince"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            required>
-                            <option value="">เลือกจังหวัด</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อำเภอ *</label>
-                        <select name="now_district" id="nowDistrict"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            required>
-                            <option value="">เลือกอำเภอ</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ตำบล *</label>
-                        <select name="now_subdistrict" id="nowSubdistrict"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            required>
-                            <option value="">เลือกตำบล</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">รหัสไปรษณีย์
-                            *</label>
-                        <input type="text" name="now_postcode" id="nowPostcode" maxlength="5"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                            required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">บ้านเลขที่
+                                *</label>
+                            <input type="text" name="now_hno"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">หมู่ที่</label>
+                            <input type="text" name="now_moo"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ซอย</label>
+                            <input type="text" name="now_soi"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ถนน</label>
+                            <input type="text" name="now_road"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">จังหวัด *</label>
+                            <select name="now_province" id="nowProvince"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                required>
+                                <option value="">เลือกจังหวัด</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อำเภอ *</label>
+                            <select name="now_district" id="nowDistrict"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                required>
+                                <option value="">เลือกอำเภอ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ตำบล *</label>
+                            <select name="now_subdistrict" id="nowSubdistrict"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                required>
+                                <option value="">เลือกตำบล</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">รหัสไปรษณีย์
+                                *</label>
+                            <input type="text" name="now_postcode" id="nowPostcode" maxlength="5"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                                required>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <!-- Step 4: Registered Address -->
+            <!-- Step 4: Registered Address - Hidden for Special Classroom -->
+            <?php if (!$isSpecialType): ?>
             <div class="tab animate-fade-in hidden" data-step="3">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span
@@ -570,8 +579,10 @@ $prefixOptions = ($grade == '1')
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
-            <!-- Step 5: Father & Mother Info -->
+            <!-- Step 5: Father & Mother Info - Hidden for Special Classroom -->
+            <?php if (!$isSpecialType): ?>
             <div class="tab animate-fade-in hidden" data-step="4">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span
@@ -721,12 +732,13 @@ $prefixOptions = ($grade == '1')
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
-            <!-- Step 6: Guardian Info -->
-            <div class="tab animate-fade-in hidden" data-step="5">
+            <!-- Step 6: Guardian Info (Step 3 for Special) -->
+            <div class="tab animate-fade-in hidden" data-step="<?php echo $isSpecialType ? '2' : '5'; ?>">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span
-                        class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3">6</span>
+                        class="w-10 h-10 flex items-center justify-center bg-primary-500 text-white rounded-xl mr-3"><?php echo $isSpecialType ? '3' : '6'; ?></span>
                     ข้อมูลผู้ปกครอง
                 </h3>
 
@@ -738,7 +750,8 @@ $prefixOptions = ($grade == '1')
                     </p>
                 </div>
 
-                <!-- Quick Fill from Father/Mother -->
+                <!-- Quick Fill from Father/Mother (hide for special type) -->
+                <?php if (!$isSpecialType): ?>
                 <div class="mb-6 flex flex-wrap gap-3">
                     <button type="button" id="fillFromDad"
                         class="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors">
@@ -749,6 +762,7 @@ $prefixOptions = ($grade == '1')
                         <i class="fas fa-female mr-2"></i>ใช้ข้อมูลมารดา
                     </button>
                 </div>
+                <?php endif; ?>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
@@ -839,8 +853,8 @@ $prefixOptions = ($grade == '1')
                 </div>
             </div>
 
-            <!-- Step 7: Confirmation -->
-            <div class="tab animate-fade-in hidden" data-step="6">
+            <!-- Step 7: Confirmation (Step 4 for Special) -->
+            <div class="tab animate-fade-in hidden" data-step="<?php echo $isSpecialType ? '3' : '6'; ?>">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <span class="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl mr-3">
                         <i class="fas fa-check"></i>
@@ -854,8 +868,11 @@ $prefixOptions = ($grade == '1')
                     </h4>
                     <ul class="space-y-2 text-green-700 dark:text-green-400">
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลส่วนตัวให้ถูกต้อง</li>
+                        <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลโรงเรียนเดิม</li>
+                        <?php if (!$isSpecialType): ?>
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบที่อยู่และข้อมูลติดต่อ</li>
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลบิดา-มารดา</li>
+                        <?php endif; ?>
                         <li><i class="fas fa-check-circle mr-2"></i>ตรวจสอบข้อมูลผู้ปกครอง</li>
                     </ul>
                 </div>
@@ -1561,7 +1578,7 @@ $prefixOptions = ($grade == '1')
 
         // Old School Address
         document.getElementById('oldSchoolProvince')?.addEventListener('change', function () {
-   loadDistricts(this.value, 'oldSchoolDistrict');
+            loadDistricts(this.value, 'oldSchoolDistrict');
         });
         document.getElementById('oldSchoolDistrict')?.addEventListener('change', function () {
             loadSubdistricts(this.value, 'oldSchoolSubdistrict');

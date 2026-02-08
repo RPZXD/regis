@@ -19,10 +19,19 @@ if (!$data) {
     exit();
 }
 
-// Check if all required fields are present
-if (isset($data['id'], $data['citizenid'], $data['stu_prefix'], $data['stu_name'], 
-          $data['stu_lastname'], $data['date_birth'], $data['month_birth'], 
-          $data['year_birth'], $data['now_tel'], $data['parent_tel'], $data['gpa_total'])) {
+// Check if essential fields are present (relaxed for special type)
+if (
+    isset(
+    $data['id'],
+    $data['citizenid'],
+    $data['stu_prefix'],
+    $data['stu_name'],
+    $data['stu_lastname'],
+    $data['date_birth'],
+    $data['month_birth'],
+    $data['year_birth']
+)
+) {
 
     $database = new Database_Regis();
     $db = $database->getConnection();

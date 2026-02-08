@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Dynamic Student Data Controller
  */
@@ -29,7 +29,7 @@ $pee = $user->getPee();
 // Check login
 if (isset($_SESSION['Admin_login'])) {
     $userid = $_SESSION['Admin_login'];
-    $userData = $userAdmin->userData($userid); 
+    $userData = $userAdmin->userData($userid);
 } else {
     $sw2 = new SweetAlert2(
         'คุณยังไม่ได้เข้าสู่ระบบ (Admin)',
@@ -51,6 +51,10 @@ if (!$regisType) {
 }
 
 $pageTitle = $regisType['grade_name'] . ' (' . $regisType['name'] . ')';
+
+// Determine type code for conditional display
+$typeCode = $regisType['code'] ?? 'general';
+$isSpecialType = ($typeCode === 'special');
 
 // Fetch study plans for mapping
 $studyPlans = $adminConfig->getStudyPlans($typeId);
