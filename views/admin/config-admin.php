@@ -265,6 +265,53 @@
     </div>
 </div>
 
+<!-- Edit Plan Modal -->
+<div id="editPlanModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-black/50" onclick="closeModal('editPlanModal')"></div>
+        <div class="relative glass rounded-2xl max-w-md w-full p-6">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                <i class="fas fa-edit text-amber-500 mr-2"></i>แก้ไขแผนการเรียน
+            </h3>
+            <form id="editPlanForm" class="space-y-4">
+                <input type="hidden" name="id" id="editPlanId">
+                <div>
+                    <label class="block text-sm font-medium mb-2">ประเภทการสมัคร</label>
+                    <select name="registration_type_id" required
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700"
+                        id="editTypeSelectPlan"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">รหัสแผน</label>
+                    <input type="text" name="code" id="editPlanCode" required
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">ชื่อแผน</label>
+                    <input type="text" name="name" id="editPlanName" required
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">จำนวนที่รับ</label>
+                    <input type="number" name="quota" id="editPlanQuota"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700"
+                        value="0">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="is_active" id="editPlanActive" value="1" class="w-4 h-4 mr-2 text-green-600">
+                    <label class="text-sm">เปิดใช้งาน</label>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeModal('editPlanModal')"
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">ยกเลิก</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg">บันทึกการแก้ไข</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Add Document Modal -->
 <div id="addDocModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen p-4">
@@ -709,7 +756,11 @@
                 <td class="px-4 py-3 text-center font-bold">${p.quota}</td>
                 <td class="px-4 py-3 text-center">${p.is_active == 1 ? '<span class="px-2 py-1 text-xs bg-green-100 text-green-600 rounded-full">เปิด</span>' : '<span class="px-2 py-1 text-xs bg-red-100 text-red-600 rounded-full">ปิด</span>'}</td>
                 <td class="px-4 py-3 text-center">
-                    <button onclick="deletePlan(${p.id})" class="px-2 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
+                    <button onclick="showEditPlanModal(${p.id}, '${p.code}', '${p.name}', ${p.quota}, ${p.is_active}, ${p.registration_type_id})" 
+                            class="px-2 py-1 bg-amber-500 text-white text-sm rounded hover:bg-amber-600 mr-1" title="แก้ไข">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deletePlan(${p.id})" class="px-2 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600" title="ลบ"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
             });
@@ -769,6 +820,46 @@
             closeModal('addPlanModal');
             loadPlans();
             Swal.fire({ icon: 'success', title: 'เพิ่มแผนแล้ว', timer: 1000 });
+        });
+    });
+
+    // Show Edit Plan Modal
+    function showEditPlanModal(id, code, name, quota, isActive, typeId) {
+        $('#editPlanId').val(id);
+        $('#editPlanCode').val(code);
+        $('#editPlanName').val(name);
+        $('#editPlanQuota').val(quota);
+        $('#editPlanActive').prop('checked', isActive == 1);
+        
+        // Load type options and set selected
+        $.get('api/admin/registration-types.php', function(types) {
+            let opts = '<option value="">-- เลือก --</option>';
+            types.forEach(t => {
+                opts += `<option value="${t.id}" ${t.id == typeId ? 'selected' : ''}>${t.grade_name} - ${t.name}</option>`;
+            });
+            $('#editTypeSelectPlan').html(opts);
+        });
+        
+        document.getElementById('editPlanModal').classList.remove('hidden');
+    }
+
+    // Edit Plan Form Submit
+    $('#editPlanForm').on('submit', function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize() + '&is_active=' + ($('#editPlanActive').is(':checked') ? 1 : 0);
+        
+        $.ajax({
+            url: 'api/admin/study-plans.php',
+            method: 'PUT',
+            data: formData,
+            success: function() {
+                closeModal('editPlanModal');
+                loadPlans();
+                Swal.fire({ icon: 'success', title: 'บันทึกการแก้ไขแล้ว', timer: 1000, showConfirmButton: false });
+            },
+            error: function() {
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถบันทึกได้' });
+            }
         });
     });
 
