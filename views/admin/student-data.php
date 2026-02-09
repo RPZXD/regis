@@ -151,9 +151,11 @@
                                 <input type="text" id="editCitizenId" maxlength="13" class="input-field" required>
                             </div>
                             <div>
-                                <label class="label-text">เลขที่ผู้สมัคร</label>
-                                <input type="text" id="editSeatNumber" class="input-field bg-gray-100 dark:bg-gray-600"
-                                    readonly placeholder="-">
+                                <label class="label-text">เลขที่ผู้สมัคร <span
+                                        class="text-xs text-blue-500">(แก้ไขได้)</span></label>
+                                <input type="text" id="editSeatNumber"
+                                    class="input-field border-blue-300 focus:border-blue-500"
+                                    placeholder="กรอกเลขที่ผู้สมัคร">
                             </div>
                             <div>
                                 <label class="label-text">ประเภทการสมัคร</label>
@@ -496,7 +498,7 @@
                 $('#record_table').DataTable({
                     "pageLength": 10,
                     "responsive": true,
-                    "dom": 'Bfrtip',
+                    "dom": '<"flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4"<"flex items-center gap-2"l><"flex-1"><"flex items-center"f>>rtip',
                     "buttons": [], // Custom buttons used instead
                     "language": {
                         "search": "ค้นหา:",
@@ -641,6 +643,9 @@
                         $('#editNumber' + i).val(r['number' + i]);
                     }
 
+                    // Update modal header display
+                    $('.text-id-display').text('รหัส: ' + r.citizenid + ' | ' + (r.stu_prefix || '') + (r.stu_name || '') + ' ' + (r.stu_lastname || ''));
+
                     // Reset Tabs
                     switchTab('tab-general');
                     openModal('editStudentModal');
@@ -667,6 +672,7 @@
             var data = {
                 id: $('#editStudentId').val(),
                 citizenid: $('#editCitizenId').val(),
+                numreg: $('#editSeatNumber').val(),
                 stu_prefix: $('#editPrefix').val(),
                 stu_name: $('#editFirstName').val(),
                 stu_lastname: $('#editLastName').val(),

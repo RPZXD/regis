@@ -553,6 +553,7 @@ class StudentRegis
             // Define all possible updatable fields
             $allFields = [
                 'citizenid',
+                'numreg',
                 'stu_prefix',
                 'stu_name',
                 'stu_lastname',
