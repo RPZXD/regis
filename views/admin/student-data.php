@@ -58,7 +58,8 @@
                 <thead>
                     <tr class="bg-gray-50 dark:bg-slate-700/50 text-gray-600 dark:text-gray-300">
                         <th class="px-4 py-4 text-center rounded-l-xl">#</th>
-                        <th class="px-4 py-4 text-center">รหัสประจำตัว</th>
+                        <th class="px-4 py-4 text-center">เลขที่ผู้สมัคร</th>
+                        <th class="px-4 py-4 text-center">เลขประจำตัว</th>
                         <th class="px-4 py-4 text-left">ชื่อ - นามสกุล</th>
                         <th class="px-4 py-4 text-center">เบอร์โทร</th>
                         <th class="px-4 py-4 text-center">GPA</th>
@@ -446,7 +447,7 @@
                 $('#record_table tbody').empty();
 
                 if (response.length === 0) {
-                    $('#record_table tbody').append('<tr><td colspan="8" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
+                    $('#record_table tbody').append('<tr><td colspan="9" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
                 } else {
                     $.each(response, function (index, record) {
                         // Parse Plan String
@@ -475,6 +476,7 @@
 
                         var row = '<tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors border-b border-gray-100 dark:border-gray-800">' +
                             '<td class="px-4 py-3 text-center text-sm text-gray-500">' + (index + 1) + '</td>' +
+                            '<td class="px-4 py-3 text-center font-mono text-sm font-bold text-blue-600 dark:text-blue-400">' + (record.numreg || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center font-mono text-sm text-indigo-600 dark:text-indigo-400 font-medium">' + (record.citizenid || '-') + '</td>' +
                             '<td class="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">' + (record.fullname || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-mono text-sm">' + (record.now_tel || '-') + '</td>' +

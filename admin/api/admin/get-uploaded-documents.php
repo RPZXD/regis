@@ -21,7 +21,7 @@ try {
     $sql = "SELECT sd.id, sd.citizenid, sd.file_path, sd.original_name, sd.status, 
                    sd.uploaded_at, sd.reject_reason,
                    dr.name as doc_name, dr.registration_type_id,
-                   u.id as user_id, u.stu_name, u.stu_lastname,
+                   u.id as user_id, u.numreg, u.stu_prefix, u.stu_name, u.stu_lastname,
                    rt.name as type_name, gl.name as grade_name
             FROM student_documents sd
             JOIN document_requirements dr ON sd.requirement_id = dr.id
@@ -29,25 +29,25 @@ try {
             LEFT JOIN registration_types rt ON dr.registration_type_id = rt.id
             LEFT JOIN grade_levels gl ON rt.grade_level_id = gl.id
             WHERE 1=1";
-    
+
     $params = [];
-    
+
     if ($status) {
         $sql .= " AND sd.status = ?";
         $params[] = $status;
     }
-    
+
     if ($typeId) {
         $sql .= " AND dr.registration_type_id = ?";
         $params[] = $typeId;
     }
-    
+
     $sql .= " ORDER BY sd.uploaded_at DESC";
-    
+
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
     $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Process results
     $result = [];
     foreach ($documents as $doc) {
@@ -55,7 +55,8 @@ try {
             'id' => $doc['id'],
             'user_id' => $doc['user_id'],
             'citizenid' => $doc['citizenid'],
-            'fullname' => trim(($doc['stu_name'] ?? '') . ' ' . ($doc['stu_lastname'] ?? '')),
+            'numreg' => $doc['numreg'],
+            'fullname' => trim(($doc['stu_prefix'] ?? '') . ($doc['stu_name'] ?? '') . ' ' . ($doc['stu_lastname'] ?? '')),
             'file_path' => $doc['file_path'],
             'original_name' => $doc['original_name'],
             'doc_name' => $doc['doc_name'],
@@ -65,7 +66,7 @@ try {
             'reject_reason' => $doc['reject_reason']
         ];
     }
-    
+
     // Get stats
     $statsSql = "SELECT 
                     COUNT(*) as total,
@@ -75,7 +76,7 @@ try {
                  FROM student_documents";
     $statsStmt = $db->query($statsSql);
     $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
-    
+
     // Get types for filter
     $typesSql = "SELECT DISTINCT rt.id, rt.name, gl.name as grade_name 
                  FROM registration_types rt
@@ -84,7 +85,7 @@ try {
                  ORDER BY gl.id, rt.id";
     $typesStmt = $db->query($typesSql);
     $types = $typesStmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     echo json_encode([
         'documents' => $result,
         'stats' => $stats,

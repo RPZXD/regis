@@ -1,14 +1,59 @@
 <?php
 
+// Auto-detect environment based on hostname
+function isLocalEnvironment()
+{
+    $localHosts = ['localhost', '127.0.0.1', '::1'];
+    $serverName = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    // Check if running on localhost or local IP
+    if (in_array($serverName, $localHosts)) {
+        return true;
+    }
+
+    // Check for local development paths (XAMPP on Mac)
+    if (strpos(__DIR__, '/Applications/XAMPP/') !== false) {
+        return true;
+    }
+
+    // Check for common local domains
+    if (strpos($serverName, '.local') !== false || strpos($serverName, '.test') !== false) {
+        return true;
+    }
+
+    return false;
+}
+
+// Get database credentials based on environment
+function getDbCredentials()
+{
+    if (isLocalEnvironment()) {
+        return [
+            'username' => 'root',
+            'password' => 'storage'
+        ];
+    } else {
+        return [
+            'username' => 'adminregister',
+            'password' => '0Z219iu&p'
+        ];
+    }
+}
+
 class Database_User
 {
     private $host = "localhost:3306";
     private $db = "phichaia_student";
-    // private $username = "adminregister";
-    // private $password = "0Z219iu&p";
-    private $username = "root";
-    private $password = "storage";
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct()
+    {
+        $creds = getDbCredentials();
+        $this->username = $creds['username'];
+        $this->password = $creds['password'];
+    }
 
     public function getConnection()
     {
@@ -30,11 +75,16 @@ class Database_Regis
 {
     private $host = "localhost:3306";
     private $db = "phichaia_regis";
-    // private $username = "adminregister";
-    // private $password = "0Z219iu&p";
-    private $username = "root";
-    private $password = "storage";
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct()
+    {
+        $creds = getDbCredentials();
+        $this->username = $creds['username'];
+        $this->password = $creds['password'];
+    }
 
     public function getConnection()
     {
