@@ -150,6 +150,11 @@
                                 <input type="text" id="editCitizenId" maxlength="13" class="input-field" required>
                             </div>
                             <div>
+                                <label class="label-text">เลขที่ผู้สมัคร</label>
+                                <input type="text" id="editSeatNumber" class="input-field bg-gray-100 dark:bg-gray-600"
+                                    readonly placeholder="-">
+                            </div>
+                            <div>
                                 <label class="label-text">ประเภทการสมัคร</label>
                                 <input type="text" id="editTyperegis" class="input-field bg-gray-100 dark:bg-gray-600"
                                     readonly>
@@ -575,6 +580,7 @@
                     $('#editStudentId').val(r.id);
                     $('#editCitizenId').val(r.citizenid);
                     $('#editCitizenIdHidden').val(r.citizenid);
+                    $('#editSeatNumber').val(r.numreg || '-');
                     $('#editTyperegis').val(r.typeregis);
                     $('#editPrefix').val(r.stu_prefix);
                     $('#editFirstName').val(r.stu_name);
@@ -757,7 +763,7 @@
 
         // Full Header List
         const headers = [
-            "ลำดับ", "เลขบัตรประชาชน", "คำนำหน้า", "ชื่อ", "นามสกุล", "เพศ", "วันเกิด",
+            "ลำดับ", "เลขที่ผู้สมัคร", "เลขบัตรประชาชน", "คำนำหน้า", "ชื่อ", "นามสกุล", "เพศ", "วันเกิด",
             "เบอร์โทรนักเรียน", "ประเภทการสมัคร", "ศาสนา", "เชื้อชาติ", "สัญชาติ", "กรุ๊ปเลือด",
             "ที่อยู่ปัจจุบัน", "หมู่", "ซอย", "ถนน", "ตำบล", "อำเภอ", "จังหวัด", "รหัสไปรษณีย์",
             "โรงเรียนเดิม", "จังหวัด(รร.เดิม)", "อำเภอ(รร.เดิม)", "GPA รวม", "GPA วิทย์", "GPA คณิต", "GPA อังกฤษ",
@@ -785,6 +791,7 @@
 
             let stringRow = [
                 index + 1,
+                s(row.numreg),
                 s(row.citizenid),
                 s(row.stu_prefix),
                 s(row.stu_name),
@@ -840,6 +847,7 @@
             <thead>
                 <tr style="background-color: #f0f0f0;">
                     <th>ลำดับ</th>
+                    <th>เลขที่ผู้สมัคร</th>
                     <th>เลขบัตรประชาชน</th>
                     <th>คำนำหน้า</th>
                     <th>ชื่อ</th>
@@ -885,6 +893,7 @@
             table += `
             <tr>
                 <td>${index + 1}</td>
+                <td style="mso-number-format:'@'">${row.numreg || '-'}</td>
                 <td style="mso-number-format:'@'">${row.citizenid || '-'}</td>
                 <td>${row.stu_prefix || '-'}</td>
                 <td>${row.stu_name || '-'}</td>
