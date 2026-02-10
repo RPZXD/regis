@@ -774,7 +774,7 @@
             "ลำดับ", "เลขที่ผู้สมัคร", "เลขบัตรประชาชน", "คำนำหน้า", "ชื่อ", "นามสกุล", "เพศ", "วันเกิด",
             "เบอร์โทรนักเรียน", "ประเภทการสมัคร", "ศาสนา", "เชื้อชาติ", "สัญชาติ", "กรุ๊ปเลือด",
             "ที่อยู่ปัจจุบัน", "หมู่", "ซอย", "ถนน", "ตำบล", "อำเภอ", "จังหวัด", "รหัสไปรษณีย์",
-            "โรงเรียนเดิม", "จังหวัด(รร.เดิม)", "อำเภอ(รร.เดิม)", "GPA รวม", "GPA วิทย์", "GPA คณิต", "GPA อังกฤษ",
+            "โรงเรียนเดิม", "จังหวัด(รร.เดิม)", "อำเภอ(รร.เดิม)", "เลขประจำตัวเดิม", "GPA รวม", "GPA วิทย์", "GPA คณิต", "GPA อังกฤษ",
             "ชื่อบิดา", "เบอร์โทรบิดา", "อาชีพบิดา",
             "ชื่อมารดา", "เบอร์โทรมารดา", "อาชีพมารดา",
             "ผู้ปกครอง", "ความสัมพันธ์", "เบอร์โทรผู้ปกครอง",
@@ -817,6 +817,7 @@
                 s(row.now_subdistrict), s(row.now_district), s(row.now_province), s(row.now_post),
                 // Education
                 s(row.old_school), s(row.old_school_province), s(row.old_school_district),
+                s(row.old_student_id),
                 s(row.gpa_total), s(row.gpa_sci), s(row.gpa_math), s(row.gpa_eng),
                 // Family
                 s((row.dad_prefix || '') + ' ' + (row.dad_name || '') + ' ' + (row.dad_lastname || '')),
@@ -866,6 +867,7 @@
                     <th>GPA วิทย์</th>
                     <th>GPA คณิต</th>
                     <th>GPA อังกฤษ</th>
+                    <th>เลขประจำตัวเดิม</th>
                     <th>โรงเรียนเดิม</th>
                     <th>จังหวัด</th>
                     <th>ที่อยู่ปัจจุบัน</th>
@@ -912,6 +914,7 @@
                 <td>${row.gpa_sci || '-'}</td>
                 <td>${row.gpa_math || '-'}</td>
                 <td>${row.gpa_eng || '-'}</td>
+                <td style="mso-number-format:'@'">${row.old_student_id || '-'}</td>
                 <td>${row.old_school || '-'}</td>
                 <td>${row.old_school_province || '-'}</td>
                 <td>${row.now_addr || '-'} หมู่ ${row.now_moo || '-'} ซอย ${row.now_soy || '-'} ถนน ${row.now_street || '-'}</td>
