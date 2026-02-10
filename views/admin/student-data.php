@@ -818,7 +818,7 @@
                 // Education
                 s(row.old_school), s(row.old_school_province), s(row.old_school_district),
                 s(row.old_student_id),
-                s(row.gpa_total), s(row.gpa_sci), s(row.gpa_math), s(row.gpa_eng),
+                s(row.gpa_total), s(row.grade_science), s(row.grade_math), s(row.grade_english),
                 // Family
                 s((row.dad_prefix || '') + ' ' + (row.dad_name || '') + ' ' + (row.dad_lastname || '')),
                 s(row.dad_tel), s(row.dad_job),
@@ -911,9 +911,9 @@
                 <td>${plans}</td>
                 <td style="mso-number-format:'@'">${row.now_tel || '-'}</td>
                 <td>${row.gpa_total || '-'}</td>
-                <td>${row.gpa_sci || '-'}</td>
-                <td>${row.gpa_math || '-'}</td>
-                <td>${row.gpa_eng || '-'}</td>
+                <td>${row.grade_science || '-'}</td>
+                <td>${row.grade_math || '-'}</td>
+                <td>${row.grade_english || '-'}</td>
                 <td style="mso-number-format:'@'">${row.old_student_id || '-'}</td>
                 <td>${row.old_school || '-'}</td>
                 <td>${row.old_school_province || '-'}</td>
