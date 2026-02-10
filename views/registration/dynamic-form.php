@@ -358,17 +358,19 @@ $prefixOptions = ($grade == '1')
                         </div>
                     <?php endif; ?>
 
-                    <!-- Quota: Old Student ID -->
-                    <?php if ($showQuotaConfirm): ?>
+                    <!-- Old Student ID (for special and quota types) -->
+                    <?php if ($isSpecialType || $showQuotaConfirm): ?>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <i class="fas fa-id-badge mr-2 text-blue-500"></i>เลขประจำตัวเดิม *
+                                <i class="fas fa-id-badge mr-2 text-blue-500"></i>เลขประจำตัวเดิม
                             </label>
                             <input type="text" name="old_student_id" maxlength="10"
                                 class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                                placeholder="เลขประจำตัวนักเรียน ม.3" required>
+                                placeholder="เลขประจำตัวนักเรียนเดิม (ถ้ามี)">
                         </div>
+                    <?php endif; ?>
 
+                    <?php if ($showQuotaConfirm): ?>
                         <!-- Quota confirmation -->
                         <div class="lg:col-span-3">
                             <div
