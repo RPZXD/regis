@@ -333,4 +333,42 @@ class AdminConfig
         $stmt = $this->db->prepare("DELETE FROM study_plan_fees WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    public function clearPlanFees($planId)
+    {
+        $stmt = $this->db->prepare("DELETE FROM study_plan_fees WHERE plan_id = ?");
+        return $stmt->execute([$planId]);
+    }
+
+    public function copyPlanFees($sourcePlanId, $targetPlanId, $mode = 'replace')
+    {
+        if ($mode === 'replace') {
+            $this->clearPlanFees($targetPlanId);
+        }
+        $sql = "INSERT INTO study_plan_fees (plan_id, category, item_name, term1_amount, term2_amount, sort_order)
+                SELECT ?, category, item_name, term1_amount, term2_amount, sort_order
+                FROM study_plan_fees WHERE plan_id = ? ORDER BY sort_order ASC";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$targetPlanId, $sourcePlanId]);
+    }
+
+    public function importPlanFees($planId, $fees, $mode = 'replace')
+    {
+        if ($mode === 'replace') {
+            $this->clearPlanFees($planId);
+        }
+        $sql = "INSERT INTO study_plan_fees (plan_id, category, item_name, term1_amount, term2_amount, sort_order) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        foreach ($fees as $fee) {
+            $stmt->execute([
+                $planId,
+                $fee['category'],
+                $fee['item_name'],
+                $fee['term1_amount'] ?? 0,
+                $fee['term2_amount'] ?? 0,
+                $fee['sort_order'] ?? 0
+            ]);
+        }
+        return true;
+    }
 }
