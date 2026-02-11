@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 require_once("../config/Database.php");
 require_once("../class/AdminConfig.php");
@@ -15,25 +15,12 @@ $connectDB = new Database_Regis();
 $db = $connectDB->getConnection();
 $adminConfig = new AdminConfig($db);
 
-// Fetch all plans
-// We need to iterate through all active types to get plans, or if getStudyPlans(null) works.
-// Let's manually aggregate to be safe and get Type Names.
-$allPlans = [];
-
-$m1Types = $adminConfig->getActiveRegistrationTypes('m1');
-$m4Types = $adminConfig->getActiveRegistrationTypes('m4');
-$allTypes = array_merge($m1Types, $m4Types);
-
-
-
-foreach ($allTypes as $type) {
-    $plans = $adminConfig->getStudyPlans($type['id']);
-    foreach ($plans as $plan) {
-        $plan['type_name'] = $type['name'];
-        $plan['grade_code'] = ($type['grade_code'] == 'm1') ? 'ม.1' : 'ม.4';
-        $allPlans[] = $plan;
-    }
+// Fetch ALL plans (regardless of registration schedule)
+$allPlans = $adminConfig->getStudyPlans();
+foreach ($allPlans as &$plan) {
+    $plan['grade_code'] = ($plan['grade_code'] == 'm1') ? 'ม.1' : 'ม.4';
 }
+unset($plan);
 
 ob_start();
 include '../views/admin/manage-fees.php';
