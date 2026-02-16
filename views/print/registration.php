@@ -5,11 +5,15 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 <div class="space-y-8">
     <!-- Page Header with Gradient -->
     <div class="text-center relative">
-        <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-rose-500/10 rounded-3xl blur-3xl -z-10"></div>
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-2xl shadow-purple-500/40 mb-6 animate-bounce-slow">
+        <div
+            class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-rose-500/10 rounded-3xl blur-3xl -z-10">
+        </div>
+        <div
+            class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-2xl shadow-purple-500/40 mb-6 animate-bounce-slow">
             <i class="fas fa-print text-3xl text-white"></i>
         </div>
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
+        <h1
+            class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
             พิมพ์ใบสมัครเรียน
         </h1>
         <p class="mt-3 text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
@@ -25,14 +29,14 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         <i class="fas fa-id-card mr-2 text-purple-500"></i>เลขบัตรประชาชน หรือ ชื่อ-นามสกุล
                     </label>
-                    <input type="text" id="search_input" name="search_input" 
-                           class="w-full px-5 py-4 text-center text-xl font-mono tracking-widest rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
-                           placeholder="X-XXXX-XXXXX-XX-X" 
-                           value="<?php echo htmlspecialchars($citizenidParam); ?>"
-                           required>
+                    <input type="text" id="search_input" name="search_input"
+                        class="w-full px-5 py-4 text-center text-xl font-mono tracking-widest rounded-2xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                        placeholder="X-XXXX-XXXXX-XX-X" value="<?php echo htmlspecialchars($citizenidParam); ?>"
+                        required>
                 </div>
-                
-                <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all transform hover:-translate-y-1 hover:scale-[1.02] group">
+
+                <button type="submit"
+                    class="w-full py-4 px-6 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 hover:from-purple-600 hover:via-pink-600 hover:to-rose-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all transform hover:-translate-y-1 hover:scale-[1.02] group">
                     <i class="fas fa-search mr-3 group-hover:animate-pulse"></i>ค้นหาข้อมูล
                 </button>
             </form>
@@ -54,7 +58,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     </div>
                 </div>
             </div>
-            
+
             <div class="p-6">
                 <!-- Info Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -77,11 +81,13 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
                 <!-- Registration Info -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800">
+                    <div
+                        class="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800">
                         <p class="text-xs text-purple-600 dark:text-purple-400 mb-1">ประเภทการสมัคร</p>
                         <p id="val_type" class="text-xl font-bold text-purple-700 dark:text-purple-300">-</p>
                     </div>
-                    <div class="bg-pink-50 dark:bg-pink-900/20 p-5 rounded-2xl border border-pink-100 dark:border-pink-800">
+                    <div
+                        class="bg-pink-50 dark:bg-pink-900/20 p-5 rounded-2xl border border-pink-100 dark:border-pink-800">
                         <p class="text-xs text-pink-600 dark:text-pink-400 mb-1">ระดับชั้น</p>
                         <p id="val_level" class="text-xl font-bold text-pink-700 dark:text-pink-300">-</p>
                     </div>
@@ -96,7 +102,8 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                 </div>
 
                 <!-- Print Button -->
-                <button id="printButton" class="w-full py-5 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-green-500/30 transition-all transform hover:-translate-y-1 hover:scale-[1.02] group">
+                <button id="printButton"
+                    class="w-full py-5 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white font-bold text-lg rounded-2xl shadow-lg shadow-green-500/30 transition-all transform hover:-translate-y-1 hover:scale-[1.02] group">
                     <div class="flex items-center justify-center">
                         <div class="bg-white/20 rounded-full p-3 mr-4 group-hover:rotate-12 transition-transform">
                             <i class="fas fa-print text-2xl"></i>
@@ -123,72 +130,137 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 </div>
 
 <style>
-@keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-.animate-bounce-slow { animation: bounce-slow 3s infinite; }
-.animate-fade-in { animation: fadeIn 0.5s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounce-slow {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .animate-bounce-slow {
+        animation: bounce-slow 3s infinite;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 
 <script>
-// Auto-search if citizenid is provided
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search_input').value;
-    if (searchInput && searchInput.length >= 10) {
-        document.getElementById('searchForm').dispatchEvent(new Event('submit'));
-    }
-});
+    // Auto-search if citizenid is provided
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search_input').value;
+        if (searchInput && searchInput.length >= 10) {
+            document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        }
+    });
 
-document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var searchInput = document.getElementById('search_input').value;
+    document.getElementById('searchForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        var searchInput = document.getElementById('search_input').value;
+        fetchAndDisplay(searchInput);
+    });
 
-    Swal.fire({ title: 'กำลังค้นหา...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    function fetchAndDisplay(searchInput, regId) {
+        Swal.fire({ title: 'กำลังค้นหา...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-    fetch('api/fetch_reg.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ search_input: searchInput }) })
-    .then(response => response.json())
-    .then(data => {
-        Swal.close();
-        if (data.exists) {
-            Swal.fire({ icon: 'success', title: 'พบข้อมูล', timer: 1500, showConfirmButton: false });
-            
-            // Populate Data
-            document.getElementById('studentName').textContent = data.fullname;
-            document.getElementById('studentTypeLevel').textContent = data.typeregis + ' | ม.' + data.level;
-            document.getElementById('val_citizenid').textContent = data.citizenid;
-            document.getElementById('val_birthday').textContent = data.birthday || '-';
-            document.getElementById('val_tel').textContent = data.now_tel || '-';
-            document.getElementById('val_type').textContent = data.typeregis;
-            document.getElementById('val_level').textContent = 'มัธยมศึกษาปีที่ ' + data.level;
+        const payload = { search_input: searchInput };
+        if (regId) payload.reg_id = regId;
 
-            // Plans
-            const plansList = document.getElementById('val_plans');
-            plansList.innerHTML = '';
-            if (data.plans && data.plans.length > 0) {
-                data.plans.forEach((plan, index) => {
-                    plansList.innerHTML += `<li class="flex items-center text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm">
+        fetch('api/fetch_reg.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            .then(response => response.json())
+            .then(data => {
+                Swal.close();
+                if (data.exists && data.multiple) {
+                    // Multiple registrations — let user choose
+                    let html = '<div style="text-align:left">';
+                    data.registrations.forEach((reg, i) => {
+                        html += `<label style="display:flex;align-items:center;padding:10px;margin:5px 0;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;transition:all 0.2s" 
+                    onmouseover="this.style.borderColor='#8b5cf6';this.style.background='#f5f3ff'" 
+                    onmouseout="this.style.borderColor=this.querySelector('input').checked?'#8b5cf6':'#e5e7eb';this.style.background=this.querySelector('input').checked?'#f5f3ff':''">
+                    <input type="radio" name="reg_choice" value="${reg.id}" ${i === 0 ? 'checked' : ''} style="margin-right:10px;accent-color:#8b5cf6">
+                    <div>
+                        <div style="font-weight:600;color:#1f2937">${reg.typeregis}</div>
+                        <div style="font-size:0.85em;color:#6b7280">ม.${reg.level} | เลขที่ ${reg.numreg || '-'}</div>
+                    </div>
+                </label>`;
+                    });
+                    html += '</div>';
+
+                    Swal.fire({
+                        title: `${data.fullname}`,
+                        html: `<p style="margin-bottom:12px;color:#6b7280">พบการสมัคร ${data.registrations.length} ประเภท กรุณาเลือก:</p>${html}`,
+                        icon: 'question',
+                        confirmButtonText: '<i class="fas fa-check mr-2"></i>เลือกประเภทนี้',
+                        confirmButtonColor: '#8b5cf6',
+                        showCancelButton: true,
+                        cancelButtonText: 'ยกเลิก'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            const selectedId = document.querySelector('input[name="reg_choice"]:checked').value;
+                            fetchAndDisplay(searchInput, selectedId);
+                        }
+                    });
+                    return;
+                }
+                if (data.exists) {
+                    Swal.fire({ icon: 'success', title: 'พบข้อมูล', timer: 1500, showConfirmButton: false });
+
+                    // Populate Data
+                    document.getElementById('studentName').textContent = data.fullname;
+                    document.getElementById('studentTypeLevel').textContent = data.typeregis + ' | ม.' + data.level;
+                    document.getElementById('val_citizenid').textContent = data.citizenid;
+                    document.getElementById('val_birthday').textContent = data.birthday || '-';
+                    document.getElementById('val_tel').textContent = data.now_tel || '-';
+                    document.getElementById('val_type').textContent = data.typeregis;
+                    document.getElementById('val_level').textContent = 'มัธยมศึกษาปีที่ ' + data.level;
+
+                    // Plans
+                    const plansList = document.getElementById('val_plans');
+                    plansList.innerHTML = '';
+                    if (data.plans && data.plans.length > 0) {
+                        data.plans.forEach((plan, index) => {
+                            plansList.innerHTML += `<li class="flex items-center text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-700 p-3 rounded-xl shadow-sm">
                         <span class="w-7 h-7 flex items-center justify-center bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-full text-sm font-bold mr-3">${index + 1}</span>${plan}
                     </li>`;
-                });
-            } else {
-                plansList.innerHTML = '<li class="text-gray-400 italic text-sm">ไม่พบข้อมูลแผนการเรียน</li>';
-            }
+                        });
+                    } else {
+                        plansList.innerHTML = '<li class="text-gray-400 italic text-sm">ไม่พบข้อมูลแผนการเรียน</li>';
+                    }
 
-            // Print button
-            document.getElementById('printButton').onclick = function() { 
-                window.location.href = `print_reginfo.php?citizenid=${data.citizenid}`; 
-            };
+                    // Print button
+                    document.getElementById('printButton').onclick = function () {
+                        window.location.href = `print_reginfo.php?citizenid=${data.citizenid}`;
+                    };
 
-            document.getElementById('studentInfo').classList.remove('hidden');
-            document.getElementById('studentInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-        } else {
-            Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: 'ไม่พบข้อมูลผู้สมัครที่ค้นหา', confirmButtonColor: '#ef4444' });
-            document.getElementById('studentInfo').classList.add('hidden');
-        }
-    })
-    .catch(error => {
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', confirmButtonColor: '#ef4444' });
-    });
-});
+                    document.getElementById('studentInfo').classList.remove('hidden');
+                    document.getElementById('studentInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } else {
+                    Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', text: 'ไม่พบข้อมูลผู้สมัครที่ค้นหา', confirmButtonColor: '#ef4444' });
+                    document.getElementById('studentInfo').classList.add('hidden');
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', confirmButtonColor: '#ef4444' });
+            });
+    }
 </script>

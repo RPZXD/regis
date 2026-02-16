@@ -84,13 +84,13 @@ try {
     // Get current academic year
     $academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
 
-    // Check for duplicate registration
-    $checkSql = "SELECT id FROM users WHERE citizenid = ? AND reg_pee = ? AND level = ?";
+    // Check for duplicate registration (same citizen + year + level + type)
+    $checkSql = "SELECT id FROM users WHERE citizenid = ? AND reg_pee = ? AND level = ? AND typeregis = ?";
     $checkStmt = $db->prepare($checkSql);
-    $checkStmt->execute([$citizenId, $academicYear, $regType['grade_code']]);
+    $checkStmt->execute([$citizenId, $academicYear, $regType['grade_code'], $regType['name']]);
 
     if ($checkStmt->fetch()) {
-        throw new Exception('เลขบัตรประชาชนนี้ได้สมัครแล้วในปีการศึกษานี้');
+        throw new Exception('เลขบัตรประชาชนนี้ได้สมัครประเภท "' . $regType['name'] . '" แล้วในปีการศึกษานี้');
     }
 
     // Prepare data for insert
@@ -98,7 +98,7 @@ try {
     $typeRegis = $regType['name'];
 
     // Use manual numreg if provided, otherwise generate
-    $regNumber = !empty($_POST['numreg']) ? trim($_POST['numreg']) : generateRegNumber($db, $level, $academicYear);
+    $regNumber = !empty($_POST['numreg']) ? trim($_POST['numreg']) : generateRegNumber($db, $level, $academicYear, $regType['id']);
 
     // Build INSERT SQL - using actual column names from users table
     $sql = "INSERT INTO users (
@@ -229,20 +229,22 @@ try {
 
 /**
  * Generate registration number
- * Format: YYLL-XXXX (Year + Level + Sequence)
+ * Format: YYLLTT-XXXX (Year + Level + TypeId + Sequence)
+ * e.g., 69101-0001 = ปี 69, ม.1, ประเภท 01, ลำดับ 0001
  */
-function generateRegNumber($db, $level, $year)
+function generateRegNumber($db, $level, $year, $typeId)
 {
     $yearShort = substr($year, -2);
     $levelNum = str_replace('m', '', $level);
-    $prefix = $yearShort . $levelNum;
+    $typeNum = str_pad($typeId, 2, '0', STR_PAD_LEFT);
+    $prefix = $yearShort . $levelNum . $typeNum;
 
-    // Get next sequence
-    $sql = "SELECT MAX(CAST(SUBSTRING(numreg, 5) AS UNSIGNED)) as max_seq 
+    // Get next sequence — find the dash position dynamically
+    $sql = "SELECT MAX(CAST(SUBSTRING_INDEX(numreg, '-', -1) AS UNSIGNED)) as max_seq 
             FROM users 
             WHERE numreg LIKE ? AND reg_pee = ?";
     $stmt = $db->prepare($sql);
-    $stmt->execute([$prefix . '%', $year]);
+    $stmt->execute([$prefix . '-%', $year]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $nextSeq = ($result['max_seq'] ?? 0) + 1;

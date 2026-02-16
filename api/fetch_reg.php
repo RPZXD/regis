@@ -17,20 +17,54 @@ try {
 
     // Prepare search params
     $searchParam = "%{$search}%";
-    
-    // Search by Citizen ID OR Name
-    $sql = "SELECT * FROM users 
-            WHERE citizenid = :search 
-            OR CONCAT(stu_name, ' ', stu_lastname) LIKE :searchLike 
-            LIMIT 1";
-            
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        ':search' => $search,
-        ':searchLike' => $searchParam
-    ]);
-    
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    $regId = $data['reg_id'] ?? null;
+
+    // If a specific registration ID is provided, fetch that one directly
+    if ($regId) {
+        $sql = "SELECT * FROM users WHERE id = :regId LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':regId' => $regId]);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        // Search by Citizen ID OR Name — check for multiple registrations
+        $sql = "SELECT * FROM users 
+                WHERE citizenid = :search 
+                OR CONCAT(stu_name, ' ', stu_lastname) LIKE :searchLike 
+                ORDER BY id DESC";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':search' => $search,
+            ':searchLike' => $searchParam
+        ]);
+
+        $allResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($allResults) > 1) {
+            // Multiple registrations found — let user choose
+            $options = [];
+            foreach ($allResults as $row) {
+                $level = str_replace('m', '', strtolower($row['level']));
+                $options[] = [
+                    'id' => $row['id'],
+                    'typeregis' => $row['typeregis'],
+                    'level' => $level,
+                    'numreg' => $row['numreg'],
+                    'fullname' => $row['stu_prefix'] . $row['stu_name'] . ' ' . $row['stu_lastname']
+                ];
+            }
+            echo json_encode([
+                'exists' => true,
+                'multiple' => true,
+                'citizenid' => $allResults[0]['citizenid'],
+                'fullname' => $allResults[0]['stu_prefix'] . $allResults[0]['stu_name'] . ' ' . $allResults[0]['stu_lastname'],
+                'registrations' => $options
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $student = $allResults[0] ?? null;
+    }
 
     if ($student) {
         // Fetch Plans
@@ -46,23 +80,23 @@ try {
 
         // Map typeregis if needed
         $typeName = $student['typeregis'];
-        
+
         // Get registration type to check all schedules
         $registrationTypeId = $student['registration_type_id'] ?? null;
-        
+
         // Initialize all schedule variables
         $canPrint = false;
         $printMessage = 'ยังไม่ได้กำหนดช่วงเวลาพิมพ์ใบสมัคร';
         $printScheduleInfo = null;
-        
+
         $canUpload = false;
         $uploadMessage = 'ยังไม่ได้กำหนดช่วงเวลาอัพโหลด';
         $uploadScheduleInfo = null;
-        
+
         $canPrintCard = false;
         $printCardMessage = 'ยังไม่ได้กำหนดช่วงเวลาพิมพ์บัตรสอบ';
         $printCardScheduleInfo = null;
-        
+
         if ($registrationTypeId) {
             $typeSql = "SELECT rt.*, gl.name as grade_name 
                        FROM registration_types rt 
@@ -71,22 +105,22 @@ try {
             $typeStmt = $conn->prepare($typeSql);
             $typeStmt->execute([$registrationTypeId]);
             $regType = $typeStmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($regType) {
                 $typeName = $regType['name']; // Use registration type name
-                
+
                 $now = new DateTime();
-                
+
                 // === 1. Print Form Schedule (พิมพ์ใบสมัคร) ===
                 $printStart = !empty($regType['print_form_start']) ? new DateTime($regType['print_form_start']) : null;
                 $printEnd = !empty($regType['print_form_end']) ? new DateTime($regType['print_form_end']) : null;
-                
+
                 if ($printStart && $printEnd) {
                     $printScheduleInfo = [
                         'start' => $printStart->format('d/m/Y H:i'),
                         'end' => $printEnd->format('d/m/Y H:i')
                     ];
-                    
+
                     if ($now < $printStart) {
                         $canPrint = false;
                         $printMessage = 'ยังไม่ถึงช่วงเวลาพิมพ์ใบสมัคร (เริ่ม ' . $printStart->format('d/m/Y H:i') . ')';
@@ -102,17 +136,17 @@ try {
                     $canPrint = true;
                     $printMessage = 'สามารถพิมพ์ใบสมัครได้';
                 }
-                
+
                 // === 2. Upload Documents Schedule (อัพโหลดหลักฐาน) ===
                 $uploadStart = !empty($regType['upload_start']) ? new DateTime($regType['upload_start']) : null;
                 $uploadEnd = !empty($regType['upload_end']) ? new DateTime($regType['upload_end']) : null;
-                
+
                 if ($uploadStart && $uploadEnd) {
                     $uploadScheduleInfo = [
                         'start' => $uploadStart->format('d/m/Y H:i'),
                         'end' => $uploadEnd->format('d/m/Y H:i')
                     ];
-                    
+
                     if ($now < $uploadStart) {
                         $canUpload = false;
                         $uploadMessage = 'ยังไม่ถึงช่วงเวลาอัพโหลดเอกสาร (เริ่ม ' . $uploadStart->format('d/m/Y H:i') . ')';
@@ -128,17 +162,17 @@ try {
                     $canUpload = true;
                     $uploadMessage = 'สามารถอัพโหลดเอกสารได้';
                 }
-                
+
                 // === 3. Print Exam Card Schedule (พิมพ์บัตรสอบ) ===
                 $cardStart = !empty($regType['exam_card_start']) ? new DateTime($regType['exam_card_start']) : null;
                 $cardEnd = !empty($regType['exam_card_end']) ? new DateTime($regType['exam_card_end']) : null;
-                
+
                 if ($cardStart && $cardEnd) {
                     $printCardScheduleInfo = [
                         'start' => $cardStart->format('d/m/Y H:i'),
                         'end' => $cardEnd->format('d/m/Y H:i')
                     ];
-                    
+
                     if ($now < $cardStart) {
                         $canPrintCard = false;
                         $printCardMessage = 'ยังไม่ถึงช่วงเวลาพิมพ์บัตรสอบ (เริ่ม ' . $cardStart->format('d/m/Y H:i') . ')';
@@ -164,14 +198,29 @@ try {
             $uploadMessage = 'สามารถอัพโหลดเอกสารได้';
             $printCardMessage = 'สามารถพิมพ์บัตรสอบได้';
         }
-        
+
         // Format Thai Date
         $thai_months = [
-            "01" => "มกราคม", "02" => "กุมภาพันธ์", "03" => "มีนาคม", "04" => "เมษายน",
-            "05" => "พฤษภาคม", "06" => "มิถุนายน", "07" => "กรกฎาคม", "08" => "สิงหาคม",
-            "09" => "กันยายน", "10" => "ตุลาคม", "11" => "พฤศจิกายน", "12" => "ธันวาคม",
-            "1" => "มกราคม", "2" => "กุมภาพันธ์", "3" => "มีนาคม", "4" => "เมษายน",
-            "5" => "พฤษภาคม", "6" => "มิถุนายน", "7" => "กรกฎาคม", "8" => "สิงหาคม",
+            "01" => "มกราคม",
+            "02" => "กุมภาพันธ์",
+            "03" => "มีนาคม",
+            "04" => "เมษายน",
+            "05" => "พฤษภาคม",
+            "06" => "มิถุนายน",
+            "07" => "กรกฎาคม",
+            "08" => "สิงหาคม",
+            "09" => "กันยายน",
+            "10" => "ตุลาคม",
+            "11" => "พฤศจิกายน",
+            "12" => "ธันวาคม",
+            "1" => "มกราคม",
+            "2" => "กุมภาพันธ์",
+            "3" => "มีนาคม",
+            "4" => "เมษายน",
+            "5" => "พฤษภาคม",
+            "6" => "มิถุนายน",
+            "7" => "กรกฎาคม",
+            "8" => "สิงหาคม",
             "9" => "กันยายน"
         ];
         $monthKey = $student['month_birth'];
@@ -188,7 +237,7 @@ try {
         $uploadedDocsCount = 0;
         $approvedDocsCount = 0;
         $rejectedDocsCount = 0;
-        
+
         // Find registration type ID from level and typeregis if not set
         $regTypeId = $student['registration_type_id'] ?? null;
         if (!$regTypeId && $student['level'] && $student['typeregis']) {
@@ -198,16 +247,17 @@ try {
             $typeFindStmt = $conn->prepare($typeFindSql);
             $typeFindStmt->execute([strtolower($student['level']), '%' . $student['typeregis'] . '%']);
             $typeFindResult = $typeFindStmt->fetch(PDO::FETCH_ASSOC);
-            if ($typeFindResult) $regTypeId = $typeFindResult['id'];
+            if ($typeFindResult)
+                $regTypeId = $typeFindResult['id'];
         }
-        
+
         if ($regTypeId) {
             // Get required documents count
             $reqDocsSql = "SELECT COUNT(*) FROM document_requirements WHERE registration_type_id = ? AND is_required = 1 AND is_active = 1";
             $reqDocsStmt = $conn->prepare($reqDocsSql);
             $reqDocsStmt->execute([$regTypeId]);
             $requiredDocsTotal = (int) $reqDocsStmt->fetchColumn();
-            
+
             // Get uploaded documents status
             $uploadedSql = "SELECT sd.status FROM student_documents sd 
                             JOIN document_requirements dr ON sd.requirement_id = dr.id
@@ -215,13 +265,15 @@ try {
             $uploadedStmt = $conn->prepare($uploadedSql);
             $uploadedStmt->execute([$student['citizenid']]);
             $uploadedDocs = $uploadedStmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             $uploadedDocsCount = count($uploadedDocs);
             foreach ($uploadedDocs as $doc) {
-                if ($doc['status'] === 'approved') $approvedDocsCount++;
-                if ($doc['status'] === 'rejected') $rejectedDocsCount++;
+                if ($doc['status'] === 'approved')
+                    $approvedDocsCount++;
+                if ($doc['status'] === 'rejected')
+                    $rejectedDocsCount++;
             }
-            
+
             // Determine status
             if ($requiredDocsTotal == 0) {
                 $docStatus = 'none';
