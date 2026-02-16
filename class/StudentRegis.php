@@ -134,7 +134,7 @@ class StudentRegis
             u.now_tel, u.gpa_total, u.status, u.create_at,
             CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
-            GROUP_CONCAT(CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
+            GROUP_CONCAT(DISTINCT CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
             FROM users u
             LEFT JOIN student_study_plans ssp ON u.id = ssp.user_id 
             WHERE u.level IN ($levelStr)";
