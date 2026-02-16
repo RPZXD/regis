@@ -155,7 +155,16 @@ class StudentRegis
         if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
             $stmt->bindParam(':typeName', $typeName);
         }
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S22' && strpos($e->getMessage(), 'user_id') !== false) {
+                $this->autoMigrateUserId();
+                $stmt->execute();
+            } else {
+                throw $e;
+            }
+        }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -280,7 +289,16 @@ class StudentRegis
         if (!(($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป')) {
             $stmt->bindParam(':typeName', $typeName);
         }
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            if ($e->getCode() == '42S22' && strpos($e->getMessage(), 'user_id') !== false) {
+                $this->autoMigrateUserId();
+                $stmt->execute();
+            } else {
+                throw $e;
+            }
+        }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -1119,6 +1137,28 @@ class StudentRegis
         }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function autoMigrateUserId()
+    {
+        try {
+            // Add user_id column
+            $this->conn->exec("ALTER TABLE student_study_plans ADD COLUMN user_id INT(11) AFTER id");
+            $this->conn->exec("ALTER TABLE student_study_plans ADD INDEX (user_id)");
+
+            // Back-fill data
+            $this->conn->exec("UPDATE student_study_plans ssp 
+                             SET ssp.user_id = (
+                                 SELECT u.id 
+                                 FROM users u 
+                                 WHERE u.citizenid = ssp.citizenid 
+                                 ORDER BY u.id DESC 
+                                 LIMIT 1
+                             )
+                             WHERE ssp.user_id IS NULL OR ssp.user_id = 0");
+        } catch (Exception $e) {
+            // Fail silently if migration fails for some reason, let the main query error be thrown
+        }
     }
 }
 ?>
