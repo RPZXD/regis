@@ -302,6 +302,7 @@ try {
 
         echo json_encode([
             'exists' => true,
+            'id' => $student['id'],
             'citizenid' => $student['citizenid'],
             'fullname' => $student['stu_prefix'] . $student['stu_name'] . ' ' . $student['stu_lastname'],
             'typeregis' => $student['typeregis'],

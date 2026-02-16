@@ -15,7 +15,7 @@ $db = $dbRegis->getConnection();
 $db->exec("set names utf8");
 
 // Get student ID
-$uid = $_GET['stu_id'] ?? null;
+$uid = $_GET['uid'] ?? $_GET['stu_id'] ?? null;
 $citizenid = $_GET['citizenid'] ?? null;
 
 if ($uid) {
