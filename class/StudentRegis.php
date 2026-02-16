@@ -129,8 +129,10 @@ class StudentRegis
             $levels[] = 'm4';
         $levelStr = "'" . implode("','", $levels) . "'";
 
-        // Select ALL user columns + calculated fields
-        $sql = "SELECT u.*, CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
+        // Select specific columns + calculated fields to avoid GROUP BY issues with u.*
+        $sql = "SELECT u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
+            u.now_tel, u.gpa_total, u.status, u.create_at,
+            CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
             GROUP_CONCAT(CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
             FROM users u
