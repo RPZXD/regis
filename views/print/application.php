@@ -163,7 +163,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
     document.getElementById('searchForm').addEventListener('submit', function (event) {
         event.preventDefault();
-        var searchInput = document.getElementById('search_input').value;
+        var searchInput = document.getElementById('search_input').value.trim();
 
         Swal.fire({ title: 'กำลังค้นหา...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 

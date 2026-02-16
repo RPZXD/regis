@@ -162,7 +162,7 @@
 <script>
     document.getElementById('searchForm').addEventListener('submit', function (event) {
         event.preventDefault();
-        var searchInput = document.getElementById('search_input').value;
+        var searchInput = document.getElementById('search_input').value.trim();
 
         fetchAndDisplay(searchInput);
     });

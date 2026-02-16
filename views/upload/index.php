@@ -149,7 +149,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
     document.getElementById('searchForm').addEventListener('submit', function (event) {
         event.preventDefault();
-        const citizenid = document.getElementById('search_citizenid').value;
+        const citizenid = document.getElementById('search_citizenid').value.trim();
 
         fetchAndDisplay(citizenid);
     });

@@ -26,15 +26,23 @@ try {
         $stmt->execute([':regId' => $regId]);
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
     } else {
+        // Normalize search input if it looks like a citizen ID (has dashes or is 13 digits)
+        $cleanSearch = $search;
+        if (preg_match('/[0-9-]{10,}/', $search)) {
+            $cleanSearch = preg_replace('/[^0-9]/', '', $search);
+        }
+
         // Search by Citizen ID OR Name — check for multiple registrations
         $sql = "SELECT * FROM users 
                 WHERE citizenid = :search 
+                OR citizenid = :cleanSearch
                 OR CONCAT(stu_name, ' ', stu_lastname) LIKE :searchLike 
                 ORDER BY id DESC";
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             ':search' => $search,
+            ':cleanSearch' => $cleanSearch,
             ':searchLike' => $searchParam
         ]);
 
