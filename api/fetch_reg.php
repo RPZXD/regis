@@ -72,10 +72,10 @@ try {
         $planSql = "SELECT sp.name 
                    FROM student_study_plans ssp
                    JOIN study_plans sp ON ssp.plan_id = sp.id
-                   WHERE ssp.citizenid = :citizenid
+                   WHERE ssp.user_id = :userId
                    ORDER BY ssp.priority ASC";
         $planStmt = $conn->prepare($planSql);
-        $planStmt->execute([':citizenid' => $student['citizenid']]);
+        $planStmt->execute([':userId' => $student['id']]);
         $plans = $planStmt->fetchAll(PDO::FETCH_COLUMN);
 
         // Map typeregis if needed

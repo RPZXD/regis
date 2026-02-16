@@ -14,19 +14,24 @@ $dbRegis = new Database_Regis();
 $db = $dbRegis->getConnection();
 $db->exec("set names utf8");
 
-// Get student by citizen ID
+// Get student ID (priority) or citizen ID
+$regId = $_GET['reg_id'] ?? $_GET['id'] ?? null;
 $citizenid = $_GET['citizenid'] ?? null;
 
-if (!$citizenid) {
-    die('กรุณาระบุเลขบัตรประชาชน');
+if ($regId) {
+    $select_stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
+    $select_stmt->execute([':id' => $regId]);
+} elseif ($citizenid) {
+    $cleanCitizen = preg_replace('/[^0-9]/', '', $citizenid);
+    $select_stmt = $db->prepare("SELECT * FROM users WHERE citizenid = :citizenid ORDER BY id DESC LIMIT 1");
+    $select_stmt->execute([':citizenid' => $cleanCitizen]);
+} else {
+    die('กรุณาระบุรหัสผู้สมัครหรือเลขบัตรประชาชน');
 }
-
-$cleanCitizen = preg_replace('/[^0-9]/', '', $citizenid);
-$select_stmt = $db->prepare("SELECT * FROM users WHERE citizenid = :citizenid");
-$select_stmt->execute([':citizenid' => $cleanCitizen]);
 $row = $select_stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$row) die('ไม่พบข้อมูลนักเรียน');
+if (!$row)
+    die('ไม่พบข้อมูลนักเรียน');
 
 // Settings - Handle both key-value and column-based settings table
 $settings = [];
@@ -35,7 +40,7 @@ try {
     $settingStmt = $db->prepare("SELECT * FROM settings");
     $settingStmt->execute();
     $settingsRows = $settingStmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     if (!empty($settingsRows)) {
         // Check if it's key-value format (has 'key_name' column)
         if (isset($settingsRows[0]['key_name'])) {
@@ -119,11 +124,12 @@ try {
     $photoStmt = $db->prepare("SELECT path FROM tbl_uploads WHERE citizenid = :citizenid AND name = 'document8'");
     $photoStmt->execute([':citizenid' => $row['citizenid']]);
     $photoResult = $photoStmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if ($photoResult && !empty($photoResult['path'])) {
         $photoPath = __DIR__ . '/uploads/' . $row['citizenid'] . '/' . $photoResult['path'];
     }
-} catch (Exception $e) {}
+} catch (Exception $e) {
+}
 
 // Fallback: try photo.jpg in uploads folder
 if (empty($photoPath) || !file_exists($photoPath)) {

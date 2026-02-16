@@ -7,23 +7,35 @@ require_once 'class/StudentRegis.php';
 
 session_start();
 
-// Get the citizenid from the GET request
-$uid = isset($_GET['citizenid']) ? $_GET['citizenid'] : '';
+// Get the registration ID (priority) or citizenid from the GET request
+$regId = $_GET['reg_id'] ?? $_GET['id'] ?? null;
+$citizenid = $_GET['citizenid'] ?? '';
 
 $connectDB = new Database_Regis();
 $db = $connectDB->getConnection();
 $studentRegis = new StudentRegis($db);
-// รับค่าการตั้งค่าปีการศึกษา
-$settings_stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
-$settings_stmt->execute();
-$settings = $settings_stmt->fetch(PDO::FETCH_ASSOC);
-$year = $settings['value'];
 
-$student = $studentRegis->getStudentByCitizId($uid);
+// Fetch specific registration if ID is provided, otherwise fallback to citizenid
+if ($regId) {
+    $student = $studentRegis->getStudentById($regId);
+} else {
+    $student = $studentRegis->getStudentByCitizId($citizenid);
+}
+// Fetch academic year
+$year = "2568"; // Fallback
+try {
+    $settings_stmt = $db->prepare("SELECT value FROM setting WHERE config_name = 'year'");
+    $settings_stmt->execute();
+    $settings_res = $settings_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($settings_res)
+        $year = $settings_res['value'];
+} catch (Exception $e) {
+}
 
 $space_bar = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
-function ck_level2($level){
+function ck_level2($level)
+{
     switch ($level) {
         case "m1":
             $results = "1";
@@ -38,7 +50,8 @@ function ck_level2($level){
     return $results;
 }
 
-function DateThai1($strDate) {
+function DateThai1($strDate)
+{
     // Set the time zone to Thailand
     $timeZone = new DateTimeZone('Asia/Bangkok');
     // Create a new DateTime object with the provided date in the default time zone
@@ -49,24 +62,25 @@ function DateThai1($strDate) {
     $strMonth = $date->format("n");
     $strDay = $date->format("j");
     $strWeekday = $date->format("N");
-    $strWeekCut = Array("", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์");
-    $strMonthCut = Array("", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
+    $strWeekCut = array("", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์");
+    $strMonthCut = array("", "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม");
     $strWeekThai = $strWeekCut[$strWeekday];
     $strMonthThai = $strMonthCut[$strMonth];
     return $strDay . "&nbsp;&nbsp;" . $strMonthThai . "&nbsp;&nbsp;พ.ศ.&nbsp;" . $strYear;
 }
 
 $mpdf = new \Mpdf\Mpdf([
-	'default_font_size' => 14,
-	'default_font' => 'sarabun'
+    'default_font_size' => 14,
+    'default_font' => 'sarabun'
 ]);
 
-$mpdf->SetTitle('บัตรประจำตัวผู้เข้าสอบ ของ'.$student["stu_prefix"].$student["stu_name"].' '.$student["stu_lastname"]);
+$mpdf->SetTitle('บัตรประจำตัวผู้เข้าสอบ ของ' . $student["stu_prefix"] . $student["stu_name"] . ' ' . $student["stu_lastname"]);
 
 $level = $student['level'];
 $type = $student['typeregis'];
 
-function typeText($type){
+function typeText($type)
+{
     switch ($type) {
         case "โควต้า":
             $results = "ห้องเรียนปกติ 
@@ -97,20 +111,20 @@ $html .= '<div style="position:absolute;top:30px;left:150px;width: 440px; height
             ';
 $html .= '<div style="position:absolute;top:50px;left:150px;width: 440px; height: 35px; border: 0px solid black;font-weight: bold;text-align: center;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-            เพื่อเข้าศึกษาต่อระดับชั้นมัธยมศึกษาปีที่ ' . $level . ' ปีการศึกษา '.$year.'
+            เพื่อเข้าศึกษาต่อระดับชั้นมัธยมศึกษาปีที่ ' . $level . ' ปีการศึกษา ' . $year . '
             </div>
             </div>
             ';
 $html .= '<div style="position:absolute;top:70px;left:150px;width: 440px; height: 35px; border: 0px solid black;font-weight: bold;text-align: center;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-            ประเภท' . typeText($type) .'
+            ประเภท' . typeText($type) . '
             </div>
             </div>
             ';
 
 $html .= '<div style="position:absolute;top:100px;left:150px;width: 440px; height: 35px; border: 0px solid black;font-weight: bold;text-align: center;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-            '. str_repeat("_", 50) .'
+            ' . str_repeat("_", 50) . '
             </div>
             </div>
             ';
@@ -119,7 +133,7 @@ $html .= '<div style="position:absolute;top:100px;left:150px;width: 440px; heigh
 // ขวาบน เฉพาะเจ้าหน้าที่
 $html .= '<div style="position:absolute;top:10px;left:600px;width: 180px; height: 50px; border: 1px solid black;"></div>';
 $html .= '<div style="position:absolute;top:15px;left:700px;font-size: 14px;font-weight: bold;">(เฉพาะเจ้าหน้าที่)</div>';
-$html .= '<div style="position:absolute;top:40px;left:650px;font-size: 18px;font-weight: bold;">เลขที่ผู้สมัคร '. $student['numreg'] . '</div>';
+$html .= '<div style="position:absolute;top:40px;left:650px;font-size: 18px;font-weight: bold;">เลขที่ผู้สมัคร ' . $student['numreg'] . '</div>';
 
 
 $photoPath = "";
@@ -168,16 +182,16 @@ $formattedStr = $part1 . "-" . $part2 . "-" . $part3 . "-" . $part4 . "-" . $par
 
 $html .= '<div style="position:absolute;top:185px;left:50px;width: 570px; height: 90px; border: 0px solid black;text-align: left;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-            ชื่อผู้สมัคร'. $space_bar . $student['stu_prefix'] . $student['stu_name'] . $space_bar .'นามสกุล' . $space_bar . $student['stu_lastname'] 
-            .'<br>เดิมเป็นนักเรียนโรงเรียน'. $space_bar . $student['old_school'] . $space_bar . 'อำเภอ' . $space_bar . $student['old_school_district']
-            . $space_bar .'จังหวัด' . $space_bar .  $student['old_school_province'] 
-            . '<br>เลขประจำตัวประชาชน' . $space_bar . $formattedStr
-            . '</div></div>';
+            ชื่อผู้สมัคร' . $space_bar . $student['stu_prefix'] . $student['stu_name'] . $space_bar . 'นามสกุล' . $space_bar . $student['stu_lastname']
+    . '<br>เดิมเป็นนักเรียนโรงเรียน' . $space_bar . $student['old_school'] . $space_bar . 'อำเภอ' . $space_bar . $student['old_school_district']
+    . $space_bar . 'จังหวัด' . $space_bar . $student['old_school_province']
+    . '<br>เลขประจำตัวประชาชน' . $space_bar . $formattedStr
+    . '</div></div>';
 
 $month = array(
-    "", 
-    "มกราคม", 
-    "กุมภาพันธ์", 
+    "",
+    "มกราคม",
+    "กุมภาพันธ์",
     "มีนาคม",
     "เมษายน",
     "พฤษภาคม",
@@ -194,9 +208,9 @@ $month = array(
 $html .= '<div style="position:absolute;top:280px;left:50px;width: 700px; height: 90px; border: 0px solid black;text-align: left;">
             <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;font-weight: bold;">
             ลงชื่อผู้สมัคร' . str_repeat(".", 50) . '(นักเรียน)' . str_repeat($space_bar, 7)
-            . 'ลงชื่อ' . str_repeat(".", 70) . '(ครู)'
-            . '<br>วันที่ยื่นใบสมัคร ' . DateThai1($student['create_at'])
-            . '</div></div>';
+    . 'ลงชื่อ' . str_repeat(".", 70) . '(ครู)'
+    . '<br>วันที่ยื่นใบสมัคร ' . DateThai1($student['create_at'])
+    . '</div></div>';
 
 $html .= '<div style="position:absolute;top:230px;left:560px;"><img src="dist/img/signal.png" alt="" style="width:60%;height:60%"></div>';
 
@@ -217,11 +231,11 @@ $html .= '<div style="position:absolute;top:350px;left:110px;width: 570px; heigh
 
 $html .= '<div style="position:absolute;top:390px;left:0px;width: 800px; height: 35px; border: 0px solid black;text-align: left;">
 <div style="display: flex; justify-content: left; align-items: left;margin-top: 8px;margin-left: 15px;">
-    '. str_repeat(".", 350) .'
+    ' . str_repeat(".", 350) . '
 </div>
 </div>
 ';
-            
+
 $mpdf->WriteHTML($html);
 
 $mpdf->Output();

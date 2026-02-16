@@ -134,12 +134,7 @@ class StudentRegis
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
             GROUP_CONCAT(CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
             FROM users u
-            LEFT JOIN student_study_plans ssp ON u.citizenid = ssp.citizenid 
-                AND ssp.id IN (
-                    SELECT MAX(id) 
-                    FROM student_study_plans 
-                    GROUP BY citizenid, priority
-                )
+            LEFT JOIN student_study_plans ssp ON u.id = ssp.user_id 
             WHERE u.level IN ($levelStr)";
 
         // Special case for M.1 General (Zone)
@@ -506,10 +501,10 @@ class StudentRegis
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            // Fetch plans
-            $planQuery = "SELECT plan_id, priority FROM student_study_plans WHERE citizenid = :citizenid ORDER BY priority ASC";
+            // Fetch plans linked to this specific registration ID
+            $planQuery = "SELECT plan_id, priority FROM student_study_plans WHERE user_id = :userId ORDER BY priority ASC";
             $planStmt = $this->conn->prepare($planQuery);
-            $planStmt->bindParam(':citizenid', $row['citizenid']);
+            $planStmt->bindParam(':userId', $row['id']);
             $planStmt->execute();
             $plans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -642,16 +637,17 @@ class StudentRegis
 
             // Update Plans
             if (!empty($plans)) {
-                $delQuery = "DELETE FROM student_study_plans WHERE citizenid = :citizenid";
+                $delQuery = "DELETE FROM student_study_plans WHERE user_id = :userId";
                 $delStmt = $this->conn->prepare($delQuery);
-                $delStmt->bindValue(':citizenid', $data['citizenid']);
+                $delStmt->bindValue(':userId', $id);
                 $delStmt->execute();
 
-                $insQuery = "INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (:citizenid, :plan_id, :priority)";
+                $insQuery = "INSERT INTO student_study_plans (user_id, citizenid, plan_id, priority) VALUES (:userId, :citizenid, :plan_id, :priority)";
                 $insStmt = $this->conn->prepare($insQuery);
 
                 foreach ($plans as $priority => $plan_id) {
                     if (!empty($plan_id)) {
+                        $insStmt->bindValue(':userId', $id);
                         $insStmt->bindValue(':citizenid', $data['citizenid']);
                         $insStmt->bindValue(':plan_id', $plan_id);
                         $insStmt->bindValue(':priority', $priority);

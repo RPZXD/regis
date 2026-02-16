@@ -19,11 +19,13 @@ $uid = $_GET['stu_id'] ?? null;
 $citizenid = $_GET['citizenid'] ?? null;
 
 if ($uid) {
+    // Priority: Fetch by specific registration ID
     $select_stmt = $db->prepare("SELECT * FROM users WHERE id = :uid");
     $select_stmt->execute([':uid' => $uid]);
 } elseif ($citizenid) {
+    // Fallback: Fetch latest registration for this citizen
     $cleanCitizen = preg_replace('/[^0-9]/', '', $citizenid);
-    $select_stmt = $db->prepare("SELECT * FROM users WHERE citizenid = :citizenid");
+    $select_stmt = $db->prepare("SELECT * FROM users WHERE citizenid = :citizenid ORDER BY id DESC LIMIT 1");
     $select_stmt->execute([':citizenid' => $cleanCitizen]);
 } else {
     die('กรุณาระบุรหัสนักเรียนหรือเลขบัตรประชาชน');
@@ -101,13 +103,13 @@ $months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.",
 $birthDate = $row['date_birth'] . ' ' . $months[intval($row['month_birth'])] . ' ' . $row['year_birth'];
 
 // Fetch Plans
-// 1. Get Student's Selected Plans
+// 1. Get Student's Selected Plans for this specific registration
 $planStmt = $db->prepare("SELECT sp.plan_id, p.name as plan_name 
                           FROM student_study_plans sp 
                           LEFT JOIN study_plans p ON sp.plan_id = p.id 
-                          WHERE sp.citizenid = :citizenid 
+                          WHERE sp.user_id = :userId 
                           ORDER BY sp.priority ASC");
-$planStmt->execute([':citizenid' => $row['citizenid']]);
+$planStmt->execute([':userId' => $row['id']]);
 $selectedPlans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // 2. Get All Available Plans for this Type

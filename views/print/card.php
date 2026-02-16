@@ -277,7 +277,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     if (canPrint !== false) {
                         printBtn.classList.remove('!bg-gray-400', '!from-gray-400', '!to-gray-500', 'cursor-not-allowed', 'opacity-60');
                         printBtn.disabled = false;
-                        printBtn.onclick = function () { window.open(`print_card_pdf.php?citizenid=${data.citizenid}`, '_blank'); };
+                        printBtn.onclick = function () { window.open(`print_card_pdf.php?reg_id=${data.id}`, '_blank'); };
 
                         statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20';
                         printIcon.className = 'fas fa-check-circle text-2xl mr-3 text-green-500';

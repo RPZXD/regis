@@ -138,7 +138,7 @@
             document.getElementById('studentDetails').innerText = `ชื่อ: ${data.fullname}\nประเภท: ${data.typeregis}\nระดับ: ม.${data.level}\nวันเกิด: ${data.birthday}`;
             document.getElementById('studentInfo').classList.remove('hidden');
             document.getElementById('printButton').classList.remove('hidden');
-            document.getElementById('printButton').onclick = function () { window.location.href = `print_card.php?citizenid=${data.citizenid}`; };
+            document.getElementById('printButton').onclick = function () { window.location.href = `print_card.php?id=${data.id}`; };
         } else {
             Swal.fire({ icon: 'error', title: 'ไม่พบข้อมูล', confirmButtonColor: '#ef4444' });
             document.getElementById('studentInfo').classList.add('hidden');

@@ -198,8 +198,8 @@ try {
     $stmt->execute($params);
     $insertId = $db->lastInsertId();
 
-    // Save study plan selections
-    saveStudyPlans($db, $citizenId, $_POST);
+    // Save study plan selections - Link to specific registration ID
+    saveStudyPlans($db, $insertId, $citizenId, $_POST);
 
     // Send notification (Discord/Telegram)
     try {
@@ -255,7 +255,7 @@ function generateRegNumber($db, $level, $year, $typeId)
 /**
  * Save student study plan selections
  */
-function saveStudyPlans($db, $citizenId, $postData)
+function saveStudyPlans($db, $userId, $citizenId, $postData)
 {
     // Check if table exists first
     try {
@@ -264,13 +264,13 @@ function saveStudyPlans($db, $citizenId, $postData)
             return; // Table doesn't exist, skip
         }
 
-        // Clear existing plans
-        $clearSql = "DELETE FROM student_study_plans WHERE citizenid = ?";
+        // Clear existing plans for this specific registration ID
+        $clearSql = "DELETE FROM student_study_plans WHERE user_id = ?";
         $clearStmt = $db->prepare($clearSql);
-        $clearStmt->execute([$citizenId]);
+        $clearStmt->execute([$userId]);
 
         // Insert new plans
-        $insertSql = "INSERT INTO student_study_plans (citizenid, plan_id, priority) VALUES (?, ?, ?)";
+        $insertSql = "INSERT INTO student_study_plans (user_id, citizenid, plan_id, priority) VALUES (?, ?, ?, ?)";
         $insertStmt = $db->prepare($insertSql);
 
         // Loop through all possible plan choices sent from the form
@@ -278,7 +278,7 @@ function saveStudyPlans($db, $citizenId, $postData)
         while (isset($postData["study_plan_{$choiceIndex}"])) {
             $planId = $postData["study_plan_{$choiceIndex}"];
             if (!empty($planId)) {
-                $insertStmt->execute([$citizenId, intval($planId), $choiceIndex]);
+                $insertStmt->execute([$userId, $citizenId, intval($planId), $choiceIndex]);
             }
             $choiceIndex++;
             if ($choiceIndex > 20)

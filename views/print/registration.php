@@ -247,7 +247,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
                     // Print button
                     document.getElementById('printButton').onclick = function () {
-                        window.location.href = `print_reginfo.php?citizenid=${data.citizenid}`;
+                        window.location.href = `print_pdf.php?uid=${data.id}`;
                     };
 
                     document.getElementById('studentInfo').classList.remove('hidden');
