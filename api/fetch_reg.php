@@ -1,19 +1,24 @@
 <?php
 header('Content-Type: application/json');
-require_once '../config/Database.php';
-
-// Get JSON input
-$data = json_decode(file_get_contents("php://input"), true);
-$search = $data['search_input'] ?? '';
-
-if (empty($search)) {
-    echo json_encode(['exists' => false, 'message' => 'No search input provided']);
-    exit;
-}
 
 try {
+    require_once __DIR__ . '/../config/Database.php';
+
+    // Get JSON input
+    $data = json_decode(file_get_contents("php://input"), true);
+    $search = $data['search_input'] ?? '';
+
+    if (empty($search)) {
+        echo json_encode(['exists' => false, 'message' => 'No search input provided']);
+        exit;
+    }
+
     $db = new Database_Regis();
     $conn = $db->getConnection();
+
+    if (!$conn) {
+        throw new Exception("Failed to obtain database connection.");
+    }
 
     // Prepare search params
     $searchParam = "%{$search}%";
@@ -119,7 +124,7 @@ try {
 
                 $now = new DateTime();
 
-                // === 1. Print Form Schedule (พิมพ์ใบสมัคร) ===
+                // === 1. Print Form Schedule ===
                 $printStart = !empty($regType['print_form_start']) ? new DateTime($regType['print_form_start']) : null;
                 $printEnd = !empty($regType['print_form_end']) ? new DateTime($regType['print_form_end']) : null;
 
@@ -140,12 +145,11 @@ try {
                         $printMessage = 'สามารถพิมพ์ใบสมัครได้ (ถึง ' . $printEnd->format('d/m/Y H:i') . ')';
                     }
                 } else {
-                    // If no schedule set, allow by default
                     $canPrint = true;
                     $printMessage = 'สามารถพิมพ์ใบสมัครได้';
                 }
 
-                // === 2. Upload Documents Schedule (อัพโหลดหลักฐาน) ===
+                // === 2. Upload Documents Schedule ===
                 $uploadStart = !empty($regType['upload_start']) ? new DateTime($regType['upload_start']) : null;
                 $uploadEnd = !empty($regType['upload_end']) ? new DateTime($regType['upload_end']) : null;
 
@@ -166,12 +170,11 @@ try {
                         $uploadMessage = 'สามารถอัพโหลดเอกสารได้ (ถึง ' . $uploadEnd->format('d/m/Y H:i') . ')';
                     }
                 } else {
-                    // If no schedule set, allow by default
                     $canUpload = true;
                     $uploadMessage = 'สามารถอัพโหลดเอกสารได้';
                 }
 
-                // === 3. Print Exam Card Schedule (พิมพ์บัตรสอบ) ===
+                // === 3. Print Exam Card Schedule ===
                 $cardStart = !empty($regType['exam_card_start']) ? new DateTime($regType['exam_card_start']) : null;
                 $cardEnd = !empty($regType['exam_card_end']) ? new DateTime($regType['exam_card_end']) : null;
 
@@ -192,13 +195,11 @@ try {
                         $printCardMessage = 'สามารถพิมพ์บัตรสอบได้ (ถึง ' . $cardEnd->format('d/m/Y H:i') . ')';
                     }
                 } else {
-                    // If no schedule set, allow by default
                     $canPrintCard = true;
                     $printCardMessage = 'สามารถพิมพ์บัตรสอบได้';
                 }
             }
         } else {
-            // No registration type - allow all by default
             $canPrint = true;
             $canUpload = true;
             $canPrintCard = true;
@@ -235,18 +236,16 @@ try {
         $thaiMonth = $thai_months[$monthKey] ?? $monthKey;
         $formattedDate = $student['date_birth'] . ' ' . $thaiMonth . ' ' . $student['year_birth'];
 
-        // Clean Level (m1 -> 1, m4 -> 4)
         $cleanLevel = str_replace('m', '', strtolower($student['level']));
 
         // === Document Completion Status ===
-        $docStatus = 'none'; // none, pending, incomplete, complete
+        $docStatus = 'none';
         $docStatusText = 'ยังไม่มีเอกสาร';
         $requiredDocsTotal = 0;
         $uploadedDocsCount = 0;
         $approvedDocsCount = 0;
         $rejectedDocsCount = 0;
 
-        // Find registration type ID from level and typeregis if not set
         $regTypeId = $student['registration_type_id'] ?? null;
         if (!$regTypeId && $student['level'] && $student['typeregis']) {
             $typeFindSql = "SELECT rt.id FROM registration_types rt 
@@ -260,13 +259,11 @@ try {
         }
 
         if ($regTypeId) {
-            // Get required documents count
             $reqDocsSql = "SELECT COUNT(*) FROM document_requirements WHERE registration_type_id = ? AND is_required = 1 AND is_active = 1";
             $reqDocsStmt = $conn->prepare($reqDocsSql);
             $reqDocsStmt->execute([$regTypeId]);
             $requiredDocsTotal = (int) $reqDocsStmt->fetchColumn();
 
-            // Get uploaded documents status
             $uploadedSql = "SELECT sd.status FROM student_documents sd 
                             JOIN document_requirements dr ON sd.requirement_id = dr.id
                             WHERE sd.citizenid = ? AND dr.is_required = 1 AND dr.is_active = 1";
@@ -282,7 +279,6 @@ try {
                     $rejectedDocsCount++;
             }
 
-            // Determine status
             if ($requiredDocsTotal == 0) {
                 $docStatus = 'none';
                 $docStatusText = 'ไม่มีเอกสารที่ต้องอัพโหลด';
@@ -314,19 +310,15 @@ try {
             'now_tel' => $student['now_tel'],
             'parent_tel' => $student['parent_tel'],
             'plans' => $plans,
-            // Print Form Schedule
             'canPrint' => $canPrint,
             'printMessage' => $printMessage,
             'printSchedule' => $printScheduleInfo,
-            // Upload Schedule
             'canUpload' => $canUpload,
             'uploadMessage' => $uploadMessage,
             'uploadSchedule' => $uploadScheduleInfo,
-            // Print Exam Card Schedule
             'canPrintCard' => $canPrintCard,
             'printCardMessage' => $printCardMessage,
             'printCardSchedule' => $printCardScheduleInfo,
-            // Status
             'status' => $student['status'] ?? 0,
             'docStatus' => $docStatus,
             'docStatusText' => $docStatusText,
@@ -344,8 +336,7 @@ try {
         echo json_encode(['exists' => false]);
     }
 
-} catch (PDOException $e) {
-    echo json_encode(['exists' => false, 'error' => $e->getMessage()]);
+} catch (Throwable $t) {
+    echo json_encode(['exists' => false, 'error' => $t->getMessage()]);
 }
-
-
+?>

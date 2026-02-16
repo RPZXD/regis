@@ -1,34 +1,35 @@
 <?php
-/**
- * API: Get all students for document checking by registration type
- * Shows all students including those who haven't uploaded documents
- */
 header('Content-Type: application/json');
-require_once('../../../config/Database.php');
-require_once('../../../class/StudentRegis.php');
-require_once('../../../class/AdminConfig.php');
-
-session_start();
-if (!isset($_SESSION['Admin_login'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
-$connectDB = new Database_Regis();
-$db = $connectDB->getConnection();
-
-$adminConfig = new AdminConfig($db);
-$studentRegis = new StudentRegis($db);
-
-$typeId = isset($_GET['type_id']) ? intval($_GET['type_id']) : 0;
-
-if (!$typeId) {
-    echo json_encode(['students' => [], 'stats' => [], 'requirements' => []]);
-    exit;
-}
 
 try {
+    require_once __DIR__ . '/../../../config/Database.php';
+    require_once __DIR__ . '/../../../class/StudentRegis.php';
+    require_once __DIR__ . '/../../../class/AdminConfig.php';
+
+    session_start();
+    if (!isset($_SESSION['Admin_login'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
+    $connectDB = new Database_Regis();
+    $db = $connectDB->getConnection();
+
+    if (!$db) {
+        throw new Exception("Failed to obtain database connection.");
+    }
+
+    $adminConfig = new AdminConfig($db);
+    $studentRegis = new StudentRegis($db);
+
+    $typeId = isset($_GET['type_id']) ? intval($_GET['type_id']) : 0;
+
+    if (!$typeId) {
+        echo json_encode(['students' => [], 'stats' => [], 'requirements' => []]);
+        exit;
+    }
+
     // Get registration type info
     $regType = $adminConfig->getRegistrationTypeById($typeId);
     if (!$regType) {
@@ -72,12 +73,11 @@ try {
     $statsComplete = 0;
     $statsPending = 0;
     $statsNoUpload = 0;
-    $statsApproved = 0;  // Student approval status count
+    $statsApproved = 0;
 
     foreach ($students as $student) {
         $statsTotal++;
 
-        // Count approved students
         if (($student['status'] ?? 0) == 1) {
             $statsApproved++;
         }
@@ -85,7 +85,6 @@ try {
         $citizenid = $student['citizenid'];
         $studentDocs = $docsByCitizen[$citizenid] ?? [];
 
-        // Calculate document status
         $totalRequired = count($requirements);
         $uploadedCount = count($studentDocs);
         $approvedCount = 0;
@@ -101,7 +100,6 @@ try {
                 $pendingCount++;
         }
 
-        // Determine overall status
         $docStatus = 'no_upload';
         if ($uploadedCount === 0) {
             $docStatus = 'no_upload';
@@ -124,7 +122,7 @@ try {
             'numreg' => $student['numreg'] ?? null,
             'fullname' => trim(($student['stu_prefix'] ?? '') . ($student['stu_name'] ?? '') . ' ' . ($student['stu_lastname'] ?? '')),
             'type_name' => $regType['grade_name'] . ' - ' . $regType['name'],
-            'status' => $student['status'] ?? 0,  // Student approval status (0=pending, 1=approved)
+            'status' => $student['status'] ?? 0,
             'documents' => array_map(function ($d) {
                 return [
                     'id' => $d['id'],
@@ -155,7 +153,11 @@ try {
         'requirements' => $requirements,
         'type_info' => $regType
     ]);
-
-} catch (PDOException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (Throwable $t) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Internal Server Error',
+        'message' => $t->getMessage()
+    ]);
 }
+?>

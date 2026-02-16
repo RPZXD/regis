@@ -5,9 +5,9 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
-require_once '../config/Database.php';
-require_once '../class/AdminConfig.php';
-require_once '../class/NotificationHelper.php';
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../class/AdminConfig.php';
+require_once __DIR__ . '/../class/NotificationHelper.php';
 
 // Error handling
 set_error_handler(function ($severity, $message, $file, $line) {
@@ -16,41 +16,50 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 try {
     $db = (new Database_Regis())->getConnection();
+    if (!$db) {
+        throw new Exception("เชื่อมต่อฐานข้อมูลล้มเหลว");
+    }
     $db->exec("SET NAMES utf8");
 
     $adminConfig = new AdminConfig($db);
 
     // Helper function to get province name from code
-    function getProvinceName($db, $code)
-    {
-        if (empty($code))
-            return '';
-        $stmt = $db->prepare("SELECT name_th FROM province WHERE code = ? LIMIT 1");
-        $stmt->execute([$code]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['name_th'] ?? $code;
+    if (!function_exists('getProvinceName')) {
+        function getProvinceName($db, $code)
+        {
+            if (empty($code))
+                return '';
+            $stmt = $db->prepare("SELECT name_th FROM province WHERE code = ? LIMIT 1");
+            $stmt->execute([$code]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['name_th'] ?? $code;
+        }
     }
 
     // Helper function to get district name from code
-    function getDistrictName($db, $code)
-    {
-        if (empty($code))
-            return '';
-        $stmt = $db->prepare("SELECT name_th FROM district WHERE code = ? LIMIT 1");
-        $stmt->execute([$code]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['name_th'] ?? $code;
+    if (!function_exists('getDistrictName')) {
+        function getDistrictName($db, $code)
+        {
+            if (empty($code))
+                return '';
+            $stmt = $db->prepare("SELECT name_th FROM district WHERE code = ? LIMIT 1");
+            $stmt->execute([$code]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['name_th'] ?? $code;
+        }
     }
 
     // Helper function to get subdistrict name from code
-    function getSubdistrictName($db, $code)
-    {
-        if (empty($code))
-            return '';
-        $stmt = $db->prepare("SELECT name_th FROM subdistrict WHERE code = ? LIMIT 1");
-        $stmt->execute([$code]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['name_th'] ?? $code;
+    if (!function_exists('getSubdistrictName')) {
+        function getSubdistrictName($db, $code)
+        {
+            if (empty($code))
+                return '';
+            $stmt = $db->prepare("SELECT name_th FROM subdistrict WHERE code = ? LIMIT 1");
+            $stmt->execute([$code]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['name_th'] ?? $code;
+        }
     }
 
     // Get POST data
@@ -84,7 +93,7 @@ try {
     // Get current academic year
     $academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
 
-    // Check for duplicate registration (same citizen + year + level + type)
+    // Check for duplicate registration
     $checkSql = "SELECT id FROM users WHERE citizenid = ? AND reg_pee = ? AND level = ? AND typeregis = ?";
     $checkStmt = $db->prepare($checkSql);
     $checkStmt->execute([$citizenId, $academicYear, $regType['grade_code'], $regType['name']]);
@@ -93,14 +102,12 @@ try {
         throw new Exception('เลขบัตรประชาชนนี้ได้สมัครประเภท "' . $regType['name'] . '" แล้วในปีการศึกษานี้');
     }
 
-    // Prepare data for insert
     $level = $regType['grade_code']; // m1 or m4
     $typeRegis = $regType['name'];
 
     // Use manual numreg if provided, otherwise generate
     $regNumber = !empty($_POST['numreg']) ? trim($_POST['numreg']) : generateRegNumber($db, $level, $academicYear, $regType['id']);
 
-    // Build INSERT SQL - using actual column names from users table
     $sql = "INSERT INTO users (
         citizenid, reg_pee, level, typeregis, numreg,
         stu_prefix, stu_name, stu_lastname,
@@ -198,17 +205,15 @@ try {
     $stmt->execute($params);
     $insertId = $db->lastInsertId();
 
-    // Save study plan selections - Link to specific registration ID
     saveStudyPlans($db, $insertId, $citizenId, $_POST);
 
-    // Send notification (Discord/Telegram)
     try {
         $notifier = new NotificationHelper($db);
         $studentName = ($_POST['stu_prefix'] ?? '') . ($_POST['stu_name'] ?? '') . ' ' . ($_POST['stu_lastname'] ?? '');
         $levelText = ($level == 'm1' || $level == '1') ? 'ม.1' : 'ม.4';
         $notifier->notifyNewRegistration($studentName, $levelText, $typeRegis, $citizenId);
-    } catch (Exception $e) {
-        // Notification failure should not affect registration
+    } catch (Throwable $e) {
+        // Silently fail
     }
 
     echo json_encode([
@@ -219,72 +224,64 @@ try {
         'id' => $insertId
     ], JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
-    http_response_code(200); // Keep 200 for frontend handling
+} catch (Throwable $e) {
+    http_response_code(200);
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
 
-/**
- * Generate registration number
- * Format: YYLLTT-XXXX (Year + Level + TypeId + Sequence)
- * e.g., 69101-0001 = ปี 69, ม.1, ประเภท 01, ลำดับ 0001
- */
-function generateRegNumber($db, $level, $year, $typeId)
-{
-    $yearShort = substr($year, -2);
-    $levelNum = str_replace('m', '', $level);
-    $typeNum = str_pad($typeId, 2, '0', STR_PAD_LEFT);
-    $prefix = $yearShort . $levelNum . $typeNum;
+if (!function_exists('generateRegNumber')) {
+    function generateRegNumber($db, $level, $year, $typeId)
+    {
+        $yearShort = substr($year, -2);
+        $levelNum = str_replace('m', '', $level);
+        $typeNum = str_pad($typeId, 2, '0', STR_PAD_LEFT);
+        $prefix = $yearShort . $levelNum . $typeNum;
 
-    // Get next sequence — find the dash position dynamically
-    $sql = "SELECT MAX(CAST(SUBSTRING_INDEX(numreg, '-', -1) AS UNSIGNED)) as max_seq 
-            FROM users 
-            WHERE numreg LIKE ? AND reg_pee = ?";
-    $stmt = $db->prepare($sql);
-    $stmt->execute([$prefix . '-%', $year]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT MAX(CAST(SUBSTRING_INDEX(numreg, '-', -1) AS UNSIGNED)) as max_seq 
+                FROM users 
+                WHERE numreg LIKE ? AND reg_pee = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$prefix . '-%', $year]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $nextSeq = ($result['max_seq'] ?? 0) + 1;
+        $nextSeq = ($result['max_seq'] ?? 0) + 1;
 
-    return $prefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
-}
-
-/**
- * Save student study plan selections
- */
-function saveStudyPlans($db, $userId, $citizenId, $postData)
-{
-    // Check if table exists first
-    try {
-        $checkTable = $db->query("SHOW TABLES LIKE 'student_study_plans'");
-        if ($checkTable->rowCount() == 0) {
-            return; // Table doesn't exist, skip
-        }
-
-        // Clear existing plans for this specific registration ID
-        $clearSql = "DELETE FROM student_study_plans WHERE user_id = ?";
-        $clearStmt = $db->prepare($clearSql);
-        $clearStmt->execute([$userId]);
-
-        // Insert new plans
-        $insertSql = "INSERT INTO student_study_plans (user_id, citizenid, plan_id, priority) VALUES (?, ?, ?, ?)";
-        $insertStmt = $db->prepare($insertSql);
-
-        // Loop through all possible plan choices sent from the form
-        $choiceIndex = 1;
-        while (isset($postData["study_plan_{$choiceIndex}"])) {
-            $planId = $postData["study_plan_{$choiceIndex}"];
-            if (!empty($planId)) {
-                $insertStmt->execute([$userId, $citizenId, intval($planId), $choiceIndex]);
-            }
-            $choiceIndex++;
-            if ($choiceIndex > 20)
-                break; // Safety break
-        }
-    } catch (Exception $e) {
-        // Silently fail if table doesn't exist
+        return $prefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
     }
 }
+
+if (!function_exists('saveStudyPlans')) {
+    function saveStudyPlans($db, $userId, $citizenId, $postData)
+    {
+        try {
+            $checkTable = $db->query("SHOW TABLES LIKE 'student_study_plans'");
+            if ($checkTable->rowCount() == 0) {
+                return;
+            }
+
+            $clearSql = "DELETE FROM student_study_plans WHERE user_id = ?";
+            $clearStmt = $db->prepare($clearSql);
+            $clearStmt->execute([$userId]);
+
+            $insertSql = "INSERT INTO student_study_plans (user_id, citizenid, plan_id, priority) VALUES (?, ?, ?, ?)";
+            $insertStmt = $db->prepare($insertSql);
+
+            $choiceIndex = 1;
+            while (isset($postData["study_plan_{$choiceIndex}"])) {
+                $planId = $postData["study_plan_{$choiceIndex}"];
+                if (!empty($planId)) {
+                    $insertStmt->execute([$userId, $citizenId, intval($planId), $choiceIndex]);
+                }
+                $choiceIndex++;
+                if ($choiceIndex > 20)
+                    break;
+            }
+        } catch (Throwable $e) {
+            // Silently fail
+        }
+    }
+}
+?>
