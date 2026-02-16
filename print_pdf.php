@@ -411,13 +411,13 @@ $html .= '<tr>
 </tr>';
 
 // Type-specific information
-if ($typeCode === 'special') {
+if ($matchedType && $matchedType['code'] === 'special') {
     // ห้องเรียนพิเศษ - แสดงเกรด 3 วิชา
     $html .= '<tr>
         <td class="label">เกรดรายวิชา</td>
         <td class="value" colspan="3">คณิตศาสตร์: ' . ($row['grade_math'] ?? '-') . ' | วิทยาศาสตร์/เทคโนโลยี: ' . ($row['grade_science'] ?? '-') . ' | ภาษาอังกฤษ: ' . ($row['grade_english'] ?? '-') . '</td>
     </tr>';
-} elseif ($typeCode === 'talent') {
+} elseif ($matchedType && $matchedType['code'] === 'talent') {
     // ความสามารถพิเศษ
     $html .= '<tr>
         <td class="label">ความสามารถพิเศษ</td>
@@ -429,7 +429,7 @@ if ($typeCode === 'special') {
             <td class="value" colspan="3">' . $row['talent_awards'] . '</td>
         </tr>';
     }
-} elseif ($typeCode === 'quota') {
+} elseif ($matchedType && $matchedType['code'] === 'quota') {
     // โควต้า ม.3 เดิม
     $html .= '<tr>
         <td class="label">เลขประจำตัว ม.3</td>
@@ -443,7 +443,7 @@ $html .= '</table>';
 $sectionNum = 2;
 
 // --- Address (skip for special type) ---
-if ($typeCode !== 'special') {
+if (!$matchedType || $matchedType['code'] !== 'special') {
     $html .= '<div class="section-head">' . $sectionNum++ . '. ข้อมูลการติดต่อ</div>';
     $html .= '<table class="form-table">';
     $html .= '<tr>
@@ -466,7 +466,7 @@ $html .= '<div class="section-head">' . $sectionNum++ . '. ข้อมูลผ
 $html .= '<table class="form-table">';
 
 // For special type, show only guardian info (no father/mother)
-if ($typeCode !== 'special') {
+if (!$matchedType || $matchedType['code'] !== 'special') {
     $html .= '<tr>
         <td width="10%" class="label">บิดา</td>
         <td width="10%" class="value">' . $row['dad_prefix'] . $row['dad_name'] . ' ' . $row['dad_lastname'] . '</td>
