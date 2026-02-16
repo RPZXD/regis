@@ -1,20 +1,25 @@
 <?php
 header('Content-Type: application/json');
+
 require_once __DIR__ . '/../../../config/Database.php';
 require_once __DIR__ . '/../../../class/StudentRegis.php';
 require_once __DIR__ . '/../../../class/AdminConfig.php';
 
-session_start();
-if (!isset($_SESSION['Admin_login'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
-$connectDB = new Database_Regis();
-$db = $connectDB->getConnection();
-
 try {
+    session_start();
+    if (!isset($_SESSION['Admin_login'])) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+
+    $connectDB = new Database_Regis();
+    $db = $connectDB->getConnection();
+
+    if (!$db) {
+        throw new Exception("Failed to obtain database connection.");
+    }
+
     $adminConfig = new AdminConfig($db);
     $studentRegis = new StudentRegis($db);
 
@@ -31,9 +36,14 @@ try {
     }
 
     echo json_encode([]);
-} catch (Exception $e) {
+} catch (Throwable $t) {
     http_response_code(500);
-    echo json_encode(['error' => 'Internal Server Error', 'message' => $e->getMessage()]);
+    echo json_encode([
+        'error' => 'Internal Server Error',
+        'message' => $t->getMessage(),
+        'file' => $t->getFile(),
+        'line' => $t->getLine()
+    ]);
     exit;
 }
 ?>

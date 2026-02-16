@@ -64,7 +64,7 @@ class Database_User
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8");
         } catch (PDOException $exception) {
-            echo "Connection Error: " . $exception->getMessage();
+            throw new Exception("Connection Error (User DB): " . $exception->getMessage());
         }
 
         return $this->conn;
@@ -95,7 +95,7 @@ class Database_Regis
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8");
         } catch (PDOException $exception) {
-            echo "Connection Error: " . $exception->getMessage();
+            throw new Exception("Connection Error (Regis DB): " . $exception->getMessage());
         }
 
         return $this->conn;

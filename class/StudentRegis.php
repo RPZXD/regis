@@ -146,7 +146,9 @@ class StudentRegis
             $sql .= " AND u.typeregis = :typeName";
         }
 
-        $sql .= " GROUP BY u.id ORDER BY u.create_at DESC";
+        $sql .= " GROUP BY u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
+                  u.now_tel, u.gpa_total, u.status, u.create_at, u.date_birth, u.month_birth, u.year_birth
+                  ORDER BY u.create_at DESC";
 
         $stmt = $this->conn->prepare($sql);
         // $stmt->bindParam(':level', $level); // Removed in favor of IN clause
@@ -267,7 +269,11 @@ class StudentRegis
             $sql .= " AND u.typeregis = :typeName";
         }
 
-        $sql .= " GROUP BY u.id ORDER BY u.create_at ASC";
+        $sql .= " GROUP BY u.id, u.citizenid, u.date_birth, u.month_birth, u.year_birth, 
+                          u.stu_prefix, u.stu_name, u.stu_lastname, u.level, u.create_at, 
+                          u.typeregis, u.old_school, u.old_school_province, u.now_tel, 
+                          u.parent_tel, u.gpa_total, u.status
+                  ORDER BY u.create_at ASC";
 
         $stmt = $this->conn->prepare($sql);
         // $stmt->bindParam(':level', $level); // Removed
