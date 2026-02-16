@@ -9,6 +9,58 @@ require_once __DIR__ . '/../config/Database.php';
 require_once __DIR__ . '/../class/AdminConfig.php';
 require_once __DIR__ . '/../class/NotificationHelper.php';
 
+// Helper function to generate registration number
+if (!function_exists('generateRegNumber')) {
+    function generateRegNumber($db, $level, $year, $typeId)
+    {
+        $yearShort = substr($year, -2);
+        $levelNum = str_replace('m', '', $level);
+        $typeNum = str_pad($typeId, 2, '0', STR_PAD_LEFT);
+        $prefix = $yearShort . $levelNum . $typeNum;
+
+        $sql = "SELECT MAX(CAST(SUBSTRING_INDEX(numreg, '-', -1) AS UNSIGNED)) as max_seq 
+                FROM users 
+                WHERE numreg LIKE ? AND reg_pee = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$prefix . '-%', $year]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $nextSeq = ($result['max_seq'] ?? 0) + 1;
+
+        return $prefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+    }
+}
+
+// Helper function to save study plans
+if (!function_exists('saveStudyPlans')) {
+    function saveStudyPlans($db, $userId, $citizenId, $postData)
+    {
+        try {
+            // Clear existing plans for this user
+            $deleteSql = "DELETE FROM student_study_plans WHERE user_id = ?";
+            $deleteStmt = $db->prepare($deleteSql);
+            $deleteStmt->execute([$userId]);
+
+            // Insert new study plan choices
+            $insertSql = "INSERT INTO student_study_plans (user_id, citizen_id, plan_id, priority) VALUES (?, ?, ?, ?)";
+            $insertStmt = $db->prepare($insertSql);
+
+            $choiceIndex = 1;
+            while (isset($postData["study_plan_{$choiceIndex}"])) {
+                $planId = $postData["study_plan_{$choiceIndex}"];
+                if (!empty($planId)) {
+                    $insertStmt->execute([$userId, $citizenId, intval($planId), $choiceIndex]);
+                }
+                $choiceIndex++;
+                if ($choiceIndex > 20)
+                    break;
+            }
+        } catch (Throwable $e) {
+            // Silently fail
+        }
+    }
+}
+
 // Error handling
 set_error_handler(function ($severity, $message, $file, $line) {
     throw new ErrorException($message, 0, $severity, $file, $line);
@@ -230,58 +282,5 @@ try {
         'success' => false,
         'message' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
-}
-
-if (!function_exists('generateRegNumber')) {
-    function generateRegNumber($db, $level, $year, $typeId)
-    {
-        $yearShort = substr($year, -2);
-        $levelNum = str_replace('m', '', $level);
-        $typeNum = str_pad($typeId, 2, '0', STR_PAD_LEFT);
-        $prefix = $yearShort . $levelNum . $typeNum;
-
-        $sql = "SELECT MAX(CAST(SUBSTRING_INDEX(numreg, '-', -1) AS UNSIGNED)) as max_seq 
-                FROM users 
-                WHERE numreg LIKE ? AND reg_pee = ?";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([$prefix . '-%', $year]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        $nextSeq = ($result['max_seq'] ?? 0) + 1;
-
-        return $prefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
-    }
-}
-
-if (!function_exists('saveStudyPlans')) {
-    function saveStudyPlans($db, $userId, $citizenId, $postData)
-    {
-        try {
-            $checkTable = $db->query("SHOW TABLES LIKE 'student_study_plans'");
-            if ($checkTable->rowCount() == 0) {
-                return;
-            }
-
-            $clearSql = "DELETE FROM student_study_plans WHERE user_id = ?";
-            $clearStmt = $db->prepare($clearSql);
-            $clearStmt->execute([$userId]);
-
-            $insertSql = "INSERT INTO student_study_plans (user_id, citizenid, plan_id, priority) VALUES (?, ?, ?, ?)";
-            $insertStmt = $db->prepare($insertSql);
-
-            $choiceIndex = 1;
-            while (isset($postData["study_plan_{$choiceIndex}"])) {
-                $planId = $postData["study_plan_{$choiceIndex}"];
-                if (!empty($planId)) {
-                    $insertStmt->execute([$userId, $citizenId, intval($planId), $choiceIndex]);
-                }
-                $choiceIndex++;
-                if ($choiceIndex > 20)
-                    break;
-            }
-        } catch (Throwable $e) {
-            // Silently fail
-        }
-    }
 }
 ?>
