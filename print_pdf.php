@@ -116,23 +116,71 @@ $selectedPlans = $planStmt->fetchAll(PDO::FETCH_ASSOC);
 $gradeLevelId = $isM1 ? 1 : 2;
 $typeCode = 'general';
 
-// Determine type code (Check specific types first)
-if (strpos($typeregis, 'ความสามารถพิเศษ') !== false)
-    $typeCode = 'talent';
-elseif (strpos($typeregis, 'พิเศษ') !== false)
-    $typeCode = 'special';
-elseif (strpos($typeregis, 'โควต้า') !== false)
-    $typeCode = 'quota';
+// First, try to find exact match in registration_types table (include inactive for matching)
+$stmt = $db->prepare("SELECT id, code, name FROM registration_types WHERE grade_level_id = :gid ORDER BY sort_order ASC, id ASC");
+$stmt->execute([':gid' => $gradeLevelId]);
+$allRegTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt = $db->prepare("SELECT id FROM registration_types WHERE grade_level_id = :gid AND code = :code");
-$stmt->execute([':gid' => $gradeLevelId, ':code' => $typeCode]);
-$regType = $stmt->fetch(PDO::FETCH_ASSOC);
-$regTypeId = $regType['id'] ?? 0;
+// Also get only active types for display purposes
+$stmt = $db->prepare("SELECT id, code, name FROM registration_types WHERE grade_level_id = :gid AND is_active = 1 ORDER BY sort_order ASC, id ASC");
+$stmt->execute([':gid' => $gradeLevelId]);
+$activeRegTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$regTypeId = 0;
+$matchedType = null;
+
+// Try to find matching registration type
+foreach ($allRegTypes as $regType) {
+    // Check for exact match first
+    if (strcasecmp($typeregis, $regType['name']) === 0) {
+        $regTypeId = $regType['id'];
+        $matchedType = $regType;
+        break;
+    }
+    // Check for partial match (typeregis contains type name)
+    if (stripos($typeregis, $regType['name']) !== false) {
+        $regTypeId = $regType['id'];
+        $matchedType = $regType;
+        break;
+    }
+    // Check for partial match (type name contains typeregis)
+    if (stripos($regType['name'], $typeregis) !== false) {
+        $regTypeId = $regType['id'];
+        $matchedType = $regType;
+        break;
+    }
+}
+
+// If still no match, try the old logic as fallback
+if ($regTypeId == 0) {
+    // Determine type code (Check specific types first)
+    if (strpos($typeregis, 'ความสามารถพิเศษ') !== false)
+        $typeCode = 'talent';
+    elseif (strpos($typeregis, 'พิเศษ') !== false)
+        $typeCode = 'special';
+    elseif (strpos($typeregis, 'โควต้า') !== false)
+        $typeCode = 'quota';
+
+    foreach ($allRegTypes as $regType) {
+        if ($regType['code'] === $typeCode) {
+            $regTypeId = $regType['id'];
+            $matchedType = $regType;
+            break;
+        }
+    }
+}
+
+// Last resort: if still no match, use the first active registration type for this grade level
+if ($regTypeId == 0 && !empty($allRegTypes)) {
+    $regTypeId = $allRegTypes[0]['id'];
+    $matchedType = $allRegTypes[0];
+}
 
 $allPlans = [];
 if ($regTypeId) {
-    // Sort by ID to ensure natural order (e.g. Plan 1, Plan 2...)
-    $stmt = $db->prepare("SELECT * FROM study_plans WHERE registration_type_id = :rid ORDER BY id ASC");
+    // Get all plans for this registration type (include inactive plans to show complete options)
+    // Sort by sort_order first, then ID to ensure proper order
+    $stmt = $db->prepare("SELECT * FROM study_plans WHERE registration_type_id = :rid ORDER BY sort_order ASC, id ASC");
     $stmt->execute([':rid' => $regTypeId]);
     $allPlans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -145,14 +193,41 @@ foreach ($selectedPlans as $idx => $p) {
 }
 
 if (empty($allPlans)) {
-    // Fallback if no master plans found
+    // Fallback: Use student's selected plans if no master plans found
+    // This ensures we always show something meaningful
     foreach ($selectedPlans as $idx => $p) {
         $displayPlans[] = [
-            'name' => $p['plan_name'],
+            'name' => $p['plan_name'] ?? 'แผนการเรียน ' . ($idx + 1),
             'rank' => $idx + 1
         ];
     }
+    
+    // If no selected plans either, create placeholder plans based on registration type
+    if (empty($displayPlans) && $matchedType) {
+        $planNames = [];
+        switch ($matchedType['code']) {
+            case 'special':
+                $planNames = ['ห้องเรียนพิเศษ คณิตศาสตร์', 'ห้องเรียนพิเศษ วิทยาศาสตร์', 'ห้องเรียนพิเศษ ภาษาอังกฤษ'];
+                break;
+            case 'talent':
+                $planNames = ['ความสามารถพิเศษ ด้านกีฬา', 'ความสามารถพิเศษ ด้านศิลปะ', 'ความสามารถพิเศษ ด้านดนตรี'];
+                break;
+            case 'quota':
+                $planNames = ['โควต้า ม.3 เดิม'];
+                break;
+            default:
+                $planNames = ['แผนการเรียนทั่วไป 1', 'แผนการเรียนทั่วไป 2', 'แผนการเรียนทั่วไป 3'];
+        }
+        
+        foreach ($planNames as $idx => $name) {
+            $displayPlans[] = [
+                'name' => $name,
+                'rank' => ''
+            ];
+        }
+    }
 } else {
+    // Use master plans from database and mark selected ones
     foreach ($allPlans as $p) {
         $rank = $selectedMap[$p['id']] ?? '';
         $displayPlans[] = [
@@ -160,7 +235,7 @@ if (empty($allPlans)) {
             'rank' => $rank
         ];
     }
-    // No re-sorting: Keep the order from study_plans (ID ASC)
+    // Keep the order from study_plans (sort_order ASC, id ASC)
 }
 
 // Checkbox Symbols
@@ -415,6 +490,9 @@ $html .= '<tr>
 $html .= '</table>';
 
 // --- Study Plans ---
+// Debug: Add comment with useful info for troubleshooting
+$debugInfo = "Type: {$typeregis}, GradeLevel: {$gradeLevelId}, RegTypeID: {$regTypeId}, Plans: " . count($displayPlans);
+$html .= '<!-- Study Plans Debug: ' . $debugInfo . ' -->';
 $html .= '<div class="section-head">' . $sectionNum . '. แผนการเรียนที่ต้องการสมัคร</div>';
 $html .= '<table class="plan-table">';
 $html .= '<tr>
@@ -423,7 +501,25 @@ $html .= '<tr>
 </tr>';
 
 $totalPlans = count($displayPlans);
-$displaySlots = $totalPlans; // Show exactly what is available for this type
+
+// Ensure we have at least some plans to display (minimum 3 for most types, 1 for quota)
+$minPlans = 3;
+if ($matchedType && $matchedType['code'] === 'quota') {
+    $minPlans = 1;
+}
+
+if ($totalPlans < $minPlans) {
+    // Add empty slots to reach minimum
+    for ($i = $totalPlans; $i < $minPlans; $i++) {
+        $displayPlans[] = [
+            'name' => '',
+            'rank' => ''
+        ];
+    }
+    $totalPlans = $minPlans;
+}
+
+$displaySlots = $totalPlans;
 if ($displaySlots % 2 != 0 && $displaySlots > 0)
     $displaySlots++; // Ensure even number for 2 columns if not empty
 $totalRows = $displaySlots / 2;
