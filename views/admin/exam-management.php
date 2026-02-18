@@ -288,6 +288,9 @@
 </div>
 
 <script>
+// Set base URL for API calls
+const API_BASE_URL = '/admin/api/';
+
 let currentData = [];
 
 function loadTable() {
@@ -299,7 +302,7 @@ function loadTable() {
     $('#bulkTools').addClass('hidden');
 
     $.ajax({
-        url: 'admin/api/fetch_students_dynamic.php',
+        url: API_BASE_URL + 'fetch_students_dynamic.php',
         method: 'GET',
         data: { type_id: typeId },
         dataType: 'json',
@@ -421,7 +424,7 @@ function bindInputEvents() {
 
 function saveData(data, statusSpan) {
     $.ajax({
-        url: 'admin/api/update_exam_info.php',
+        url: API_BASE_URL + 'update_exam_info.php',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -464,7 +467,7 @@ function saveAll() {
         // let's make it a bulk update loop.
         
         requests.push($.ajax({
-            url: 'admin/api/update_exam_info.php',
+            url: API_BASE_URL + 'update_exam_info.php',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data)
@@ -590,7 +593,7 @@ function openRoomManagementModal() {
 
 function loadRooms() {
     $.ajax({
-        url: 'admin/api/get_exam_rooms.php',
+        url: API_BASE_URL + 'get_exam_rooms.php',
         method: 'GET',
         dataType: 'json',
         success: function(response) {
@@ -705,7 +708,7 @@ function deleteRoom(roomId) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: 'admin/api/delete_exam_room.php',
+                url: API_BASE_URL + 'delete_exam_room.php',
                 method: 'POST',
                 data: { id: roomId },
                 success: function(response) {
@@ -741,7 +744,7 @@ function saveRoom() {
         return;
     }
 
-    const url = roomId ? 'admin/api/update_exam_room.php' : 'admin/api/create_exam_room.php';
+    const url = roomId ? API_BASE_URL + 'update_exam_room.php' : API_BASE_URL + 'create_exam_room.php';
     
     $.ajax({
         url: url,
@@ -793,7 +796,7 @@ function assignToRoom() {
                 const student = currentData.find(s => s.id == studentId);
                 if (student) {
                     return $.ajax({
-                        url: 'admin/api/update_exam_info.php',
+                        url: API_BASE_URL + 'update_exam_info.php',
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
@@ -863,7 +866,7 @@ function assignRandomly() {
             // Apply assignments
             const requests = assignments.map(assignment => 
                 $.ajax({
-                    url: 'admin/api/update_exam_info.php',
+                    url: API_BASE_URL + 'update_exam_info.php',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
