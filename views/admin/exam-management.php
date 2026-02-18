@@ -299,7 +299,7 @@ function loadTable() {
     $('#bulkTools').addClass('hidden');
 
     $.ajax({
-        url: 'api/admin/fetch_students_dynamic.php',
+        url: 'admin/api/fetch_students_dynamic.php',
         method: 'GET',
         data: { type_id: typeId },
         dataType: 'json',
