@@ -288,8 +288,9 @@
 </div>
 
 <script>
-// Set base URL for API calls
+// Set base URL for API calls with cache-busting
 const API_BASE_URL = '/admin/api/';
+const CACHE_BUSTER = Date.now(); // Add timestamp to prevent caching
 
 let currentData = [];
 
@@ -302,7 +303,7 @@ function loadTable() {
     $('#bulkTools').addClass('hidden');
 
     $.ajax({
-        url: API_BASE_URL + 'fetch_students_dynamic.php',
+        url: API_BASE_URL + 'fetch_students_dynamic.php?t=' + CACHE_BUSTER,
         method: 'GET',
         data: { type_id: typeId },
         dataType: 'json',
@@ -593,7 +594,7 @@ function openRoomManagementModal() {
 
 function loadRooms() {
     $.ajax({
-        url: API_BASE_URL + 'get_exam_rooms.php',
+        url: API_BASE_URL + 'get_exam_rooms.php?t=' + CACHE_BUSTER,
         method: 'GET',
         dataType: 'json',
         success: function(response) {
