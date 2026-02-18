@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../../../config/Database.php';
-require_once __DIR__ . '/../../../class/StudentRegis.php';
+require_once __DIR__ . '/../../config/Database.php';
+require_once __DIR__ . '/../../class/StudentRegis.php';
 
 try {
     session_start();
@@ -19,13 +19,15 @@ try {
         throw new Exception("Failed to obtain database connection.");
     }
 
+    $studentRegis = new StudentRegis($db);
+
     $typeId = isset($_GET['type_id']) ? intval($_GET['type_id']) : 0;
-    
+
     if ($typeId) {
-        require_once __DIR__ . '/../../../class/AdminConfig.php';
+        require_once __DIR__ . '/../../class/AdminConfig.php';
         $adminConfig = new AdminConfig($db);
         $type = $adminConfig->getRegistrationTypeById($typeId);
-        
+
         if ($type) {
             $level = ($type['grade_code'] == 'm1') ? '1' : '4';
             $students = $studentRegis->getStudentsByCriteria($level, $type['name']);

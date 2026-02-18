@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 require_once("../config/Database.php");
 require_once("../config/Setting.php");
@@ -20,10 +20,17 @@ $adminConfig = new AdminConfig($dbRegis);
 
 $setting = new Setting();
 
+// Fetch all study plans for mapping
+$allPlans = $adminConfig->getStudyPlans();
+$plansMap = [];
+foreach ($allPlans as $plan) {
+    $plansMap[$plan['id']] = $plan['name'];
+}
+
 // Check login
 if (isset($_SESSION['Admin_login'])) {
     $userid = $_SESSION['Admin_login'];
-    $userData = $userAdmin->userData($userid); 
+    $userData = $userAdmin->userData($userid);
 } else {
     $sw2 = new SweetAlert2(
         'คุณยังไม่ได้เข้าสู่ระบบ (Admin)',

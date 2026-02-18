@@ -131,7 +131,7 @@ class StudentRegis
 
         // Select specific columns + calculated fields to avoid GROUP BY issues with u.*
         $sql = "SELECT u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
-            u.now_tel, u.gpa_total, u.status, u.create_at,
+            u.now_tel, u.gpa_total, u.status, u.create_at, u.seat_number, u.exam_room, u.exam_date,
             CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
             GROUP_CONCAT(DISTINCT CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
@@ -147,7 +147,8 @@ class StudentRegis
         }
 
         $sql .= " GROUP BY u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
-                  u.now_tel, u.gpa_total, u.status, u.create_at, u.date_birth, u.month_birth, u.year_birth
+                  u.now_tel, u.gpa_total, u.status, u.create_at, u.date_birth, u.month_birth, u.year_birth,
+                  u.seat_number, u.exam_room, u.exam_date
                   ORDER BY u.create_at DESC";
 
         $stmt = $this->conn->prepare($sql);
