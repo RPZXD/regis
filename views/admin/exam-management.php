@@ -421,7 +421,7 @@ function bindInputEvents() {
 
 function saveData(data, statusSpan) {
     $.ajax({
-        url: 'api/update_exam_info.php',
+        url: 'admin/api/update_exam_info.php',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -464,7 +464,7 @@ function saveAll() {
         // let's make it a bulk update loop.
         
         requests.push($.ajax({
-            url: 'api/update_exam_info.php',
+            url: 'admin/api/update_exam_info.php',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data)
@@ -590,7 +590,7 @@ function openRoomManagementModal() {
 
 function loadRooms() {
     $.ajax({
-        url: 'api/admin/get_exam_rooms.php',
+        url: 'admin/api/get_exam_rooms.php',
         method: 'GET',
         dataType: 'json',
         success: function(response) {
@@ -705,7 +705,7 @@ function deleteRoom(roomId) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: 'api/admin/delete_exam_room.php',
+                url: 'admin/api/delete_exam_room.php',
                 method: 'POST',
                 data: { id: roomId },
                 success: function(response) {
@@ -741,7 +741,7 @@ function saveRoom() {
         return;
     }
 
-    const url = roomId ? 'api/admin/update_exam_room.php' : 'api/admin/create_exam_room.php';
+    const url = roomId ? 'admin/api/update_exam_room.php' : 'admin/api/create_exam_room.php';
     
     $.ajax({
         url: url,
@@ -793,7 +793,7 @@ function assignToRoom() {
                 const student = currentData.find(s => s.id == studentId);
                 if (student) {
                     return $.ajax({
-                        url: 'api/update_exam_info.php',
+                        url: 'admin/api/update_exam_info.php',
                         method: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
@@ -863,7 +863,7 @@ function assignRandomly() {
             // Apply assignments
             const requests = assignments.map(assignment => 
                 $.ajax({
-                    url: 'api/update_exam_info.php',
+                    url: 'admin/api/update_exam_info.php',
                     method: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({
