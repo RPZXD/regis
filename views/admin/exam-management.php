@@ -48,6 +48,9 @@
             </div>
             
             <div id="bulkTools" class="hidden flex gap-2">
+                <button onclick="openRoomManagementModal()" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg shadow-lg shadow-purple-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all font-bold">
+                    <i class="fas fa-door-open mr-2"></i> จัดการห้องสอบ
+                </button>
                 <button onclick="openAutoGenerateModal()" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all font-bold">
                     <i class="fas fa-magic mr-2"></i> สร้างอัตโนมัติ
                 </button>
@@ -125,6 +128,165 @@
     </div>
 </div>
 
+<!-- Room Management Modal -->
+<div id="roomManagementModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('roomManagementModal')"></div>
+        <div class="relative glass rounded-2xl w-full max-w-6xl flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">จัดการห้องสอบ</h3>
+                <button onclick="closeModal('roomManagementModal')" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Room List -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200">รายการห้องสอบ</h4>
+                        <button onclick="addNewRoom()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                            <i class="fas fa-plus mr-2"></i>เพิ่มห้องใหม่
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm" id="roomTable">
+                            <thead>
+                                <tr class="bg-gray-50 dark:bg-slate-700/50 text-gray-600 dark:text-gray-300">
+                                    <th class="px-4 py-3 text-left">ชื่อห้อง</th>
+                                    <th class="px-4 py-3 text-left">อาคาร</th>
+                                    <th class="px-4 py-3 text-center">จำนวนนั่ง</th>
+                                    <th class="px-4 py-3 text-center">จำนวนที่นั่ง</th>
+                                    <th class="px-4 py-3 text-center">สถานะ</th>
+                                    <th class="px-4 py-3 text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700 dark:text-gray-300 divide-y divide-gray-100 dark:divide-gray-800">
+                                <tr><td colspan="6" class="text-center py-4 text-gray-400">ยังไม่มีข้อมูลห้องสอบ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Assignment Tools -->
+                <div class="border-t pt-6">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">เครื่องมือการจัดสรร</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Manual Assignment -->
+                        <div class="space-y-4">
+                            <h5 class="font-medium text-gray-700 dark:text-gray-300">การจัดสรรแบบกำหนดเอง</h5>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">เลือกห้องสอบ</label>
+                                    <select id="manualRoomSelect" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none">
+                                        <option value="">-- เลือกห้อง --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">นักเรียนที่เลือก</label>
+                                    <select id="manualStudentSelect" multiple class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none" size="6">
+                                        <option value="">-- กรุณาโหลดข้อมูลนักเรียนก่อน --</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 mt-1">กดปุ่ม Ctrl หรือ Cmd เพื่อเลือกหลายคน</p>
+                                </div>
+                                <button onclick="assignToRoom()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                    <i class="fas fa-user-plus mr-2"></i>จัดนักเรียนลงห้อง
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Random Assignment -->
+                        <div class="space-y-4">
+                            <h5 class="font-medium text-gray-700 dark:text-gray-300">การจัดสรรแบบสุ่ม</h5>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">เลือกห้องที่ใช้ในการสุ่ม</label>
+                                    <div id="randomRoomSelection" class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-3">
+                                        <p class="text-sm text-gray-400">-- กรุณาเพิ่มห้องสอบก่อน --</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">จำนวนนักเรียนต่อห้อง (สูงสุด)</label>
+                                    <input type="number" id="randomMaxPerRoom" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น 25" value="25">
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="randomBalancePlans" class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                    <label for="randomBalancePlans" class="text-sm text-gray-700 dark:text-gray-300">พยายามพิจารณาแผนการเรียนให้สมดุล</label>
+                                </div>
+                                <button onclick="assignRandomly()" class="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all">
+                                    <i class="fas fa-random mr-2"></i>จัดสรรแบบสุ่ม
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800 flex justify-end space-x-3">
+                <button onclick="closeModal('roomManagementModal')" class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">ปิด</button>
+                <button onclick="saveRoomChanges()" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-lg transition-all">
+                    <i class="fas fa-save mr-2"></i> บันทึกการเปลี่ยนแปลง
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Room Modal -->
+<div id="roomModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('roomModal')"></div>
+        <div class="relative glass rounded-2xl w-full max-w-md flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white" id="roomModalTitle">เพิ่มห้องสอบใหม่</h3>
+                <button onclick="closeModal('roomModal')" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="roomId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ชื่อห้อง</label>
+                    <input type="text" id="roomName" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น ห้อง 101">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">อาคาร</label>
+                    <input type="text" id="roomBuilding" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น อาคาร 1">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">จำนวนนั่ง</label>
+                        <input type="number" id="roomSeats" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น 30">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">จำนวนที่นั่ง</label>
+                        <input type="number" id="roomCapacity" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น 25">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">รายละเอียดเพิ่มเติม</label>
+                    <textarea id="roomDetails" rows="3" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="เช่น อยู่ชั้น 1 ใกล้ประตาทางเดิน"></textarea>
+                </div>
+                <div>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="roomActive" class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" checked>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">ใช้งาน</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800 flex justify-end space-x-3">
+                <button onclick="closeModal('roomModal')" class="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">ยกเลิก</button>
+                <button onclick="saveRoom()" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-lg hover:shadow-lg transition-all">
+                    <i class="fas fa-save mr-2"></i> บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 let currentData = [];
 
@@ -144,6 +306,7 @@ function loadTable() {
         success: function(response) {
             currentData = response;
             renderTable(response);
+            updateStudentSelect();
             $('#bulkTools').removeClass('hidden');
         },
         error: function(xhr, status, error) {
@@ -151,6 +314,17 @@ function loadTable() {
             $('#examTable tbody').html('<tr><td colspan="8" class="text-center text-red-500 py-4">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>');
         }
     });
+}
+
+function updateStudentSelect() {
+    const studentSelect = $('#manualStudentSelect');
+    studentSelect.empty().append('<option value="">-- กรุณาโหลดข้อมูลนักเรียนก่อน --</option>');
+    
+    if (currentData.length > 0) {
+        currentData.forEach(student => {
+            studentSelect.append(`<option value="${student.id}">${student.fullname} (${student.citizenid})</option>`);
+        });
+    }
 }
 
 function renderTable(data) {
@@ -404,5 +578,326 @@ function applyAutoGenerate() {
         icon: 'success',
         timer: 3000
     });
+}
+
+// Room Management Functions
+let rooms = [];
+
+function openRoomManagementModal() {
+    loadRooms();
+    document.getElementById('roomManagementModal').classList.remove('hidden');
+}
+
+function loadRooms() {
+    $.ajax({
+        url: 'api/admin/get_exam_rooms.php',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            rooms = response;
+            renderRoomTable();
+            updateRoomSelects();
+        },
+        error: function() {
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลห้องสอบได้', 'error');
+        }
+    });
+}
+
+function renderRoomTable() {
+    const tbody = $('#roomTable tbody');
+    tbody.empty();
+
+    if (rooms.length === 0) {
+        tbody.html('<tr><td colspan="6" class="text-center py-4 text-gray-400">ยังไม่มีข้อมูลห้องสอบ</td></tr>');
+        return;
+    }
+
+    rooms.forEach((room, index) => {
+        const statusBadge = room.is_active ? 
+            '<span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 dark:bg-green-900/30 dark:text-green-400 rounded-full">ใช้งาน</span>' :
+            '<span class="px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 rounded-full">ไม่ใช้งาน</span>';
+
+        const tr = `
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors" data-id="${room.id}">
+                <td class="px-4 py-3 font-medium">${room.name}</td>
+                <td class="px-4 py-3">${room.building}</td>
+                <td class="px-4 py-3 text-center">${room.seats || '-'}</td>
+                <td class="px-4 py-3 text-center">${room.capacity || '-'}</td>
+                <td class="px-4 py-3 text-center">${statusBadge}</td>
+                <td class="px-4 py-3 text-center">
+                    <div class="flex justify-center space-x-2">
+                        <button onclick="editRoom(${room.id})" class="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" title="แก้ไข">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteRoom(${room.id})" class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="ลบ">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        tbody.append(tr);
+    });
+}
+
+function updateRoomSelects() {
+    // Update manual room select
+    const manualSelect = $('#manualRoomSelect');
+    manualSelect.empty().append('<option value="">-- เลือกห้อง --</option>');
+    
+    // Update random room selection
+    const randomSelection = $('#randomRoomSelection');
+    randomSelection.empty();
+
+    const activeRooms = rooms.filter(room => room.is_active);
+    
+    activeRooms.forEach(room => {
+        manualSelect.append(`<option value="${room.id}">${room.name} (${room.building})</option>`);
+        randomSelection.append(`
+            <label class="flex items-center space-x-2 p-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded cursor-pointer">
+                <input type="checkbox" value="${room.id}" class="room-checkbox">
+                <span class="text-sm">${room.name} (${room.building}) - ความจุ: ${room.capacity || room.seats || '-'}</span>
+            </label>
+        `);
+    });
+}
+
+function addNewRoom() {
+    document.getElementById('roomModalTitle').textContent = 'เพิ่มห้องสอบใหม่';
+    document.getElementById('roomId').value = '';
+    document.getElementById('roomName').value = '';
+    document.getElementById('roomBuilding').value = '';
+    document.getElementById('roomSeats').value = '';
+    document.getElementById('roomCapacity').value = '';
+    document.getElementById('roomDetails').value = '';
+    document.getElementById('roomActive').checked = true;
+    document.getElementById('roomModal').classList.remove('hidden');
+}
+
+function editRoom(roomId) {
+    const room = rooms.find(r => r.id == roomId);
+    if (!room) return;
+
+    document.getElementById('roomModalTitle').textContent = 'แก้ไขข้อมูลห้องสอบ';
+    document.getElementById('roomId').value = room.id;
+    document.getElementById('roomName').value = room.name;
+    document.getElementById('roomBuilding').value = room.building;
+    document.getElementById('roomSeats').value = room.seats || '';
+    document.getElementById('roomCapacity').value = room.capacity || '';
+    document.getElementById('roomDetails').value = room.details || '';
+    document.getElementById('roomActive').checked = room.is_active;
+    document.getElementById('roomModal').classList.remove('hidden');
+}
+
+function deleteRoom(roomId) {
+    const room = rooms.find(r => r.id == roomId);
+    if (!room) return;
+
+    Swal.fire({
+        title: 'ยืนยันการลบ',
+        html: `คุณต้องการลบห้อง <strong>${room.name}</strong> ใช่หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'api/admin/delete_exam_room.php',
+                method: 'POST',
+                data: { id: roomId },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('ลบสำเร็จ', '', 'success');
+                        loadRooms();
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบข้อมูลห้องได้', 'error');
+                }
+            });
+        }
+    });
+}
+
+function saveRoom() {
+    const roomId = document.getElementById('roomId').value;
+    const roomData = {
+        id: roomId || null,
+        name: document.getElementById('roomName').value.trim(),
+        building: document.getElementById('roomBuilding').value.trim(),
+        seats: parseInt(document.getElementById('roomSeats').value) || null,
+        capacity: parseInt(document.getElementById('roomCapacity').value) || null,
+        details: document.getElementById('roomDetails').value.trim(),
+        is_active: document.getElementById('roomActive').checked
+    };
+
+    if (!roomData.name || !roomData.building) {
+        Swal.fire('กรุณากรอกข้อมูลให้ครบ', 'ชื่อห้องและอาคารเป็นข้อมูลที่จำเป็นต้องกรอก', 'warning');
+        return;
+    }
+
+    const url = roomId ? 'api/admin/update_exam_room.php' : 'api/admin/create_exam_room.php';
+    
+    $.ajax({
+        url: url,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(roomData),
+        success: function(response) {
+            if (response.success) {
+                Swal.fire(roomId ? 'แก้ไขสำเร็จ' : 'เพิ่มสำเร็จ', '', 'success');
+                closeModal('roomModal');
+                loadRooms();
+            } else {
+                Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลห้องได้', 'error');
+        }
+    });
+}
+
+function assignToRoom() {
+    const roomId = $('#manualRoomSelect').val();
+    const selectedStudents = $('#manualStudentSelect').val() || [];
+
+    if (!roomId) {
+        Swal.fire('กรุณาเลือกห้อง', 'กรุณาเลือกห้องสอบที่ต้องการจัดนักเรียน', 'warning');
+        return;
+    }
+
+    if (selectedStudents.length === 0) {
+        Swal.fire('กรุณาเลือกนักเรียน', 'กรุณาเลือกนักเรียนที่ต้องการจัดลงห้อง', 'warning');
+        return;
+    }
+
+    const room = rooms.find(r => r.id == roomId);
+    const roomName = room ? `${room.name} (${room.building})` : 'ห้องที่เลือก';
+
+    Swal.fire({
+        title: 'ยืนยันการจัดสรร',
+        html: `จัดนักเรียน ${selectedStudents.length} คนลงห้อง <strong>${roomName}</strong> ใช่หรือไม่?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ตกลง',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const requests = selectedStudents.map(studentId => {
+                const student = currentData.find(s => s.id == studentId);
+                if (student) {
+                    return $.ajax({
+                        url: 'api/update_exam_info.php',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            id: studentId,
+                            exam_room: roomName
+                        })
+                    });
+                }
+                return null;
+            }).filter(req => req !== null);
+
+            Promise.all(requests).then(() => {
+                Swal.fire('จัดสรรสำเร็จ', '', 'success');
+                loadTable(); // Reload main table
+            }).catch(() => {
+                Swal.fire('เกิดข้อผิดพลาดบางรายการ', '', 'warning');
+            });
+        }
+    });
+}
+
+function assignRandomly() {
+    const selectedRoomIds = $('.room-checkbox:checked').map(function() {
+        return parseInt($(this).val());
+    }).get();
+
+    if (selectedRoomIds.length === 0) {
+        Swal.fire('กรุณาเลือกห้อง', 'กรุณาเลือกห้องสอบที่ต้องการใช้ในการจัดสรรแบบสุ่ม', 'warning');
+        return;
+    }
+
+    const maxPerRoom = parseInt($('#randomMaxPerRoom').val()) || 25;
+    const balancePlans = $('#randomBalancePlans').is(':checked');
+
+    Swal.fire({
+        title: 'ยืนยันการจัดสรรแบบสุ่ม',
+        html: `จัดนักเรียนลงห้องสอบ ${selectedRoomIds.length} ห้องโดยสุ่ม<br>
+                จำนวนนักเรียนต่อห้อง: ${maxPerRoom} คน<br>
+                ${balancePlans ? 'พยายามพิจารณาแผนการเรียนให้สมดุล' : ''}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ตกลง',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const selectedRooms = rooms.filter(room => selectedRoomIds.includes(room.id));
+            const unassignedStudents = [...currentData];
+            const assignments = [];
+
+            // Shuffle students if balancing plans
+            let studentsToAssign = balancePlans ? 
+                [...unassignedStudents].sort(() => Math.random() - 0.5) : 
+                [...unassignedStudents];
+
+            selectedRooms.forEach(room => {
+                let roomCount = 0;
+                while (roomCount < maxPerRoom && studentsToAssign.length > 0) {
+                    const student = studentsToAssign.shift();
+                    assignments.push({
+                        studentId: student.id,
+                        roomName: `${room.name} (${room.building})`
+                    });
+                    roomCount++;
+                }
+            });
+
+            // Apply assignments
+            const requests = assignments.map(assignment => 
+                $.ajax({
+                    url: 'api/update_exam_info.php',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: assignment.studentId,
+                        exam_room: assignment.roomName
+                    })
+                })
+            );
+
+            Promise.all(requests).then(() => {
+                const assigned = assignments.length;
+                const unassigned = studentsToAssign.length;
+                let message = `จัดสรรสำเร็จ ${assigned} คน`;
+                if (unassigned > 0) {
+                    message += `<br>ยังคงเหลือ ${unassigned} คนที่ยังไม่ได้จัดห้อง`;
+                }
+                
+                Swal.fire({
+                    title: 'จัดสรรแบบสุ่มสำเร็จ',
+                    html: message,
+                    icon: unassigned > 0 ? 'warning' : 'success'
+                });
+                
+                loadTable(); // Reload main table
+            }).catch(() => {
+                Swal.fire('เกิดข้อผิดพลาดบางรายการ', '', 'error');
+            });
+        }
+    });
+}
+
+function saveRoomChanges() {
+    // This function can be used for bulk operations if needed
+    closeModal('roomManagementModal');
+    Swal.fire('บันทึกการเปลี่ยนแปลง', '', 'success');
 }
 </script>
