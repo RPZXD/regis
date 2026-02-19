@@ -63,7 +63,7 @@ try {
         $numreg = $yearShort . $level . $seq;
     }
 
-    // Map input fields to database columns (matching StudentRegis.php allowed fields)
+    // Map input fields to database columns
     $data = [
         'citizenid' => $citizenid,
         'stu_prefix' => $_POST['stu_prefix'] ?? '',
@@ -81,8 +81,7 @@ try {
         'old_school' => $_POST['old_school_name'] ?? '',
         'old_school_province' => getLocationName($db, 'province', $_POST['old_school_province'] ?? ''),
         'old_school_district' => getLocationName($db, 'district', $_POST['old_school_district'] ?? ''),
-        'old_school_stuid' => $_POST['old_student_id'] ?? '',
-        'now_addr' => $_POST['now_hno'] ?? '', // Map hno to addr
+        'now_hno' => $_POST['now_hno'] ?? '',
         'now_moo' => $_POST['now_moo'] ?? '',
         'now_soy' => $_POST['now_soi'] ?? '',
         'now_street' => $_POST['now_road'] ?? '',
@@ -103,19 +102,21 @@ try {
         'parent_prefix' => $_POST['parent_prefix'] ?? '',
         'parent_name' => $_POST['parent_name'] ?? '',
         'parent_lastname' => $_POST['parent_lastname'] ?? '',
+        'parent_tel' => $_POST['parent_tel'] ?? '',
         'parent_relation' => $_POST['parent_relation'] ?? '',
         'parent_job' => $_POST['parent_occupation'] ?? '',
-        'parent_tel' => $_POST['parent_tel'] ?? '',
         'gpa_total' => !empty($_POST['gpa_total']) ? $_POST['gpa_total'] : null,
+        'grade_math' => !empty($_POST['grade_math']) ? $_POST['grade_math'] : null,
+        'grade_science' => !empty($_POST['grade_science']) ? $_POST['grade_science'] : null,
+        'grade_english' => !empty($_POST['grade_english']) ? $_POST['grade_english'] : null,
         'typeregis' => $typeName,
         'level' => $level,
         'reg_pee' => $academicYear,
         'numreg' => $numreg,
-        'create_at' => date('Y-m-d H:i:s'),
         'status' => 0
     ];
 
-    // Map study plans
+    // Add legacy number1-10 fields for backward compatibility with StudentRegis.php and other parts of the system
     for ($i = 1; $i <= 10; $i++) {
         $data['number' . $i] = $_POST['study_plan_' . $i] ?? '';
     }
@@ -131,7 +132,7 @@ try {
     $stmt->execute($data);
     $newId = $db->lastInsertId();
 
-    // Save plans to student_study_plans
+    // Save plans to student_study_plans (Relational storage for modern queries)
     for ($i = 1; $i <= 10; $i++) {
         $planId = $_POST['study_plan_' . $i] ?? '';
         if ($planId) {
@@ -141,9 +142,13 @@ try {
     }
 
     // Notification
-    $notifier = new NotificationHelper($db);
-    $fullname = $data['stu_prefix'] . $data['stu_name'] . ' ' . $data['stu_lastname'];
-    $notifier->notifyNewRegistration($fullname, "ม." . $level, $typeName, $citizenid);
+    try {
+        $notifier = new NotificationHelper($db);
+        $fullname = ($data['stu_prefix'] ?? '') . ($data['stu_name'] ?? '') . ' ' . ($data['stu_lastname'] ?? '');
+        $notifier->notifyNewRegistration($fullname, "ม." . $level, $typeName, $citizenid);
+    } catch (Exception $e) {
+        // Notification error shouldn't stop the registration process
+    }
 
     echo json_encode([
         'success' => true,
