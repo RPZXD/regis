@@ -254,7 +254,7 @@ $html .= '      </div>
             </td>
             <td width="90" valign="top">
                 <div class="seat-box">
-                    <div class="seat-label">เลขที่ผู้สมัคร</div>
+                    <div class="seat-label">เลขที่นั่งสอบ</div>
                     <div class="seat-number">' . htmlspecialchars($seatNumber) . '</div>
                 </div>
             </td>

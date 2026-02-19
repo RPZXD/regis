@@ -59,7 +59,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                         </div>
                     </div>
                     <div class="text-right text-white">
-                        <p class="text-xs text-blue-100">เลขที่ผู้สมัคร</p>
+                        <p class="text-xs text-blue-100">เลขที่นั่งสอบ</p>
                         <p class="text-3xl font-bold" id="seatNumber">-</p>
                     </div>
                 </div>
