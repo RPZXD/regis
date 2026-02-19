@@ -189,7 +189,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     <input type="radio" name="reg_choice" value="${reg.id}" ${i === 0 ? 'checked' : ''} style="margin-right:10px;accent-color:#6366f1">
                     <div>
                         <div style="font-weight:600;color:#1f2937">${reg.typeregis}</div>
-                        <div style="font-size:0.85em;color:#6b7280">ม.${reg.level} | เลขที่ ${reg.numreg || '-'}</div>
+                        <div style="font-size:0.85em;color:#6b7280">ม.${reg.level == 'm1' ? '1' : (reg.level == 'm4' ? '4' : reg.level)} | เลขที่ ${reg.numreg || '-'}</div>
                     </div>
                 </label>`;
                     });
@@ -215,10 +215,10 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
                     // Populate Data
                     document.getElementById('studentName').textContent = data.fullname;
-                    document.getElementById('studentTypeLevel').textContent = data.typeregis + ' | ม.' + data.level;
+                    document.getElementById('studentTypeLevel').textContent = data.typeregis + ' | ม.' + (data.level == 'm1' ? '1' : (data.level == 'm4' ? '4' : data.level));
                     document.getElementById('val_citizenid').textContent = data.citizenid;
                     document.getElementById('val_type').textContent = data.typeregis;
-                    document.getElementById('val_level').textContent = 'ม.' + data.level;
+                    document.getElementById('val_level').textContent = 'ม.' + (data.level == 'm1' ? '1' : (data.level == 'm4' ? '4' : data.level));
 
                     const printBtn = document.getElementById('printAppButton');
                     const statusCard = document.getElementById('printStatusCard');
