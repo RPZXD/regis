@@ -63,7 +63,7 @@ try {
         $numreg = $yearShort . $level . $seq;
     }
 
-    // Map input fields to database columns
+    // Map input fields to database columns (STRICTLY matching users table schema)
     $data = [
         'citizenid' => $citizenid,
         'stu_prefix' => $_POST['stu_prefix'] ?? '',
@@ -81,7 +81,10 @@ try {
         'old_school' => $_POST['old_school_name'] ?? '',
         'old_school_province' => getLocationName($db, 'province', $_POST['old_school_province'] ?? ''),
         'old_school_district' => getLocationName($db, 'district', $_POST['old_school_district'] ?? ''),
-        'now_hno' => $_POST['now_hno'] ?? '',
+        'old_school_stuid' => $_POST['old_student_id'] ?? '',
+
+        // Address - mapping house numbers (hno) to the 'addr' columns
+        'now_addr' => $_POST['now_hno'] ?? '',
         'now_moo' => $_POST['now_moo'] ?? '',
         'now_soy' => $_POST['now_soi'] ?? '',
         'now_street' => $_POST['now_road'] ?? '',
@@ -89,6 +92,18 @@ try {
         'now_district' => getLocationName($db, 'district', $_POST['now_district'] ?? ''),
         'now_province' => getLocationName($db, 'province', $_POST['now_province'] ?? ''),
         'now_post' => $_POST['now_postcode'] ?? '',
+
+        // Registered Address
+        'old_addr' => $_POST['reg_hno'] ?? '',
+        'old_moo' => $_POST['reg_moo'] ?? '',
+        'old_soy' => $_POST['reg_soi'] ?? '',
+        'old_street' => $_POST['reg_road'] ?? '',
+        'old_subdistrict' => getLocationName($db, 'subdistrict', $_POST['reg_subdistrict'] ?? ''),
+        'old_district' => getLocationName($db, 'district', $_POST['reg_district'] ?? ''),
+        'old_province' => getLocationName($db, 'province', $_POST['reg_province'] ?? ''),
+        'old_post' => $_POST['reg_postcode'] ?? '',
+        'old_tel' => $_POST['now_tel'] ?? '', // Default to now_tel if not separate
+
         'dad_prefix' => $_POST['dad_prefix'] ?? '',
         'dad_name' => $_POST['dad_name'] ?? '',
         'dad_lastname' => $_POST['dad_lastname'] ?? '',
@@ -105,18 +120,21 @@ try {
         'parent_tel' => $_POST['parent_tel'] ?? '',
         'parent_relation' => $_POST['parent_relation'] ?? '',
         'parent_job' => $_POST['parent_occupation'] ?? '',
+
         'gpa_total' => !empty($_POST['gpa_total']) ? $_POST['gpa_total'] : null,
         'grade_math' => !empty($_POST['grade_math']) ? $_POST['grade_math'] : null,
         'grade_science' => !empty($_POST['grade_science']) ? $_POST['grade_science'] : null,
         'grade_english' => !empty($_POST['grade_english']) ? $_POST['grade_english'] : null,
+
         'typeregis' => $typeName,
         'level' => $level,
         'reg_pee' => $academicYear,
         'numreg' => $numreg,
-        'status' => 0
+        'status' => 0,
+        'create_at' => date('Y-m-d H:i:s')
     ];
 
-    // Add legacy number1-10 fields for backward compatibility with StudentRegis.php and other parts of the system
+    // Add legacy number1-10 fields
     for ($i = 1; $i <= 10; $i++) {
         $data['number' . $i] = $_POST['study_plan_' . $i] ?? '';
     }
@@ -132,7 +150,7 @@ try {
     $stmt->execute($data);
     $newId = $db->lastInsertId();
 
-    // Save plans to student_study_plans (Relational storage for modern queries)
+    // Save plans to student_study_plans
     for ($i = 1; $i <= 10; $i++) {
         $planId = $_POST['study_plan_' . $i] ?? '';
         if ($planId) {
@@ -147,7 +165,6 @@ try {
         $fullname = ($data['stu_prefix'] ?? '') . ($data['stu_name'] ?? '') . ' ' . ($data['stu_lastname'] ?? '');
         $notifier->notifyNewRegistration($fullname, "ม." . $level, $typeName, $citizenid);
     } catch (Exception $e) {
-        // Notification error shouldn't stop the registration process
     }
 
     echo json_encode([
