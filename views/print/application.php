@@ -173,7 +173,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
     function fetchAndDisplay(searchInput, regId) {
         Swal.fire({ title: 'กำลังค้นหา...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-        const payload = { search_input: searchInput };
+        const payload = { search_input: searchInput, context: 'application' };
         if (regId) payload.reg_id = regId;
 
         fetch('api/fetch_reg.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
