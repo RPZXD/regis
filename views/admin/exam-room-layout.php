@@ -106,8 +106,23 @@
     </div>
 
     <!-- Rooms Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="roomsOuterGrid">
-        <?php foreach ($roomData as $room): ?>
+    <?php if (empty($roomData)): ?>
+        <div class="glass rounded-[3rem] p-20 text-center border-white/20 shadow-2xl">
+            <div class="relative inline-block mb-8">
+                <div class="absolute inset-0 bg-indigo-500 blur-3xl opacity-20 animate-pulse"></div>
+                <div class="w-24 h-24 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl shadow-xl relative z-10">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+            </div>
+            <h3 class="text-3xl font-black text-gray-800 dark:text-white mb-4">ไม่มีข้อมูลการจัดสอบ</h3>
+            <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto text-lg leading-relaxed">
+                ไม่พบรายชื่อนักเรียนที่ถูกจัดลงห้องสอบในวันที่ <span class="font-bold text-indigo-600"><?php echo htmlspecialchars($selectedDate); ?></span> 
+                กรุณาเลือกวันที่อื่นหรือตรวจสอบการจัดห้องในเมนูจัดการห้องสอบ
+            </p>
+        </div>
+    <?php else: ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="roomsOuterGrid">
+            <?php foreach ($roomData as $room): ?>
             <div class="room-card group" data-building="<?php echo htmlspecialchars($room['building']); ?>"
                 data-name="<?php echo htmlspecialchars($room['name']); ?>">
 
@@ -203,6 +218,7 @@
             </div>
         <?php endforeach; ?>
     </div>
+<?php endif; ?>
 </div>
 
 <!-- Room Detail Modal -->

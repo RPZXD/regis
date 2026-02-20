@@ -86,16 +86,21 @@ $allAssignedStudents = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
 // 2. Distribute students to rooms
 $roomData = [];
 foreach ($rooms as $room) {
-    $room['students'] = [];
+    $matchedStudents = [];
     $roomNameTrim = trim($room['name']);
 
     foreach ($allAssignedStudents as $student) {
         // Match if student's exam_room contains our room name (e.g. "ห้อง 233" in "ห้อง 233 (อาคาร 2 ชั้น 3)")
         if (strpos($student['exam_room'], $roomNameTrim) !== false) {
-            $room['students'][] = $student;
+            $matchedStudents[] = $student;
         }
     }
-    $roomData[] = $room;
+
+    // Only include room if it has students assigned for this specific date
+    if (!empty($matchedStudents)) {
+        $room['students'] = $matchedStudents;
+        $roomData[] = $room;
+    }
 }
 
 // Debug: Count total students found across all rooms
