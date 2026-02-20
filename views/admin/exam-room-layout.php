@@ -460,17 +460,17 @@
             <head>
                 <title>รายชื่อผู้สอบห้อง ${currentRoom.name}</title>
                 <style>
-                    body { font-family: 'Sarabun', sans-serif; padding: 40px; }
+                    body { font-family: 'Sarabun', sans-serif; padding: 20px; }
                     h1 { text-align: center; margin-bottom: 5px; }
                     p { text-align: center; margin-top: 0; color: #666; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
                     th { bg-color: #f8f9fa; }
                     .center { text-align: center; }
                 </style>
             </head>
             <body>
-                <h1>โรงเรียนวิชัยราษฎร์ - รายชื่อผู้สอบ</h1>
+                <h1>โรงเรียนพิชัย - รายชื่อผู้สอบ</h1>
                 <p>อาคาร ${currentRoom.building} ห้องสอบ ${currentRoom.name} | <b>วันที่สอบ: ${<?php echo json_encode($selectedDate); ?>}</b></p>
                 <table>
                     <thead>
@@ -478,8 +478,8 @@
                             <th class="center" width="10%">ลำดับ</th>
                             <th class="center" width="15%">เลขที่นั่ง</th>
                             <th>ชื่อ-นามสกุล</th>
-                            <th>แผนการเรียน</th>
                             <th>ประเภท</th>
+                            <th>หมายเหตุ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -497,8 +497,8 @@
                                     <td class="center">${i + 1}</td>
                                     <td class="center">${s.seat_number || '-'}</td>
                                     <td>${s.fullname}</td>
-                                    <td>${plansText}</td>
                                     <td>${s.typeregis}</td>
+                                    <td></td>
                                 </tr>
                             `;
         }).join('')}
