@@ -201,7 +201,7 @@ if (empty($allPlans)) {
             'rank' => $idx + 1
         ];
     }
-    
+
     // If no selected plans either, create placeholder plans based on registration type
     if (empty($displayPlans) && $matchedType) {
         $planNames = [];
@@ -218,7 +218,7 @@ if (empty($allPlans)) {
             default:
                 $planNames = ['แผนการเรียนทั่วไป 1', 'แผนการเรียนทั่วไป 2', 'แผนการเรียนทั่วไป 3'];
         }
-        
+
         foreach ($planNames as $idx => $name) {
             $displayPlans[] = [
                 'name' => $name,
@@ -235,7 +235,16 @@ if (empty($allPlans)) {
             'rank' => $rank
         ];
     }
-    // Keep the order from study_plans (sort_order ASC, id ASC)
+
+    // Sort by rank: chosen plans first (1, 2, 3...), then unchosen plans
+    usort($displayPlans, function ($a, $b) {
+        $rankA = $a['rank'] === '' ? 999 : (int) $a['rank'];
+        $rankB = $b['rank'] === '' ? 999 : (int) $b['rank'];
+        // If ranks are equal, preserve original order vaguely by comparing names, or just keep it 0
+        if ($rankA === $rankB)
+            return 0;
+        return $rankA < $rankB ? -1 : 1;
+    });
 }
 
 // Checkbox Symbols
@@ -525,8 +534,9 @@ if ($displaySlots % 2 != 0 && $displaySlots > 0)
 $totalRows = $displaySlots / 2;
 
 for ($r = 0; $r < $totalRows; $r++) {
-    $idx1 = $r * 2;
-    $idx2 = $r * 2 + 1;
+    // Left column gets first half, Right column gets second half
+    $idx1 = $r;
+    $idx2 = $r + $totalRows;
 
     $plan1 = $displayPlans[$idx1] ?? null;
     $plan2 = $displayPlans[$idx2] ?? null;
