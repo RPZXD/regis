@@ -132,6 +132,12 @@ class StudentRegis
         // Select specific columns + calculated fields to avoid GROUP BY issues with u.*
         $sql = "SELECT u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
             u.now_tel, u.gpa_total, u.status, u.create_at, u.seat_number, u.exam_room, u.exam_date,
+            u.typeregis, u.old_school, u.old_school_province, u.old_school_district, u.old_school_stuid,
+            u.now_addr, u.now_moo, u.now_soy, u.now_street, u.now_subdistrict, u.now_district, u.now_province, u.now_post,
+            u.grade_science, u.grade_math, u.grade_english, u.stu_sex, u.stu_blood_group, u.stu_religion, u.stu_ethnicity, u.stu_nationality,
+            u.dad_prefix, u.dad_name, u.dad_lastname, u.dad_tel, u.dad_job,
+            u.mom_prefix, u.mom_name, u.mom_lastname, u.mom_tel, u.mom_job,
+            u.parent_prefix, u.parent_name, u.parent_lastname, u.parent_relation, u.parent_tel,
             CONCAT_WS('/', u.date_birth, u.month_birth, u.year_birth) AS birthday, 
             CONCAT(u.stu_prefix, u.stu_name, ' ', u.stu_lastname) AS fullname,
             GROUP_CONCAT(DISTINCT CONCAT(ssp.priority, ':', ssp.plan_id) ORDER BY ssp.priority ASC SEPARATOR ',') as plan_string
@@ -148,7 +154,12 @@ class StudentRegis
 
         $sql .= " GROUP BY u.id, u.numreg, u.citizenid, u.stu_prefix, u.stu_name, u.stu_lastname, 
                   u.now_tel, u.gpa_total, u.status, u.create_at, u.date_birth, u.month_birth, u.year_birth,
-                  u.seat_number, u.exam_room, u.exam_date
+                  u.seat_number, u.exam_room, u.exam_date, u.typeregis, u.old_school, u.old_school_province, u.old_school_district, u.old_school_stuid,
+                  u.now_addr, u.now_moo, u.now_soy, u.now_street, u.now_subdistrict, u.now_district, u.now_province, u.now_post,
+                  u.grade_science, u.grade_math, u.grade_english, u.stu_sex, u.stu_blood_group, u.stu_religion, u.stu_ethnicity, u.stu_nationality,
+                  u.dad_prefix, u.dad_name, u.dad_lastname, u.dad_tel, u.dad_job,
+                  u.mom_prefix, u.mom_name, u.mom_lastname, u.mom_tel, u.mom_job,
+                  u.parent_prefix, u.parent_name, u.parent_lastname, u.parent_relation, u.parent_tel
                   ORDER BY u.create_at DESC";
 
         $stmt = $this->conn->prepare($sql);

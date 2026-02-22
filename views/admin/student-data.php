@@ -479,7 +479,10 @@
                         var row = '<tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors border-b border-gray-100 dark:border-gray-800">' +
                             '<td class="px-4 py-3 text-center text-sm text-gray-500">' + (index + 1) + '</td>' +
                             '<td class="px-4 py-3 text-center font-mono text-sm font-bold text-blue-600 dark:text-blue-400">' + (record.numreg || '-') + '</td>' +
-                            '<td class="px-4 py-3 text-center font-mono text-sm text-indigo-600 dark:text-indigo-400 font-medium">' + (record.citizenid || '-') + '</td>' +
+                            '<td class="px-4 py-3 text-center">' +
+                            '<div class="font-mono text-sm text-indigo-600 dark:text-indigo-400 font-medium">' + (record.citizenid || '-') + '</div>' +
+                            (record.old_school_stuid ? '<div class="text-xs text-gray-500 mt-1" title="เลขประจำตัวเดิม">รหัสเดิม: <span class="font-mono text-indigo-500">' + record.old_school_stuid + '</span></div>' : '') +
+                            '</td>' +
                             '<td class="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">' + (record.fullname || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-mono text-sm">' + (record.now_tel || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-bold text-xs">' + (record.gpa_total || '-') + '</span></td>' +
@@ -817,7 +820,7 @@
                 s(row.now_subdistrict), s(row.now_district), s(row.now_province), s(row.now_post),
                 // Education
                 s(row.old_school), s(row.old_school_province), s(row.old_school_district),
-                s(row.old_student_id),
+                s(row.old_school_stuid),
                 s(row.gpa_total), s(row.grade_science), s(row.grade_math), s(row.grade_english),
                 // Family
                 s((row.dad_prefix || '') + ' ' + (row.dad_name || '') + ' ' + (row.dad_lastname || '')),
@@ -914,7 +917,7 @@
                 <td>${row.grade_science || '-'}</td>
                 <td>${row.grade_math || '-'}</td>
                 <td>${row.grade_english || '-'}</td>
-                <td style="mso-number-format:'@'">${row.old_student_id || '-'}</td>
+                <td style="mso-number-format:'@'">${row.old_school_stuid || '-'}</td>
                 <td>${row.old_school || '-'}</td>
                 <td>${row.old_school_province || '-'}</td>
                 <td>${row.now_addr || '-'} หมู่ ${row.now_moo || '-'} ซอย ${row.now_soy || '-'} ถนน ${row.now_street || '-'}</td>
