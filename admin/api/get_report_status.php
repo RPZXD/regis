@@ -28,35 +28,51 @@ try {
                 FROM users u
                 LEFT JOIN study_plans sp ON u.final_plan_id = sp.id
                 WHERE u.status IN (1, 2, 3)";
-    
+
     if ($typeId) {
         // Get type info first
         $typeStmt = $db->prepare("SELECT rt.name, gl.code FROM registration_types rt JOIN grade_levels gl ON rt.grade_level_id = gl.id WHERE rt.id = ?");
         $typeStmt->execute([$typeId]);
         $typeInfo = $typeStmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($typeInfo) {
-            // Filter by partial match on typeregis and by level
-            $baseSelect .= " AND (u.typeregis LIKE '%" . substr($typeInfo['name'], 0, 10) . "%' OR u.typeregis LIKE '%พิเศษ%' AND '" . $typeInfo['name'] . "' LIKE '%พิเศษ%')";
-            $baseSelect .= " AND u.level = '" . $typeInfo['code'] . "'";
+            $level = $typeInfo['code'];
+            $levels = [$level];
+            if (in_array($level, ['1', 'm1'])) {
+                $levels[] = '1';
+                $levels[] = 'm1';
+            }
+            if (in_array($level, ['4', 'm4'])) {
+                $levels[] = '4';
+                $levels[] = 'm4';
+            }
+            $levelStr = "'" . implode("','", array_unique($levels)) . "'";
+            $baseSelect .= " AND u.level IN ($levelStr)";
+
+            $typeName = $typeInfo['name'];
+            if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
+                $baseSelect .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
+            } else {
+                $baseSelect .= " AND u.typeregis = " . $db->quote($typeName);
+            }
         }
     }
-    
+
     // Confirmed (status = 2)
     $confirmedSql = $baseSelect . " AND u.status = 2 ORDER BY u.update_at DESC";
     $stmt = $db->query($confirmedSql);
     $confirmed = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Cancelled (status = 3)
     $cancelledSql = $baseSelect . " AND u.status = 3 ORDER BY u.update_at DESC";
     $stmt = $db->query($cancelledSql);
     $cancelled = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Pending (status = 1, passed but not confirmed yet)
     $pendingSql = $baseSelect . " AND u.status = 1 ORDER BY u.update_at DESC";
     $stmt = $db->query($pendingSql);
     $pending = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     // Get types
     $typesSql = "SELECT rt.id, rt.name, gl.name as grade_name 
                  FROM registration_types rt
@@ -64,7 +80,7 @@ try {
                  ORDER BY gl.id, rt.id";
     $typesStmt = $db->query($typesSql);
     $types = $typesStmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     echo json_encode([
         'confirmed' => $confirmed,
         'cancelled' => $cancelled,
