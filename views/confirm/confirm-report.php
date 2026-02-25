@@ -283,10 +283,10 @@
 
                         <!-- Grand Total -->
                         <div
-                            class="glass rounded-xl p-6 flex justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800 text-white">
-                            <div class="text-lg opacity-90">รวมเงินทั้งสิ้น (เงินบำรุงการศึกษา + ค่าใช้จ่ายสนับสนุน)</div>
-                            <div class="text-3xl font-bold text-yellow-400">
-                                <?php echo number_format(($mTotal1 + $mTotal2 + $sTotal1 + $sTotal2), 2); ?> บาท
+                            class="glass rounded-xl p-6 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-xl gap-4">
+                            <div class="text-xl opacity-90 font-bold">รวมยอดชำระในมอบตัว (เฉพาะภาคเรียนที่ 1)</div>
+                            <div class="text-4xl font-bold text-yellow-400">
+                                <?php echo number_format($mTotal1 + $sTotal1, 2); ?> บาท
                             </div>
                         </div>
 
