@@ -14,7 +14,11 @@ $db = $connectDB->getConnection();
 
 $typeId = isset($_GET['type_id']) ? intval($_GET['type_id']) : 0;
 
+require_once('../../class/StudentRegis.php');
 try {
+    $studentRegis = new StudentRegis($db);
+    $studentRegis->autoCallReservistsAllPlans();
+
     $baseSelect = "SELECT 
                     u.id,
                     u.citizenid,
@@ -24,6 +28,8 @@ try {
                     u.status,
                     u.update_at,
                     u.final_plan_id,
+                    u.pass_rank,
+                    u.is_called,
                     sp.name AS plan_name
                 FROM users u
                 LEFT JOIN study_plans sp ON u.final_plan_id = sp.id

@@ -1,11 +1,11 @@
-
 <!-- Admin Report Status View -->
 <div class="space-y-6">
     <!-- Page Header -->
     <div class="glass rounded-2xl p-6 border-l-4 border-purple-500">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+                <div
+                    class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg">
                     <i class="fas fa-chart-pie text-2xl text-white"></i>
                 </div>
                 <div>
@@ -14,7 +14,8 @@
                 </div>
             </div>
             <div class="flex gap-2">
-                <select id="filterType" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-sm">
+                <select id="filterType"
+                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-sm">
                     <option value="">-- ประเภททั้งหมด --</option>
                 </select>
             </div>
@@ -64,13 +65,16 @@
     <!-- Tabs -->
     <div class="glass rounded-2xl overflow-hidden">
         <div class="flex border-b border-gray-200 dark:border-gray-700">
-            <button onclick="showTab('confirmed')" id="tab-confirmed" class="flex-1 py-4 px-6 text-center font-bold transition-all tab-active">
+            <button onclick="showTab('confirmed')" id="tab-confirmed"
+                class="flex-1 py-4 px-6 text-center font-bold transition-all tab-active">
                 <i class="fas fa-check-circle mr-2 text-green-500"></i>ยืนยันแล้ว
             </button>
-            <button onclick="showTab('cancelled')" id="tab-cancelled" class="flex-1 py-4 px-6 text-center font-bold transition-all">
+            <button onclick="showTab('cancelled')" id="tab-cancelled"
+                class="flex-1 py-4 px-6 text-center font-bold transition-all">
                 <i class="fas fa-user-times mr-2 text-red-500"></i>สละสิทธิ์
             </button>
-            <button onclick="showTab('pending')" id="tab-pending" class="flex-1 py-4 px-6 text-center font-bold transition-all">
+            <button onclick="showTab('pending')" id="tab-pending"
+                class="flex-1 py-4 px-6 text-center font-bold transition-all">
                 <i class="fas fa-clock mr-2 text-amber-500"></i>รอรายงานตัว
             </button>
         </div>
@@ -129,128 +133,149 @@
 </div>
 
 <style>
-.tab-active {
-    background: linear-gradient(to right, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
-    border-bottom: 3px solid #8b5cf6;
-    color: #7c3aed;
-}
+    .tab-active {
+        background: linear-gradient(to right, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
+        border-bottom: 3px solid #8b5cf6;
+        color: #7c3aed;
+    }
 </style>
 
 <script>
-let currentTab = 'confirmed';
-let allData = { confirmed: [], cancelled: [], pending: [] };
+    let currentTab = 'confirmed';
+    let allData = { confirmed: [], cancelled: [], pending: [] };
 
-function showTab(tab) {
-    currentTab = tab;
-    $('.tab-content').addClass('hidden');
-    $(`#content-${tab}`).removeClass('hidden');
-    
-    $('[id^="tab-"]').removeClass('tab-active');
-    $(`#tab-${tab}`).addClass('tab-active');
-}
+    function showTab(tab) {
+        currentTab = tab;
+        $('.tab-content').addClass('hidden');
+        $(`#content-${tab}`).removeClass('hidden');
 
-function loadData() {
-    const typeId = $('#filterType').val();
-    
-    $.get('api/get_report_status.php', { type_id: typeId }, function(response) {
-        allData = response;
-        
-        // Update stats
-        $('#confirmedCount').text(response.confirmed.length);
-        $('#cancelledCount').text(response.cancelled.length);
-        $('#pendingCount').text(response.pending.length);
-        $('#totalCount').text(response.confirmed.length + response.cancelled.length + response.pending.length);
-        
-        // Populate types filter
-        if (response.types && $('#filterType option').length <= 1) {
-            response.types.forEach(t => {
-                $('#filterType').append(`<option value="${t.id}">${t.grade_name} - ${t.name}</option>`);
+        $('[id^="tab-"]').removeClass('tab-active');
+        $(`#tab-${tab}`).addClass('tab-active');
+    }
+
+    function loadData() {
+        const typeId = $('#filterType').val();
+
+        $.get('api/get_report_status.php', { type_id: typeId }, function (response) {
+            allData = response;
+
+            // Update stats
+            $('#confirmedCount').text(response.confirmed.length);
+            $('#cancelledCount').text(response.cancelled.length);
+            $('#pendingCount').text(response.pending.length);
+            $('#totalCount').text(response.confirmed.length + response.cancelled.length + response.pending.length);
+
+            // Populate types filter
+            if (response.types && $('#filterType option').length <= 1) {
+                response.types.forEach(t => {
+                    $('#filterType').append(`<option value="${t.id}">${t.grade_name} - ${t.name}</option>`);
+                });
+            }
+
+            renderTables();
+        });
+    }
+
+    function renderTables() {
+        // Confirmed Table
+        let html = '';
+        if (allData.confirmed.length === 0) {
+            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+        } else {
+            allData.confirmed.forEach((s, i) => {
+                html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                <td class="px-3 py-3">${i + 1}</td>
+                <td class="px-3 py-3 font-medium">${s.fullname}</td>
+                <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
+                <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
+                <td class="px-3 py-3">${s.plan_name || '-'}</td>
+                <td class="px-3 py-3 text-xs text-gray-500">${s.update_at || '-'}</td>
+            </tr>`;
             });
         }
-        
-        renderTables();
-    });
-}
+        $('#confirmedTableBody').html(html);
 
-function renderTables() {
-    // Confirmed Table
-    let html = '';
-    if (allData.confirmed.length === 0) {
-        html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
-    } else {
-        allData.confirmed.forEach((s, i) => {
-            html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                <td class="px-3 py-3">${i+1}</td>
+        // Cancelled Table
+        html = '';
+        if (allData.cancelled.length === 0) {
+            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+        } else {
+            allData.cancelled.forEach((s, i) => {
+                html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                <td class="px-3 py-3">${i + 1}</td>
                 <td class="px-3 py-3 font-medium">${s.fullname}</td>
                 <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
                 <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
                 <td class="px-3 py-3">${s.plan_name || '-'}</td>
                 <td class="px-3 py-3 text-xs text-gray-500">${s.update_at || '-'}</td>
             </tr>`;
-        });
-    }
-    $('#confirmedTableBody').html(html);
-    
-    // Cancelled Table
-    html = '';
-    if (allData.cancelled.length === 0) {
-        html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
-    } else {
-        allData.cancelled.forEach((s, i) => {
-            html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                <td class="px-3 py-3">${i+1}</td>
-                <td class="px-3 py-3 font-medium">${s.fullname}</td>
-                <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
-                <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
-                <td class="px-3 py-3">${s.plan_name || '-'}</td>
-                <td class="px-3 py-3 text-xs text-gray-500">${s.update_at || '-'}</td>
-            </tr>`;
-        });
-    }
-    $('#cancelledTableBody').html(html);
-    
-    // Pending Table
-    html = '';
-    if (allData.pending.length === 0) {
-        html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
-    } else {
-        allData.pending.forEach((s, i) => {
-            html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                <td class="px-3 py-3">${i+1}</td>
-                <td class="px-3 py-3 font-medium">${s.fullname}</td>
-                <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
-                <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
-                <td class="px-3 py-3">${s.plan_name || '-'}</td>
-                <td class="px-3 py-3">
-                    <button onclick="callReserve(${s.id})" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg">
-                        <i class="fas fa-phone mr-1"></i>เรียกตัวสำรอง
-                    </button>
-                </td>
-            </tr>`;
-        });
-    }
-    $('#pendingTableBody').html(html);
-}
-
-function callReserve(id) {
-    Swal.fire({
-        title: 'เรียกตัวสำรอง',
-        text: 'ต้องการแจ้งเตือนนักเรียนให้มารายงานตัวหรือไม่?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'ใช่',
-        cancelButtonText: 'ยกเลิก'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // TODO: Implement notification logic (SMS/Email)
-            Swal.fire('สำเร็จ', 'แจ้งเตือนนักเรียนเรียบร้อยแล้ว (จำลอง)', 'success');
+            });
         }
+        $('#cancelledTableBody').html(html);
+
+        // Pending Table
+        html = '';
+        if (allData.pending.length === 0) {
+            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+        } else {
+            allData.pending.forEach((s, i) => {
+                let actionHtml = '';
+                if (s.is_called == 1) {
+                    actionHtml = `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i> เรียกตัวแล้ว</span>`;
+                } else {
+                    actionHtml = `<button onclick="callReserve(${s.id})" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-lg transition-colors">
+                        <i class="fas fa-phone mr-1"></i> เรียกตัวสำรอง
+                    </button>`;
+                }
+                html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                <td class="px-3 py-3">${i + 1}</td>
+                <td class="px-3 py-3 font-medium">${s.fullname}</td>
+                <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
+                <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
+                <td class="px-3 py-3">${s.plan_name || '-'}</td>
+                <td class="px-3 py-3">${actionHtml}</td>
+            </tr>`;
+            });
+        }
+        $('#pendingTableBody').html(html);
+    }
+
+    function callReserve(id) {
+        Swal.fire({
+            title: 'เรียกตัวสำรอง',
+            text: 'ต้องการเปลี่ยนสถานะเป็นเรียกตัวแล้วใช่หรือไม่?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ใช่, เรียกตัว',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'api/update_call_status.php',
+                    method: 'POST',
+                    data: JSON.stringify({ id: id, is_called: 1 }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire('สำเร็จ', 'บันทึกสถานะการเรียกตัวแล้ว', 'success');
+                            loadData(); // Refresh table
+                        } else {
+                            Swal.fire('Error', response.message || 'บันทึกไม่สำเร็จ', 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    $('#filterType').on('change', loadData);
+
+    $(document).ready(function () {
+        loadData();
     });
-}
-
-$('#filterType').on('change', loadData);
-
-$(document).ready(function() {
-    loadData();
-});
 </script>

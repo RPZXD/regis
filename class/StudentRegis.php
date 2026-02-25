@@ -395,13 +395,15 @@ class StudentRegis
                         parent_tel,
                         gpa_total, 
                         status,
+                        pass_rank,
+                        is_called,
                         update_at
                     FROM users u
                     WHERE level = '1' 
                         AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')
                         AND status = 1
                         AND DATE(update_at) = :date
-                    ORDER BY update_at ASC";
+                    ORDER BY pass_rank ASC, update_at ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':date', $date);
         $stmt->execute();
@@ -423,13 +425,15 @@ class StudentRegis
                         parent_tel,
                         gpa_total, 
                         status,
+                        pass_rank,
+                        is_called,
                         update_at
                     FROM users u
                     WHERE level = '4' 
                         AND typeregis = 'รอบทั่วไป'
                         AND status = 1
                         AND DATE(update_at) = :date
-                    ORDER BY update_at ASC";
+                    ORDER BY pass_rank ASC, update_at ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':date', $date);
         $stmt->execute();
@@ -847,7 +851,9 @@ class StudentRegis
                         now_tel, 
                         parent_tel,
                         final_plan_id,
-                        status
+                        status,
+                        is_called,
+                        pass_rank
                     FROM users 
                     WHERE citizenid = :citizen_id";
         $stmt = $this->conn->prepare($query);
@@ -1099,6 +1105,9 @@ class StudentRegis
     }
     public function getStudentsPassed($level, $typeName, $date = null)
     {
+        // Auto-call reservists if seats are available
+        $this->autoCallReservistsAllPlans();
+
         // Prepare Level Criteria
         $levels = [$level];
         if ($level == '1')
@@ -1122,9 +1131,11 @@ class StudentRegis
                     gpa_total, 
                     status,
                     update_at,
+                    pass_rank,
+                    is_called,
                     final_plan_id
                 FROM users 
-                WHERE level IN ($levelStr) AND status = 1";
+                WHERE level IN ($levelStr) AND status IN (1, 2, 3)";
 
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
@@ -1137,7 +1148,7 @@ class StudentRegis
             $sql .= " AND DATE(update_at) = :date";
         }
 
-        $sql .= " ORDER BY update_at ASC";
+        $sql .= " ORDER BY pass_rank IS NULL, pass_rank ASC, update_at ASC";
 
         $stmt = $this->conn->prepare($sql);
         // $stmt->bindParam(':level', $level); // Removed
@@ -1170,6 +1181,62 @@ class StudentRegis
                              WHERE ssp.user_id IS NULL OR ssp.user_id = 0");
         } catch (Exception $e) {
             // Fail silently if migration fails for some reason, let the main query error be thrown
+        }
+    }
+
+    public function autoCallReservistsAllPlans()
+    {
+        try {
+            // Get all plans with quota > 0
+            $stmt = $this->conn->prepare("SELECT id, quota FROM study_plans WHERE quota > 0 AND is_active = 1");
+            $stmt->execute();
+            $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($plans as $plan) {
+                $planId = $plan['id'];
+                $quota = (int) $plan['quota'];
+
+                // Count taken spots: confirmed (2) OR pending but called (1 and is_called = 1)
+                $takenStmt = $this->conn->prepare("
+                    SELECT COUNT(*) as taken 
+                    FROM users 
+                    WHERE final_plan_id = :plan_id 
+                    AND (status = 2 OR (status = 1 AND is_called = 1))
+                ");
+                $takenStmt->bindParam(':plan_id', $planId);
+                $takenStmt->execute();
+                $takenRes = $takenStmt->fetch(PDO::FETCH_ASSOC);
+                $taken = $takenRes ? (int) $takenRes['taken'] : 0;
+
+                $spotsAvailable = $quota - $taken;
+
+                if ($spotsAvailable > 0) {
+                    // Find next N students in line
+                    $nextStmt = $this->conn->prepare("
+                        SELECT id 
+                        FROM users 
+                        WHERE final_plan_id = :plan_id 
+                        AND status = 1 
+                        AND is_called = 0 
+                        AND pass_rank IS NOT NULL 
+                        ORDER BY pass_rank ASC 
+                        LIMIT :limit
+                    ");
+                    $nextStmt->bindValue(':plan_id', $planId, PDO::PARAM_INT);
+                    $nextStmt->bindValue(':limit', $spotsAvailable, PDO::PARAM_INT);
+                    $nextStmt->execute();
+                    $studentsToCall = $nextStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if (!empty($studentsToCall)) {
+                        $ids = array_column($studentsToCall, 'id');
+                        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                        $updateStmt = $this->conn->prepare("UPDATE users SET is_called = 1 WHERE id IN ($placeholders)");
+                        $updateStmt->execute($ids);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            error_log("Error in autoCallReservistsAllPlans: " . $e->getMessage());
         }
     }
 }
