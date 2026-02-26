@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('Asia/Bangkok');
 // Auto-detect environment based on hostname
 function isLocalEnvironment()
 {
