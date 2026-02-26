@@ -301,7 +301,7 @@
                             </div>
                         <?php else: ?>
                             <div class="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                                <a href="cancel_report.php"
+                                <a href="cancel_report.php?citizenid=<?php echo urlencode($studentData['citizenid']); ?>"
                                     class="px-8 py-3 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 font-bold transition-all text-center">
                                     สละสิทธิ์
                                 </a>
