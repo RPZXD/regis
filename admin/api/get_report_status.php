@@ -66,17 +66,17 @@ try {
     }
 
     // Confirmed (status = 2)
-    $confirmedSql = $baseSelect . " AND u.status = 2 ORDER BY u.update_at DESC";
+    $confirmedSql = $baseSelect . " AND u.status = 2 ORDER BY u.pass_rank ASC";
     $stmt = $db->query($confirmedSql);
     $confirmed = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Cancelled (status = 3)
-    $cancelledSql = $baseSelect . " AND u.status = 3 ORDER BY u.update_at DESC";
+    $cancelledSql = $baseSelect . " AND u.status = 3 ORDER BY u.pass_rank ASC";
     $stmt = $db->query($cancelledSql);
     $cancelled = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Pending (status = 1, passed but not confirmed yet)
-    $pendingSql = $baseSelect . " AND u.status = 1 ORDER BY u.update_at DESC";
+    $pendingSql = $baseSelect . " AND u.status = 1 ORDER BY u.pass_rank ASC";
     $stmt = $db->query($pendingSql);
     $pending = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

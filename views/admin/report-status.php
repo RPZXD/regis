@@ -84,6 +84,16 @@
             </button>
         </div>
 
+        <!-- Search Box -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="relative max-w-md">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="tableSearch" placeholder="ค้นหาชื่อ, เลขบัตร, แผนการเรียน..."
+                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    oninput="filterTable()">
+            </div>
+        </div>
+
         <!-- Tables -->
         <div class="p-6">
             <div id="content-confirmed" class="tab-content">
@@ -159,6 +169,10 @@
 
         $('[id^="tab-"]').removeClass('tab-active');
         $(`#tab-${tab}`).addClass('tab-active');
+
+        // Clear search when switching tabs
+        $('#tableSearch').val('');
+        filterTable();
     }
 
     function loadData() {
@@ -281,6 +295,16 @@
                     }
                 });
             }
+        });
+    }
+
+    function filterTable() {
+        const keyword = $('#tableSearch').val().toLowerCase();
+        const tableId = currentTab === 'confirmed' ? 'confirmedTableBody' :
+                        currentTab === 'cancelled' ? 'cancelledTableBody' : 'pendingTableBody';
+        $(`#${tableId} tr`).each(function () {
+            const text = $(this).text().toLowerCase();
+            $(this).toggle(text.includes(keyword));
         });
     }
 
