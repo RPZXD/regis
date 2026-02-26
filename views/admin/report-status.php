@@ -86,6 +86,7 @@
                     <thead>
                         <tr class="text-left text-gray-600 dark:text-gray-400 border-b border-gray-200">
                             <th class="px-3 py-3">ลำดับ</th>
+                            <th class="px-3 py-3">ลำดับเรียก</th>
                             <th class="px-3 py-3">ชื่อ-นามสกุล</th>
                             <th class="px-3 py-3">เลขบัตร</th>
                             <th class="px-3 py-3">ประเภท</th>
@@ -102,6 +103,7 @@
                     <thead>
                         <tr class="text-left text-gray-600 dark:text-gray-400 border-b border-gray-200">
                             <th class="px-3 py-3">ลำดับ</th>
+                            <th class="px-3 py-3">ลำดับเรียก</th>
                             <th class="px-3 py-3">ชื่อ-นามสกุล</th>
                             <th class="px-3 py-3">เลขบัตร</th>
                             <th class="px-3 py-3">ประเภท</th>
@@ -118,6 +120,7 @@
                     <thead>
                         <tr class="text-left text-gray-600 dark:text-gray-400 border-b border-gray-200">
                             <th class="px-3 py-3">ลำดับ</th>
+                            <th class="px-3 py-3">ลำดับเรียก</th>
                             <th class="px-3 py-3">ชื่อ-นามสกุล</th>
                             <th class="px-3 py-3">เลขบัตร</th>
                             <th class="px-3 py-3">ประเภท</th>
@@ -180,16 +183,17 @@
         // Confirmed Table
         let html = '';
         if (allData.confirmed.length === 0) {
-            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+            html = '<tr><td colspan="7" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
         } else {
             allData.confirmed.forEach((s, i) => {
                 html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
                 <td class="px-3 py-3">${i + 1}</td>
+                <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">${s.pass_rank || '-'}</span></td>
                 <td class="px-3 py-3 font-medium">${s.fullname}</td>
                 <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
                 <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
                 <td class="px-3 py-3">${s.plan_name || '-'}</td>
-                <td class="px-3 py-3 text-xs text-gray-500">${s.update_at || '-'}</td>
+                <td class="px-3 py-3 text-xs text-gray-500">${s.confirmed_at || s.update_at || '-'}</td>
             </tr>`;
             });
         }
@@ -198,16 +202,17 @@
         // Cancelled Table
         html = '';
         if (allData.cancelled.length === 0) {
-            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+            html = '<tr><td colspan="7" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
         } else {
             allData.cancelled.forEach((s, i) => {
                 html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
                 <td class="px-3 py-3">${i + 1}</td>
+                <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">${s.pass_rank || '-'}</span></td>
                 <td class="px-3 py-3 font-medium">${s.fullname}</td>
                 <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
                 <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>
                 <td class="px-3 py-3">${s.plan_name || '-'}</td>
-                <td class="px-3 py-3 text-xs text-gray-500">${s.update_at || '-'}</td>
+                <td class="px-3 py-3 text-xs text-gray-500">${s.confirmed_at || s.update_at || '-'}</td>
             </tr>`;
             });
         }
@@ -216,7 +221,7 @@
         // Pending Table
         html = '';
         if (allData.pending.length === 0) {
-            html = '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
+            html = '<tr><td colspan="7" class="text-center py-8 text-gray-400">ไม่มีข้อมูล</td></tr>';
         } else {
             allData.pending.forEach((s, i) => {
                 let actionHtml = '';
@@ -229,6 +234,7 @@
                 }
                 html += `<tr class="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-slate-700/50">
                 <td class="px-3 py-3">${i + 1}</td>
+                <td class="px-3 py-3 text-center"><span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">${s.pass_rank || '-'}</span></td>
                 <td class="px-3 py-3 font-medium">${s.fullname}</td>
                 <td class="px-3 py-3 font-mono text-sm">${s.citizenid}</td>
                 <td class="px-3 py-3 text-xs">${s.typeregis || '-'}</td>

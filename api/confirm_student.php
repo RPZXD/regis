@@ -39,7 +39,7 @@ try {
     }
 
     // Update student status to 2 (ยืนยันสิทธิ์)
-    $stmt = $db->prepare("UPDATE users SET status = 2 WHERE id = ?");
+    $stmt = $db->prepare("UPDATE users SET status = 2, confirmed_at = NOW() WHERE id = ?");
     $result = $stmt->execute([$id]);
 
     if ($result) {

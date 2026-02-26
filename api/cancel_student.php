@@ -40,7 +40,7 @@ try {
     }
 
     // Update student status to 3 (สละสิทธิ์) 
-    $stmt = $db->prepare("UPDATE users SET status = 3 WHERE id = ?"); // Let's also save the reason if we want to... but the users table might not have a cancel_reason column. I'll pass for now or save if it has one. Let me check users schema.
+    $stmt = $db->prepare("UPDATE users SET status = 3, confirmed_at = NOW() WHERE id = ?");
     $result = $stmt->execute([$id]);
 
     if ($result) {

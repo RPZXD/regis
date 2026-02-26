@@ -27,6 +27,7 @@ try {
                     u.level,
                     u.status,
                     u.update_at,
+                    u.confirmed_at,
                     u.final_plan_id,
                     u.pass_rank,
                     u.is_called,
