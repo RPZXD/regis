@@ -1,3 +1,4 @@
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <!-- Admin Report Status View -->
 <div class="space-y-6">
     <!-- Page Header -->
@@ -18,6 +19,10 @@
                     class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-sm">
                     <option value="">-- ประเภททั้งหมด --</option>
                 </select>
+                <button onclick="exportExcel()"
+                    class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-bold hover:shadow-lg transition-all flex items-center gap-2">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
             </div>
         </div>
     </div>
@@ -280,6 +285,56 @@
     }
 
     $('#filterType').on('change', loadData);
+
+    function exportExcel() {
+        const tabNames = { confirmed: 'ยืนยันแล้ว', cancelled: 'สละสิทธิ์', pending: 'รอรายงานตัว' };
+        const sheetName = tabNames[currentTab] || currentTab;
+        const data = allData[currentTab] || [];
+
+        if (data.length === 0) {
+            Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลสำหรับ Export', 'warning');
+            return;
+        }
+
+        let rows = [];
+
+        if (currentTab === 'confirmed') {
+            rows.push(['ลำดับ', 'ลำดับเรียก', 'ชื่อ-นามสกุล', 'เลขบัตร', 'ประเภท', 'แผนการเรียน', 'วันที่ยืนยัน']);
+            data.forEach((s, i) => {
+                rows.push([i + 1, s.pass_rank || '-', s.fullname, s.citizenid, s.typeregis || '-', s.plan_name || '-', s.confirmed_at || s.update_at || '-']);
+            });
+        } else if (currentTab === 'cancelled') {
+            rows.push(['ลำดับ', 'ลำดับเรียก', 'ชื่อ-นามสกุล', 'เลขบัตร', 'ประเภท', 'แผนการเรียน', 'วันที่สละสิทธิ์']);
+            data.forEach((s, i) => {
+                rows.push([i + 1, s.pass_rank || '-', s.fullname, s.citizenid, s.typeregis || '-', s.plan_name || '-', s.confirmed_at || s.update_at || '-']);
+            });
+        } else {
+            rows.push(['ลำดับ', 'ลำดับเรียก', 'ชื่อ-นามสกุล', 'เลขบัตร', 'ประเภท', 'แผนการเรียน', 'สถานะเรียกตัว']);
+            data.forEach((s, i) => {
+                rows.push([i + 1, s.pass_rank || '-', s.fullname, s.citizenid, s.typeregis || '-', s.plan_name || '-', s.is_called == 1 ? 'เรียกตัวแล้ว' : 'รอเรียกตัว']);
+            });
+        }
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // Set column widths
+        ws['!cols'] = [
+            { wch: 6 },   // ลำดับ
+            { wch: 10 },  // ลำดับเรียก
+            { wch: 30 },  // ชื่อ-นามสกุล
+            { wch: 16 },  // เลขบัตร
+            { wch: 18 },  // ประเภท
+            { wch: 30 },  // แผนการเรียน
+            { wch: 22 },  // วันที่/สถานะ
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+        const filterText = $('#filterType option:selected').text().replace('-- ', '').replace(' --', '') || 'ทั้งหมด';
+        const fileName = `สถานะรายงานตัว_${sheetName}_${filterText}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+    }
 
     $(document).ready(function () {
         loadData();
