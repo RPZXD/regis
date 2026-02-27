@@ -1196,24 +1196,47 @@ class StudentRegis
                 $planId = $plan['id'];
                 $quota = (int) $plan['quota'];
 
-                // Count taken spots: confirmed (2) OR pending but called (1 and is_called = 1)
+                // Count taken spots by unique students (citizenid)
+                // taken = confirmed (2) OR pending but called (1 and is_called = 1)
+                // Excluding students who have at least one record as cancelled (status 3) for this plan
                 $takenStmt = $this->conn->prepare("
-                    SELECT COUNT(*) as taken 
+                    SELECT COUNT(DISTINCT citizenid) as taken 
                     FROM users 
                     WHERE final_plan_id = :plan_id 
                     AND (status = 2 OR (status = 1 AND is_called = 1))
+                    AND citizenid NOT IN (SELECT citizenid FROM users WHERE final_plan_id = :plan_id_inner AND status = 3)
                 ");
-                $takenStmt->bindParam(':plan_id', $planId);
+                $takenStmt->bindValue(':plan_id', $planId);
+                $takenStmt->bindValue(':plan_id_inner', $planId);
                 $takenStmt->execute();
                 $takenRes = $takenStmt->fetch(PDO::FETCH_ASSOC);
                 $taken = $takenRes ? (int) $takenRes['taken'] : 0;
 
+                // Sync is_called status for all records of students who are already considered 'taken'
+                // This ensures consistency when a student has multiple records (different registration types)
+                $syncStmt = $this->conn->prepare("
+                    UPDATE users u1
+                    JOIN (
+                        SELECT DISTINCT citizenid 
+                        FROM users 
+                        WHERE final_plan_id = :plan_id 
+                        AND (status = 2 OR (status = 1 AND is_called = 1))
+                        AND citizenid NOT IN (SELECT citizenid FROM users WHERE final_plan_id = :plan_id_inner AND status = 3)
+                    ) u2 ON u1.citizenid = u2.citizenid
+                    SET u1.is_called = 1
+                    WHERE u1.final_plan_id = :plan_id_inner2 AND u1.is_called = 0 AND u1.status != 3
+                ");
+                $syncStmt->bindValue(':plan_id', $planId);
+                $syncStmt->bindValue(':plan_id_inner', $planId);
+                $syncStmt->bindValue(':plan_id_inner2', $planId);
+                $syncStmt->execute();
+
                 $spotsAvailable = $quota - $taken;
 
                 if ($spotsAvailable > 0) {
-                    // Find next N students in line
+                    // Find next N unique students in line
                     $nextStmt = $this->conn->prepare("
-                        SELECT id 
+                        SELECT DISTINCT citizenid 
                         FROM users 
                         WHERE final_plan_id = :plan_id 
                         AND status = 1 
@@ -1228,10 +1251,12 @@ class StudentRegis
                     $studentsToCall = $nextStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     if (!empty($studentsToCall)) {
-                        $ids = array_column($studentsToCall, 'id');
-                        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-                        $updateStmt = $this->conn->prepare("UPDATE users SET is_called = 1 WHERE id IN ($placeholders)");
-                        $updateStmt->execute($ids);
+                        $citizenIds = array_column($studentsToCall, 'citizenid');
+                        $placeholders = implode(',', array_fill(0, count($citizenIds), '?'));
+                        // Update ALL records for these students for this plan
+                        $updateStmt = $this->conn->prepare("UPDATE users SET is_called = 1 WHERE citizenid IN ($placeholders) AND final_plan_id = ?");
+                        $params = array_merge($citizenIds, [$planId]);
+                        $updateStmt->execute($params);
                     }
                 }
             }
