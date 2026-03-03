@@ -16,10 +16,15 @@
                     </h2>
                     <p class="text-gray-600 dark:text-gray-400 mt-1 text-lg"><?php echo $regisType['name']; ?></p>
                 </div>
-                <div class="mt-4 flex gap-3">
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <button onclick="$('#importCsvFile').click()"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 text-sm font-medium">
+                        <i class="fas fa-upload"></i> Import CSV
+                    </button>
+                    <input type="file" id="importCsvFile" accept=".csv" class="hidden" onchange="importCSV(this)">
                     <button onclick="exportCSV()"
                         class="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-lg shadow-green-500/30 transition-all hover:-translate-y-1 text-sm font-medium">
-                        <i class="fas fa-file-csv"></i> Export CSV
+                        <i class="fas fa-download"></i> Export CSV
                     </button>
                     <button onclick="exportExcel()"
                         class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-1 text-sm font-medium">
@@ -797,8 +802,8 @@
                 });
             }
 
-            // Helper to safe string
-            const s = (val) => val ? '"' + String(val).replace(/"/g, '""') + '"' : '""';
+            // Helper to safe string (using ="..." for preventing scientific notation in Excel)
+            const s = (val) => val ? '="' + String(val).replace(/"/g, '""') + '"' : '""';
 
             let stringRow = [
                 index + 1,
@@ -829,7 +834,7 @@
                 s(row.mom_tel), s(row.mom_job),
                 s((row.parent_prefix || '') + ' ' + (row.parent_name || '') + ' ' + (row.parent_lastname || '')),
                 s(row.parent_relation), s(row.parent_tel),
-                status,
+                s(status),
                 s(plans)
             ];
             csvContent += stringRow.join(",") + "\n";
@@ -947,5 +952,53 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    function importCSV(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('csv_file', file);
+
+        Swal.fire({
+            title: 'กำลังนำเข้าข้อมูล...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('api/admin/import_student_csv.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'นำเข้าข้อมูลสำเร็จ',
+                        text: 'อัปเดตข้อมูลจำนวน ' + data.updated + ' รายการ',
+                    });
+                    loadTable();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: data.message || 'ไม่สามารถนำเข้าข้อมูลได้'
+                    });
+                }
+                input.value = ''; // Reset file input
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาดระบบ',
+                    text: 'เซิร์ฟเวอร์มีปัญหา กรุณาลองใหม่'
+                });
+                input.value = ''; // Reset file input
+            });
     }
 </script>
