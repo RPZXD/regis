@@ -17,31 +17,31 @@ $db->exec("set names utf8");
 $regId = $_GET['reg_id'] ?? $_GET['id'] ?? null;
 $citizenid = $_GET['citizenid'] ?? null;
 if ($regId) {
-    $s = $db->prepare("SELECT * FROM users WHERE id = :id");
-    $s->execute([':id' => $regId]);
+  $s = $db->prepare("SELECT * FROM users WHERE id = :id");
+  $s->execute([':id' => $regId]);
 } elseif ($citizenid) {
-    $cc = preg_replace('/[^0-9]/', '', $citizenid);
-    $s = $db->prepare("SELECT * FROM users WHERE citizenid = :c ORDER BY id DESC LIMIT 1");
-    $s->execute([':c' => $cc]);
+  $cc = preg_replace('/[^0-9]/', '', $citizenid);
+  $s = $db->prepare("SELECT * FROM users WHERE citizenid = :c ORDER BY id DESC LIMIT 1");
+  $s->execute([':c' => $cc]);
 } else {
-    die('กรุณาระบุรหัสผู้สมัครหรือเลขบัตรประชาชน');
+  die('กรุณาระบุรหัสผู้สมัครหรือเลขบัตรประชาชน');
 }
 $row = $s->fetch(PDO::FETCH_ASSOC);
 if (!$row)
-    die('ไม่พบข้อมูลนักเรียน');
+  die('ไม่พบข้อมูลนักเรียน');
 
 // ── Settings ───────────────────────────────────────────────────────
 $settings = [];
 try {
-    $q = $db->query("SELECT * FROM settings");
-    $rows = $q->fetchAll(PDO::FETCH_ASSOC);
-    if ($rows) {
-        if (isset($rows[0]['key_name']))
-            foreach ($rows as $r)
-                $settings[$r['key_name']] = $r['value'];
-        else
-            $settings = $rows[0];
-    }
+  $q = $db->query("SELECT * FROM settings");
+  $rows = $q->fetchAll(PDO::FETCH_ASSOC);
+  if ($rows) {
+    if (isset($rows[0]['key_name']))
+      foreach ($rows as $r)
+        $settings[$r['key_name']] = $r['value'];
+    else
+      $settings = $rows[0];
+  }
 } catch (Exception $e) {
 }
 $schoolLogo = $settings['logo_school'] ?? 'logo-phicha.png';
@@ -57,29 +57,62 @@ $cid = $row['citizenid'];
 $fmtCid = substr($cid, 0, 1) . '-' . substr($cid, 1, 4) . '-' . substr($cid, 5, 5) . '-' . substr($cid, 10, 2) . '-' . substr($cid, 12, 1);
 $appNum = htmlspecialchars($row['numreg'] ?? '-');
 $examRoom = htmlspecialchars($row['exam_room'] ?? 'รอประกาศ');
-$examDate = htmlspecialchars($row['exam_date'] ?? 'รอประกาศ');
+
+// ── Exam Date Thai Formatting ──────────────────────────────────────
+$examDateRaw = $row['exam_date'] ?? 'รอประกาศ';
+$examDate = 'รอประกาศ';
+if ($examDateRaw && $examDateRaw !== 'รอประกาศ') {
+  $dateObj = null;
+  // Handle d/m/Y format (common in Thai systems)
+  if (strpos($examDateRaw, '/') !== false) {
+    $parts = explode('/', $examDateRaw);
+    if (count($parts) === 3) {
+      // Ensure leading zeros for createFromFormat
+      $d = str_pad($parts[0], 2, '0', STR_PAD_LEFT);
+      $m = str_pad($parts[1], 2, '0', STR_PAD_LEFT);
+      $y = $parts[2];
+      $dateObj = DateTime::createFromFormat('d/m/Y', "$d/$m/$y");
+    }
+  } else {
+    try {
+      $dateObj = new DateTime($examDateRaw);
+    } catch (Exception $e) {
+      $dateObj = null;
+    }
+  }
+
+  if ($dateObj) {
+    $y = (int) $dateObj->format("Y") + 543;
+    $m = (int) $dateObj->format("n");
+    $d = (int) $dateObj->format("j");
+    $months = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค. "];
+    $examDate = $d . " " . $months[$m] . " " . $y;
+  } else {
+    $examDate = htmlspecialchars($examDateRaw);
+  }
+}
 $fullName = htmlspecialchars($row['stu_prefix'] . $row['stu_name'] . ' ' . $row['stu_lastname']);
 
 // ── Theme colors by typeregis ──────────────────────────────────────
 // palette: [header, darker, light-tint, label]
 $palettes = [
-    'ในเขต' => ['#1d4ed8', '#1e40af', '#dbeafe', '🔵 ในเขตพื้นที่บริการ'],
-    'นอกเขต' => ['#0f766e', '#115e59', '#ccfbf1', '🟢 นอกเขตพื้นที่บริการ'],
-    'โควต้า' => ['#be123c', '#9f1239', '#ffe4e6', '🔴 โควต้า ม.3 เดิม'],
-    'รอบทั่วไป' => ['#b45309', '#92400e', '#fef3c7', '🟡 รอบทั่วไป'],
-    'ESC' => ['#0369a1', '#075985', '#e0f2fe', '🔷 ห้องเรียนพิเศษ (ESC)'],
-    'EP' => ['#7c3aed', '#6d28d9', '#ede9fe', '🟣 English Program'],
-    'default_m1' => ['#1d4ed8', '#1e40af', '#dbeafe', ''],
-    'default_m4' => ['#6d28d9', '#5b21b6', '#ede9fe', ''],
+  'ในเขต' => ['#1d4ed8', '#1e40af', '#dbeafe', '🔵 ในเขตพื้นที่บริการ'],
+  'นอกเขต' => ['#0f766e', '#115e59', '#ccfbf1', '🟢 นอกเขตพื้นที่บริการ'],
+  'โควต้า' => ['#be123c', '#9f1239', '#ffe4e6', '🔴 โควต้า ม.3 เดิม'],
+  'รอบทั่วไป' => ['#b45309', '#92400e', '#fef3c7', '🟡 รอบทั่วไป'],
+  'ESC' => ['#0369a1', '#075985', '#e0f2fe', '🔷 ห้องเรียนพิเศษ (ESC)'],
+  'EP' => ['#7c3aed', '#6d28d9', '#ede9fe', '🟣 English Program'],
+  'default_m1' => ['#1d4ed8', '#1e40af', '#dbeafe', ''],
+  'default_m4' => ['#6d28d9', '#5b21b6', '#ede9fe', ''],
 ];
 
 // Match typeregis to palette
 $themeKey = 'default_m' . $levelText;
 foreach ($palettes as $key => $pal) {
-    if (mb_strpos($row['typeregis'] ?? '', $key) !== false || ($row['typeregis'] ?? '') === $key) {
-        $themeKey = $key;
-        break;
-    }
+  if (mb_strpos($row['typeregis'] ?? '', $key) !== false || ($row['typeregis'] ?? '') === $key) {
+    $themeKey = $key;
+    break;
+  }
 }
 $palette = $palettes[$themeKey] ?? $palettes['default_m4'];
 $col1 = $palette[0];
@@ -90,23 +123,23 @@ $typeLabel = $palette[3] ?: ($isM1 ? 'ม.1' : 'ม.4') . ' ' . htmlspecialchars
 // ── mPDF setup ─────────────────────────────────────────────────────
 $fontData = (new Mpdf\Config\FontVariables())->getDefaults()['fontdata'];
 $mpdf = new \Mpdf\Mpdf([
-    'tempDir' => defined('MPDF_TEMP_DIR') ? MPDF_TEMP_DIR : __DIR__ . '/tmp',
-    'default_font_size' => 14,
-    'default_font' => 'sarabun',
-    'format' => 'A4',
-    'orientation' => 'P',
-    'margin_left' => 15,
-    'margin_right' => 15,
-    'margin_top' => 15,
-    'margin_bottom' => 15,
-    'fontdata' => $fontData + [
-        'sarabun' => [
-            'R' => 'THSarabunNew.ttf',
-            'B' => 'THSarabunNew-Bold.ttf',
-            'I' => 'THSarabunNew-Italic.ttf',
-            'BI' => 'THSarabunNew-BoldItalic.ttf',
-        ]
-    ],
+  'tempDir' => defined('MPDF_TEMP_DIR') ? MPDF_TEMP_DIR : __DIR__ . '/tmp',
+  'default_font_size' => 14,
+  'default_font' => 'sarabun',
+  'format' => 'A4',
+  'orientation' => 'P',
+  'margin_left' => 15,
+  'margin_right' => 15,
+  'margin_top' => 15,
+  'margin_bottom' => 15,
+  'fontdata' => $fontData + [
+    'sarabun' => [
+      'R' => 'THSarabunNew.ttf',
+      'B' => 'THSarabunNew-Bold.ttf',
+      'I' => 'THSarabunNew-Italic.ttf',
+      'BI' => 'THSarabunNew-BoldItalic.ttf',
+    ]
+  ],
 ]);
 $mpdf->SetTitle('บัตรประจำตัวผู้เข้าสอบ - ' . $row['stu_name']);
 
@@ -114,40 +147,40 @@ $mpdf->SetTitle('บัตรประจำตัวผู้เข้าสอ
 $logoPath = __DIR__ . '/dist/img/' . $schoolLogo;
 $logoTag = '';
 if (file_exists($logoPath)) {
-    $b64 = base64_encode(file_get_contents($logoPath));
-    $logoTag = '<img src="data:image/png;base64,' . $b64 . '" width="48" height="48">';
+  $b64 = base64_encode(file_get_contents($logoPath));
+  $logoTag = '<img src="data:image/png;base64,' . $b64 . '" width="48" height="48">';
 }
 
 // ── Photo ──────────────────────────────────────────────────────────
 $photoPath = '';
 try {
-    $ps = $db->prepare("SELECT path FROM tbl_uploads WHERE citizenid=:c AND name='document8'");
-    $ps->execute([':c' => $row['citizenid']]);
-    $pr = $ps->fetch(PDO::FETCH_ASSOC);
-    if ($pr && !empty($pr['path']))
-        $photoPath = __DIR__ . '/uploads/' . $row['citizenid'] . '/' . $pr['path'];
+  $ps = $db->prepare("SELECT path FROM tbl_uploads WHERE citizenid=:c AND name='document8'");
+  $ps->execute([':c' => $row['citizenid']]);
+  $pr = $ps->fetch(PDO::FETCH_ASSOC);
+  if ($pr && !empty($pr['path']))
+    $photoPath = __DIR__ . '/uploads/' . $row['citizenid'] . '/' . $pr['path'];
 } catch (Exception $e) {
 }
 if (!$photoPath || !file_exists($photoPath))
-    $photoPath = __DIR__ . '/uploads/' . $row['citizenid'] . '/photo.jpg';
+  $photoPath = __DIR__ . '/uploads/' . $row['citizenid'] . '/photo.jpg';
 if (!file_exists($photoPath)) {
-    $ud = __DIR__ . '/uploads/' . $row['citizenid'] . '/';
-    if (is_dir($ud)) {
-        $fs = glob($ud . '*.{jpg,jpeg,png}', GLOB_BRACE);
-        if ($fs)
-            $photoPath = $fs[0];
-    }
+  $ud = __DIR__ . '/uploads/' . $row['citizenid'] . '/';
+  if (is_dir($ud)) {
+    $fs = glob($ud . '*.{jpg,jpeg,png}', GLOB_BRACE);
+    if ($fs)
+      $photoPath = $fs[0];
+  }
 }
 $photoTag = '';
 if (file_exists($photoPath)) {
-    $ext = strtolower(pathinfo($photoPath, PATHINFO_EXTENSION));
-    $mime = $ext === 'png' ? 'image/png' : 'image/jpeg';
-    $b64 = base64_encode(file_get_contents($photoPath));
-    // 113px ≈ 30mm, 150px ≈ 40mm at 96dpi
-    $photoTag = '<img src="data:' . $mime . ';base64,' . $b64 . '" width="113" height="150"
+  $ext = strtolower(pathinfo($photoPath, PATHINFO_EXTENSION));
+  $mime = $ext === 'png' ? 'image/png' : 'image/jpeg';
+  $b64 = base64_encode(file_get_contents($photoPath));
+  // 113px ≈ 30mm, 150px ≈ 40mm at 96dpi
+  $photoTag = '<img src="data:' . $mime . ';base64,' . $b64 . '" width="113" height="150"
                       style="border:2px solid ' . $col1 . ';border-radius:4px;object-fit:cover;">';
 } else {
-    $photoTag = '<table width="113" height="150" cellpadding="0" cellspacing="0"
+  $photoTag = '<table width="113" height="150" cellpadding="0" cellspacing="0"
                         style="border:2px dashed #c0cde4;border-radius:4px;background:#f1f5fb;">
                    <tr><td align="center" valign="middle"
                          style="font-size:11pt;color:#9daabf;line-height:1.7;">
