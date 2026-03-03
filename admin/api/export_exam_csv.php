@@ -6,9 +6,9 @@ header('Content-Disposition: attachment; filename=ExamRoomData_' . date('Ymd_His
 echo "\xEF\xBB\xBF";
 
 try {
-    require_once __DIR__ . '/../../../config/Database.php';
-    require_once __DIR__ . '/../../../class/StudentRegis.php';
-    require_once __DIR__ . '/../../../class/AdminConfig.php';
+    require_once __DIR__ . '/../../config/Database.php';
+    require_once __DIR__ . '/../../class/StudentRegis.php';
+    require_once __DIR__ . '/../../class/AdminConfig.php';
 
     session_start();
     if (!isset($_SESSION['Admin_login'])) {
