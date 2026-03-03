@@ -215,74 +215,75 @@
             }
         window.location.href = API_BASE_URL + 'export_exam_csv.php?type_id=' + typeId;
         }
+    }
 
     function importExamCSV(event) {
-                const file = event.target.files[0];
-                if (!file) return;
+        const file = event.target.files[0];
+        if (!file) return;
 
-                // Reset input so the same file can be selected again if needed
-                event.target.value = '';
+        // Reset input so the same file can be selected again if needed
+        event.target.value = '';
 
-                if (!file.name.toLowerCase().endsWith('.csv')) {
-                    Swal.fire('ข้อผิดพลาด', 'กรุณาอัปโหลดไฟล์นามสกุล .csv เท่านั้น', 'error');
-                    return;
-                }
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาอัปโหลดไฟล์นามสกุล .csv เท่านั้น', 'error');
+            return;
+        }
 
-                Swal.fire({
-                    title: 'กำลังนำเข้าข้อมูล',
-                    text: 'รอสักครู่...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                const formData = new FormData();
-                formData.append('csv_file', file);
-
-                $.ajax({
-                    url: API_BASE_URL + 'import_exam_csv.php',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        try {
-                            const res = typeof response === 'string' ? JSON.parse(response) : response;
-                            if (res.success) {
-                                let htmlMsg = `<p>อัปเดตข้อมูลสำเร็จ <b>${res.updated_count}</b> รายการ</p>`;
-                                if (res.errors && res.errors.length > 0) {
-                                    htmlMsg += `<hr class="my-2"><div class="text-xs text-red-500 text-left max-h-40 overflow-y-auto"><b>พบปัญหา:</b><br>${res.errors.join('<br>')}</div>`;
-                                }
-
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'นำเข้าสำเร็จ!',
-                                    html: htmlMsg,
-                                    confirmButtonColor: '#3085d6',
-                                }).then((result) => {
-                                    if (result.isConfirmed || result.dismiss) {
-                                        loadTable(); // Refresh table
-                                    }
-                                });
-                            } else {
-                                Swal.fire('เกิดข้อผิดพลาด', res.error || 'ไม่สามารถนำเข้าข้อมูลได้', 'error');
-                            }
-                        } catch (e) {
-                            console.error(e);
-                            Swal.fire('เกิดข้อผิดพลาด', 'รูปแบบการตอบกลับจากเซิร์ฟเวอร์ไม่ถูกต้อง', 'error');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(error);
-                        let errMsg = 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้';
-                        if (xhr.responseJSON && xhr.responseJSON.error) {
-                            errMsg = xhr.responseJSON.error;
-                        }
-                        Swal.fire('เกิดข้อผิดพลาดระบบ', errMsg, 'error');
-                    }
-                });
+        Swal.fire({
+            title: 'กำลังนำเข้าข้อมูล',
+            text: 'รอสักครู่...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
             }
+        });
+
+        const formData = new FormData();
+        formData.append('csv_file', file);
+
+        $.ajax({
+            url: API_BASE_URL + 'import_exam_csv.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                try {
+                    const res = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (res.success) {
+                        let htmlMsg = `<p>อัปเดตข้อมูลสำเร็จ <b>${res.updated_count}</b> รายการ</p>`;
+                        if (res.errors && res.errors.length > 0) {
+                            htmlMsg += `<hr class="my-2"><div class="text-xs text-red-500 text-left max-h-40 overflow-y-auto"><b>พบปัญหา:</b><br>${res.errors.join('<br>')}</div>`;
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'นำเข้าสำเร็จ!',
+                            html: htmlMsg,
+                            confirmButtonColor: '#3085d6',
+                        }).then((result) => {
+                            if (result.isConfirmed || result.dismiss) {
+                                loadTable(); // Refresh table
+                            }
+                        });
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', res.error || 'ไม่สามารถนำเข้าข้อมูลได้', 'error');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    Swal.fire('เกิดข้อผิดพลาด', 'รูปแบบการตอบกลับจากเซิร์ฟเวอร์ไม่ถูกต้อง', 'error');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                let errMsg = 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errMsg = xhr.responseJSON.error;
+                }
+                Swal.fire('เกิดข้อผิดพลาดระบบ', errMsg, 'error');
+            }
+        });
+    }
 </script>
 document.getElementById('roomActive').checked = room.is_active;
 document.getElementById('roomModal').classList.remove('hidden');
