@@ -318,7 +318,9 @@ $currentTypeId = $typeId ?? 0;
                     </button>` : ''}
                     ${student.status != 1 ? `<button onclick="approveStudentDirect(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg">
                         <i class="fas fa-user-check mr-1"></i>อนุมัติ
-                    </button>` : ''}
+                    </button>` : `<button onclick="cancelStudentApproval(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white text-xs rounded-lg">
+                        <i class="fas fa-undo mr-1"></i>ยกเลิก
+                    </button>`}
                 </div>
             </td>
         </tr>`;
@@ -443,6 +445,38 @@ $currentTypeId = $typeId ?? 0;
                             icon: 'success',
                             title: 'อนุมัติสำเร็จ!',
                             text: 'นักเรียนถูกเปลี่ยนสถานะเป็น "ผ่านการตรวจสอบ" เรียบร้อยแล้ว',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: response.error });
+                    }
+                }, 'json');
+            }
+        });
+    }
+
+    function cancelStudentApproval(userId, fullname) {
+        Swal.fire({
+            title: 'ยกเลิกการอนุมัติ?',
+            html: `<p>คุณต้องการเปลี่ยนสถานะของ <strong>${fullname}</strong> กลับไปเป็น "รอตรวจสอบ" ใช่หรือไม่?</p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f97316',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'ใช่, ยกเลิกการอนุมัติ',
+            cancelButtonText: 'ปิด'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('api/admin/unapprove-student.php', {
+                    student_id: userId
+                }, function (response) {
+                    if (response.success) {
+                        loadStudents();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ยกเลิกสำเร็จ!',
+                            text: 'สถานะของนักเรียนกลับไปเป็น "รอตรวจสอบ" แล้ว',
                             timer: 2000,
                             showConfirmButton: false
                         });
