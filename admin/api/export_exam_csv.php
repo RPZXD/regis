@@ -50,37 +50,33 @@ try {
         $plansMap[$plan['id']] = $plan['name'];
     }
 
-    // CSV Header matching requested columns
+    // CSV Header matching requested columns (Removed แผนการเรียน)
     fputcsv($output, [
         'เลขประจำตัวผู้สมัคร',
         'เลขบัตรประชาชน',
         'ชื่อนามสกุล',
-        'แผนการเรียน',
         'เลขที่นั่งสอบ',
         'ห้องสอบ',
         'วันสอบ',
         'สถานะ (0=รอตรวจสอบ, 1=ยืนยันแล้ว, 2=สละสิทธิ์)'
     ]);
 
-    foreach ($students as $student) {
-        // Format plans
-        $plansStr = '-';
-        if (!empty($student['plan_string'])) {
-            $planPairs = explode(',', $student['plan_string']);
-            $formattedPlans = [];
-            foreach ($planPairs as $pair) {
-                list($priority, $planId) = explode(':', $pair);
-                $planName = isset($plansMap[$planId]) ? $plansMap[$planId] : $planId;
-                $formattedPlans[] = "{$priority}. {$planName}";
-            }
-            $plansStr = implode(', ', $formattedPlans);
-        }
+    // Add a sample data row
+    fputcsv($output, [
+        'ex_12345',
+        '="1100000000000"',
+        'นายทดสอบ ระบบ',
+        'A001',
+        'ห้อง 101',
+        '24/03/2026',
+        '1'
+    ]);
 
+    foreach ($students as $student) {
         fputcsv($output, [
             $student['numreg'] ?? '',
             '="' . $student['citizenid'] . '"', // Prevent scientific notation in Excel
             $student['fullname'],
-            $plansStr,
             $student['seat_number'] ?? '',
             $student['exam_room'] ?? '',
             $student['exam_date'] ?? '',

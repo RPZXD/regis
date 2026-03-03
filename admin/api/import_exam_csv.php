@@ -41,18 +41,6 @@ try {
     // Handle potential BOM in the first column header
     $header[0] = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header[0]);
 
-    // Expected headers
-    $expectedHeaders = [
-        'เลขประจำตัวผู้สมัคร',
-        'เลขบัตรประชาชน',
-        'ชื่อนามสกุล',
-        'แผนการเรียน',
-        'เลขที่นั่งสอบ',
-        'ห้องสอบ',
-        'วันสอบ',
-        'สถานะ (0=รอตรวจสอบ, 1=ยืนยันแล้ว, 2=สละสิทธิ์)'
-    ];
-
     // Map column names to indexes dynamically to handle reordered columns
     $colMap = [];
     foreach ($header as $index => $colName) {
