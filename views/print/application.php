@@ -227,7 +227,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     const scheduleMessage = document.getElementById('scheduleMessage');
                     const scheduleTimeRange = document.getElementById('scheduleTimeRange');
 
-                    if (data.canPrint) {
+                    if (data.canPrint && data.status != 3) {
                         printBtn.classList.remove('!bg-gray-400', '!from-gray-400', '!to-gray-500', 'cursor-not-allowed', 'opacity-60');
                         printBtn.disabled = false;
                         printBtn.onclick = function () { window.open(`print_pdf.php?uid=${data.id}`, '_blank'); };
@@ -245,12 +245,20 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                             Swal.fire({ icon: 'warning', title: 'ยังไม่สามารถพิมพ์ได้', text: data.printMessage, confirmButtonColor: '#f59e0b' });
                         };
 
-                        statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20';
-                        scheduleIcon.className = 'fas fa-clock text-2xl mr-3 text-amber-500';
-                        scheduleTitle.textContent = 'ยังไม่ถึงช่วงเวลาพิมพ์';
-                        scheduleTitle.className = 'font-semibold text-amber-700 dark:text-amber-400';
+                        if (data.status == 3) {
+                            statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20';
+                            scheduleIcon.className = 'fas fa-times-circle text-2xl mr-3 text-red-500';
+                            scheduleTitle.textContent = 'ไม่สามารถพิมพ์ได้';
+                            scheduleTitle.className = 'font-semibold text-red-700 dark:text-red-400';
+                        } else {
+                            statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20';
+                            scheduleIcon.className = 'fas fa-clock text-2xl mr-3 text-amber-500';
+                            scheduleTitle.textContent = 'ยังไม่ถึงช่วงเวลาพิมพ์';
+                            scheduleTitle.className = 'font-semibold text-amber-700 dark:text-amber-400';
+                        }
+
                         scheduleMessage.textContent = data.printMessage;
-                        scheduleMessage.className = 'text-sm text-amber-600 dark:text-amber-300';
+                        scheduleMessage.className = 'text-sm ' + (data.status == 3 ? 'text-red-600 dark:text-red-300' : 'text-amber-600 dark:text-amber-300');
                     }
 
                     if (data.printSchedule) {

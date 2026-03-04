@@ -262,6 +262,12 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     if (data.docStatus === 'complete') { statusClass = 'text-green-600'; }
                     else if (data.docStatus === 'pending') { statusClass = 'text-amber-600'; }
                     else if (data.docStatus === 'rejected') { statusClass = 'text-red-600'; }
+                    else if (data.docStatus === 'disqualified') { statusClass = 'text-red-700'; }
+
+                    if (data.status == 3 && data.reject_reason) {
+                        statusText = 'ไม่ผ่านคุณสมบัติ';
+                    }
+
                     document.getElementById('scheduleStatus').textContent = statusText;
                     document.getElementById('scheduleStatus').className = 'font-bold text-sm ' + statusClass;
 
@@ -292,12 +298,20 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                             Swal.fire({ icon: 'warning', title: 'ยังไม่สามารถพิมพ์ได้', text: printMsg, confirmButtonColor: '#f59e0b' });
                         };
 
-                        statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20';
-                        printIcon.className = 'fas fa-clock text-2xl mr-3 text-amber-500';
-                        printTitle.textContent = 'ยังไม่ถึงช่วงเวลาพิมพ์';
-                        printTitle.className = 'font-semibold text-amber-700 dark:text-amber-400';
+                        if (data.status == 3) {
+                            statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20';
+                            printIcon.className = 'fas fa-times-circle text-2xl mr-3 text-red-500';
+                            printTitle.textContent = 'ไม่สามารถพิมพ์ได้';
+                            printTitle.className = 'font-semibold text-red-700 dark:text-red-400';
+                        } else {
+                            statusCard.className = 'mb-6 p-4 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20';
+                            printIcon.className = 'fas fa-clock text-2xl mr-3 text-amber-500';
+                            printTitle.textContent = 'ยังไม่ถึงช่วงเวลาพิมพ์';
+                            printTitle.className = 'font-semibold text-amber-700 dark:text-amber-400';
+                        }
+                        
                         printMessage.textContent = printMsg;
-                        printMessage.className = 'text-sm text-amber-600 dark:text-amber-300';
+                        printMessage.className = 'text-sm ' + (data.status == 3 ? 'text-red-600 dark:text-red-300' : 'text-amber-600 dark:text-amber-300');
                     }
 
                     document.getElementById('studentInfo').classList.remove('hidden');

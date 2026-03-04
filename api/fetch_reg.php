@@ -81,7 +81,11 @@ function processStudentData($student, $db, $adminConfig, $context)
     // 2. Determine Document/Confirmation Status
     $docStatus = 'pending';
     $docStatusText = 'รอดำเนินการ';
-    if ($student['status'] == 1) {
+
+    if ($student['status'] == 3) {
+        $docStatus = 'disqualified';
+        $docStatusText = 'ไม่ผ่านคุณสมบัติ';
+    } elseif ($student['status'] == 1) {
         $docStatus = 'complete';
         $docStatusText = 'ตรวจสอบแล้ว';
     } else {
@@ -123,10 +127,16 @@ function processStudentData($student, $db, $adminConfig, $context)
     $canPrintForm = $isPrintFormAvailable;
 
     $examMsg = 'ยังไม่ถึงช่วงเวลาพิมพ์บัตรประจำตัวสอบ';
-    if ($isExamCardAvailable) {
+    if ($student['status'] == 3) {
+        $examMsg = 'ไม่ผ่านคุณสมบัติ: ' . ($student['reject_reason'] ?: '-');
+    } elseif ($isExamCardAvailable) {
         $examMsg = ($student['status'] == 1) ? 'พร้อมพิมพ์บัตรประจำตัวสอบ' : 'รอการยืนยันสถานะการสมัครก่อนพิมพ์บัตร';
     }
+
     $formMsg = $isPrintFormAvailable ? 'พร้อมพิมพ์ใบสมัคร' : 'ยังไม่ถึงช่วงเวลาพิมพ์ใบสมัคร';
+    if ($student['status'] == 3) {
+        $formMsg = 'ไม่ผ่านคุณสมบัติ: ' . ($student['reject_reason'] ?: '-');
+    }
 
     return [
         'exists' => true,
@@ -138,6 +148,8 @@ function processStudentData($student, $db, $adminConfig, $context)
         'level' => $student['level'],
         'birthday' => $student['birthday'] ?? '-',
         'now_tel' => $student['now_tel'] ?? '-',
+        'status' => $student['status'],
+        'reject_reason' => $student['reject_reason'] ?? '',
         'docStatus' => $docStatus,
         'docStatusText' => $docStatusText,
         'plans' => $planNames,
@@ -186,12 +198,12 @@ try {
     // Case 2: Search by input
     $cleanSearch = preg_replace('/[^0-9]/', '', $searchInput);
     if (strlen($cleanSearch) === 13) {
-        $query = "SELECT id, numreg, citizenid, stu_prefix, stu_name, stu_lastname, typeregis, level, status 
+        $query = "SELECT id, numreg, citizenid, stu_prefix, stu_name, stu_lastname, typeregis, level, status, reject_reason 
                   FROM users WHERE citizenid = :search";
         $stmt = $db->prepare($query);
         $stmt->bindValue(':search', $cleanSearch);
     } else {
-        $query = "SELECT id, numreg, citizenid, stu_prefix, stu_name, stu_lastname, typeregis, level, status 
+        $query = "SELECT id, numreg, citizenid, stu_prefix, stu_name, stu_lastname, typeregis, level, status, reject_reason 
                   FROM users 
                   WHERE CONCAT(stu_prefix, stu_name, ' ', stu_lastname) LIKE :search_like 
                      OR numreg = :search";

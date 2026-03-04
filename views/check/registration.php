@@ -226,6 +226,11 @@
                     else if (data.docStatus === 'pending') { statusClass = 'text-amber-600'; iconClass = 'text-amber-500'; }
                     else if (data.docStatus === 'rejected') { statusClass = 'text-red-600'; iconClass = 'text-red-500'; }
                     else if (data.docStatus === 'incomplete') { statusClass = 'text-blue-600'; iconClass = 'text-blue-500'; }
+                    else if (data.docStatus === 'disqualified') { statusClass = 'text-red-700'; iconClass = 'text-red-600'; }
+
+                    if (data.status == 3 && data.reject_reason) {
+                        statusText = `ไม่ผ่านคุณสมบัติ: ${data.reject_reason}`;
+                    }
 
                     document.getElementById('statusText').textContent = statusText;
                     document.getElementById('statusText').className = 'font-bold text-sm ' + statusClass;
