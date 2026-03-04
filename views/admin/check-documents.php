@@ -31,6 +31,7 @@ $currentTypeId = $typeId ?? 0;
                     <option value="">-- สถานะผู้สมัคร --</option>
                     <option value="0">รอตรวจสอบ</option>
                     <option value="1">ยืนยันแล้ว</option>
+                    <option value="3">ไม่ผ่านคุณสมบัติ</option>
                 </select>
             </div>
         </div>
@@ -199,9 +200,16 @@ $currentTypeId = $typeId ?? 0;
         }
     }
 
-    function getStudentStatusBadge(status) {
+    function getStudentStatusBadge(status, reason = '') {
         if (status == 1) {
             return '<span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>ยืนยันแล้ว</span>';
+        } else if (status == 3) {
+            return `<div class="flex flex-col items-center gap-1">
+                <span class="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>ไม่ผ่านคุณสมบัติ</span>
+                ${reason ? `<span class="text-[10px] text-red-500 italic max-w-[150px] truncate" title="${reason}">${reason}</span>` : ''}
+            </div>`;
+        } else if (status == 2) {
+            return '<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-semibold"><i class="fas fa-user-minus mr-1"></i>สละสิทธิ์</span>';
         }
         return '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">รอตรวจสอบ</span>';
     }
@@ -310,17 +318,25 @@ $currentTypeId = $typeId ?? 0;
             <td class="px-3 py-3 font-mono text-sm">${student.citizenid}</td>
             <td class="px-3 py-3">${docList}</td>
             <td class="px-3 py-3 text-center">${getDocStatusBadge(student.doc_status)}</td>
-            <td class="px-3 py-3 text-center">${getStudentStatusBadge(student.status)}</td>
+            <td class="px-3 py-3 text-center">${getStudentStatusBadge(student.status, student.reject_reason)}</td>
             <td class="px-3 py-3 text-center">
                 <div class="flex flex-col gap-1">
                     ${student.documents.length > 0 ? `<button onclick="openStudentDocs('${student.citizenid}')" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white text-xs rounded-lg">
                         <i class="fas fa-folder-open mr-1"></i>ตรวจสอบ
                     </button>` : ''}
-                    ${student.status != 1 ? `<button onclick="approveStudentDirect(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg">
-                        <i class="fas fa-user-check mr-1"></i>อนุมัติ
-                    </button>` : `<button onclick="cancelStudentApproval(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white text-xs rounded-lg">
-                        <i class="fas fa-undo mr-1"></i>ยกเลิก
-                    </button>`}
+                    ${student.status != 1 ? `
+                        <button onclick="approveStudentDirect(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs rounded-lg">
+                            <i class="fas fa-user-check mr-1"></i>อนุมัติ
+                        </button>
+                        ${student.status != 3 ? `
+                        <button onclick="disqualifyStudent(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg">
+                            <i class="fas fa-user-times mr-1"></i>ไม่ผ่าน
+                        </button>` : ''}
+                    ` : `
+                        <button onclick="cancelStudentApproval(${student.user_id}, '${student.fullname}')" class="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white text-xs rounded-lg">
+                            <i class="fas fa-undo mr-1"></i>ยกเลิกอนุมัติ
+                        </button>
+                    `}
                 </div>
             </td>
         </tr>`;
@@ -445,6 +461,48 @@ $currentTypeId = $typeId ?? 0;
                             icon: 'success',
                             title: 'อนุมัติสำเร็จ!',
                             text: 'นักเรียนถูกเปลี่ยนสถานะเป็น "ผ่านการตรวจสอบ" เรียบร้อยแล้ว',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: response.error });
+                    }
+                }, 'json');
+            }
+        });
+    }
+
+    function disqualifyStudent(userId, fullname) {
+        Swal.fire({
+            title: 'ระบุเหตุผลที่ไม่ผ่านคุณสมบัติ',
+            html: `<p>ผู้สมัคร: <strong>${fullname}</strong></p>`,
+            input: 'textarea',
+            inputPlaceholder: 'ระบุเหตุผล (เช่น เกรดไม่ถึง, หลักฐานปลอม, ...)',
+            inputAttributes: {
+                'aria-label': 'ระบุเหตุผล'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'ยืนยันไม่ผ่านคุณสมบัติ',
+            cancelButtonText: 'ยกเลิก',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('กรุณาระบุเหตุผล');
+                }
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('api/admin/disqualify-student.php', {
+                    user_id: userId,
+                    reason: result.value
+                }, function (response) {
+                    if (response.success) {
+                        loadStudents();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกสำเร็จ',
+                            text: 'นักเรียนถูกเปลี่ยนสถานะเป็น "ไม่ผ่านคุณสมบัติ" เรียบร้อยแล้ว',
                             timer: 2000,
                             showConfirmButton: false
                         });

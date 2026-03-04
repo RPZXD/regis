@@ -123,6 +123,7 @@ try {
             'fullname' => trim(($student['stu_prefix'] ?? '') . ($student['stu_name'] ?? '') . ' ' . ($student['stu_lastname'] ?? '')),
             'type_name' => $regType['grade_name'] . ' - ' . $regType['name'],
             'status' => $student['status'] ?? 0,
+            'reject_reason' => $student['reject_reason'] ?? '',
             'documents' => array_map(function ($d) {
                 return [
                     'id' => $d['id'],
