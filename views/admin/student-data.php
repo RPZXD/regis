@@ -1,5 +1,5 @@
 <!-- Dynamic Student Data View -->
-<!-- Dynamic Student Data View -->
+<?php $isTalentType = (isset($regisType['code']) && $regisType['code'] === 'talent'); ?>
 <div class="space-y-6 animate-fade-in-up">
     <!-- Page Header & Stats -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -68,6 +68,9 @@
                         <th class="px-4 py-4 text-left">ชื่อ - นามสกุล</th>
                         <th class="px-4 py-4 text-center">เบอร์โทร</th>
                         <th class="px-4 py-4 text-center">GPA</th>
+                        <?php if ($isTalentType): ?>
+                            <th class="px-4 py-4 text-left">ความสามารถพิเศษ</th>
+                        <?php endif; ?>
                         <th class="px-4 py-4 text-left">แผนการเรียน</th>
                         <th class="px-4 py-4 text-center">สถานะ</th>
                         <th class="px-4 py-4 text-center rounded-r-xl">จัดการ</th>
@@ -216,6 +219,22 @@
                                 <input type="tel" id="editNowTel" class="input-field">
                             </div>
                         </div>
+                        <?php if ($isTalentType): ?>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-200">
+                                <div class="col-span-1 md:col-span-2">
+                                    <label class="label-text flex items-center gap-2">
+                                        <i class="fas fa-trophy text-amber-500"></i>ความสามารถพิเศษ
+                                    </label>
+                                    <textarea id="editTalentSkill" rows="2" class="input-field" placeholder="ระบุความสามารถพิเศษ"></textarea>
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                    <label class="label-text flex items-center gap-2">
+                                        <i class="fas fa-medal text-amber-500"></i>ผลงาน/รางวัล
+                                    </label>
+                                    <textarea id="editTalentAwards" rows="2" class="input-field" placeholder="ระบุผลงานหรือรางวัลที่เคยได้รับ"></textarea>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Tab: Address (Hidden for Special Classroom) -->
@@ -421,6 +440,7 @@
 <script>
     const typeId = <?php echo $typeId; ?>;
     const plansMap = <?php echo json_encode($plansMap); ?>;
+    const isTalentType = <?php echo $isTalentType ? 'true' : 'false'; ?>;
 
     function getPlanName(id) {
         return plansMap[id] || '-';
@@ -454,7 +474,7 @@
                 $('#record_table tbody').empty();
 
                 if (response.length === 0) {
-                    $('#record_table tbody').append('<tr><td colspan="9" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
+                    $('#record_table tbody').append('<tr><td colspan="' + (isTalentType ? 10 : 9) + '" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
                 } else {
                     $.each(response, function (index, record) {
                         // Parse Plan String
@@ -491,6 +511,7 @@
                             '<td class="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">' + (record.fullname || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-mono text-sm">' + (record.now_tel || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-bold text-xs">' + (record.gpa_total || '-') + '</span></td>' +
+                            (isTalentType ? '<td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs max-w-[200px] truncate" title="' + (record.talent_skill || '') + '">' + (record.talent_skill || '-') + '</td>' : '') +
                             '<td class="px-4 py-3">' + plansHtml + '</td>' +
                             '<td class="px-4 py-3 text-center">' + statusBadge + '</td>' +
                             '<td class="px-4 py-3 text-center">' +
@@ -519,7 +540,7 @@
             },
             error: function (xhr, status, error) {
                 console.error(error);
-                $('#record_table tbody').html('<tr><td colspan="8" class="text-center text-red-500 py-4">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>');
+                $('#record_table tbody').html('<tr><td colspan="' + (isTalentType ? 10 : 9) + '" class="text-center text-red-500 py-4">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>');
             }
         });
     }
@@ -604,6 +625,10 @@
                     $('#editEthnicity').val(r.stu_ethnicity);
                     $('#editNationality').val(r.stu_nationality);
                     $('#editNowTel').val(r.now_tel);
+                    if (isTalentType) {
+                        $('#editTalentSkill').val(r.talent_skill || '');
+                        $('#editTalentAwards').val(r.talent_awards || '');
+                    }
 
                     // Populate Address Tab
                     $('#editNowAddr').val(r.now_addr);
@@ -713,6 +738,12 @@
                 parent_tel: $('#editParentTel').val()
             };
 
+            // Conditionally add talent fields
+            if (isTalentType) {
+                data.talent_skill = $('#editTalentSkill').val();
+                data.talent_awards = $('#editTalentAwards').val();
+            }
+
             // Conditionally add typeregis if element exists
             if ($('#editTyperegis').length) {
                 data.typeregis = $('#editTyperegis').val();
@@ -786,6 +817,7 @@
             "ชื่อบิดา", "เบอร์โทรบิดา", "อาชีพบิดา",
             "ชื่อมารดา", "เบอร์โทรมารดา", "อาชีพมารดา",
             "ผู้ปกครอง", "ความสัมพันธ์", "เบอร์โทรผู้ปกครอง",
+            "ความสามารถพิเศษ", "ผลงาน/รางวัล",
             "สถานะ", "แผนการเรียน"
         ];
         csvContent += headers.join(",") + "\n";
@@ -834,6 +866,7 @@
                 s(row.mom_tel), s(row.mom_job),
                 s((row.parent_prefix || '') + ' ' + (row.parent_name || '') + ' ' + (row.parent_lastname || '')),
                 s(row.parent_relation), s(row.parent_tel),
+                s(row.talent_skill), s(row.talent_awards),
                 s(status),
                 s(plans)
             ];
@@ -890,6 +923,8 @@
                     <th>ผู้ปกครอง</th>
                     <th>ความสัมพันธ์</th>
                     <th>เบอร์โทร</th>
+                    <th>ความสามารถพิเศษ</th>
+                    <th>ผลงาน/รางวัล</th>
                     <th>สถานะ</th>
                 </tr>
             </thead>
@@ -937,6 +972,8 @@
                 <td>${(row.parent_prefix || '')}${row.parent_name || ''} ${row.parent_lastname || ''}</td>
                 <td>${row.parent_relation || '-'}</td>
                 <td style="mso-number-format:'@'">${row.parent_tel || '-'}</td>
+                <td>${row.talent_skill || '-'}</td>
+                <td>${row.talent_awards || '-'}</td>
                 <td>${status}</td>
             </tr>
         `;
