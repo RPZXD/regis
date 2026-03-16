@@ -30,23 +30,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
     if (empty($citizenid)) {
         $error = "กรุณากรอกเลขประจำตัวประชาชน";
     } else {
-        // Fetch student by citizen ID
-        $student = $studentRegis->getStudentByCitizenId($citizenid);
+        // Fetch ALL registrations for this citizen ID (handles multi-type registration)
+        $allRegistrations = $studentRegis->getAllStudentsByCitizenId($citizenid);
 
-        if ($student) {
-            $studentData = $student;
+        if (!empty($allRegistrations)) {
+            // If a specific registration ID was selected via POST
+            $selectedRegId = $_POST['selected_reg_id'] ?? null;
+
+            if ($selectedRegId) {
+                // Find the selected registration
+                foreach ($allRegistrations as $reg) {
+                    if ($reg['id'] == $selectedRegId) {
+                        $studentData = $reg;
+                        break;
+                    }
+                }
+                // Fallback if not found
+                if (!$studentData) {
+                    $studentData = $allRegistrations[0];
+                }
+            } else {
+                // Auto-select the best actionable record
+                // Priority: status=1 & is_called=1 > status=1 > status=2 > status=0 > status=3
+                $bestRecord = null;
+                foreach ($allRegistrations as $reg) {
+                    if (intval($reg['status']) === 1 && intval($reg['is_called'] ?? 0) === 1) {
+                        $bestRecord = $reg;
+                        break; // Best possible: passed and called
+                    }
+                }
+                if (!$bestRecord) {
+                    foreach ($allRegistrations as $reg) {
+                        if (intval($reg['status']) === 1) {
+                            $bestRecord = $reg;
+                            break;
+                        }
+                    }
+                }
+                if (!$bestRecord) {
+                    foreach ($allRegistrations as $reg) {
+                        if (intval($reg['status']) === 2) {
+                            $bestRecord = $reg;
+                            break;
+                        }
+                    }
+                }
+                if (!$bestRecord) {
+                    foreach ($allRegistrations as $reg) {
+                        if (intval($reg['status']) === 0) {
+                            $bestRecord = $reg;
+                            break;
+                        }
+                    }
+                }
+                // If all are cancelled (status=3), use the first one
+                if (!$bestRecord) {
+                    $bestRecord = $allRegistrations[0];
+                }
+                $studentData = $bestRecord;
+            }
+
+            // Store all registrations for display in view (multi-type selection)
+            $allStudentRegistrations = $allRegistrations;
 
             // Check Final Plan
             if (!empty($studentData['final_plan_id'])) {
-                // Fetch Plan Details
-                $plans = $adminConfig->getStudyPlans(); // We might need a getStudyPlanById
-                // Filter manually or add method. Let's filter manually for now or use the type fetch.
-                // Actually AdminConfig::getStudyPlans takes type_id.
-                // Let's add getStudyPlanById to AdminConfig or just query directly here?
-                // Querying directly is cleaner for specific logic, but let's stick to class if possible.
-                // AdminConfig doesn't have getStudyPlanById. I'll just query DB here for simplicity or add method.
-                // Query DB here is faster.
-
                 $stmt = $db->prepare("SELECT sp.*, rt.name as type_name, gl.code as grade_code, gl.name as grade_name,
                                         rt.use_schedule, rt.report_start, rt.report_end
                                     FROM study_plans sp 

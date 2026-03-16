@@ -28,10 +28,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
 }
 
 if (!empty($citizenid)) {
-    $student = $studentRegis->getStudentByCitizenId($citizenid);
+    // Fetch ALL registrations for this citizen ID
+    $allRegistrations = $studentRegis->getAllStudentsByCitizenId($citizenid);
 
-    if ($student) {
-        $studentData = $student;
+    if (!empty($allRegistrations)) {
+        // Check if a specific registration ID was provided
+        $selectedRegId = $_GET['id'] ?? ($_POST['id'] ?? null);
+
+        if ($selectedRegId) {
+            // Find the specific registration
+            foreach ($allRegistrations as $reg) {
+                if ($reg['id'] == $selectedRegId) {
+                    $studentData = $reg;
+                    break;
+                }
+            }
+            if (!$studentData) {
+                $studentData = $allRegistrations[0];
+            }
+        } else {
+            // Auto-select: find the best actionable record (same logic as confirm_report)
+            $bestRecord = null;
+            foreach ($allRegistrations as $reg) {
+                if (intval($reg['status']) === 1 && intval($reg['is_called'] ?? 0) === 1) {
+                    $bestRecord = $reg;
+                    break;
+                }
+            }
+            if (!$bestRecord) {
+                foreach ($allRegistrations as $reg) {
+                    if (intval($reg['status']) === 1) {
+                        $bestRecord = $reg;
+                        break;
+                    }
+                }
+            }
+            if (!$bestRecord) {
+                $bestRecord = $allRegistrations[0];
+            }
+            $studentData = $bestRecord;
+        }
 
         // Check Final Plan Schedule
         if (!empty($studentData['final_plan_id'])) {

@@ -45,7 +45,57 @@
         <?php
         // Check if student has already confirmed or cancelled
         $currentStatus = intval($studentData['status'] ?? 0);
+        $hasMultipleRegistrations = isset($allStudentRegistrations) && count($allStudentRegistrations) > 1;
         ?>
+
+        <?php if ($hasMultipleRegistrations): ?>
+            <!-- Multi-Registration Summary Panel -->
+            <div class="max-w-4xl mx-auto glass rounded-2xl p-6 shadow-xl mb-6">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 border-l-4 border-indigo-500 pl-3">
+                    <i class="fas fa-layer-group mr-2"></i>ประเภทการสมัครทั้งหมด
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <?php foreach ($allStudentRegistrations as $reg): 
+                        $regStatus = intval($reg['status']);
+                        $isCurrentReg = ($reg['id'] == $studentData['id']);
+                        $statusLabel = '';
+                        $statusClass = '';
+                        $cardClass = '';
+                        switch ($regStatus) {
+                            case 0: $statusLabel = 'รอตรวจสอบ'; $statusClass = 'bg-amber-100 text-amber-700'; $cardClass = 'border-amber-200'; break;
+                            case 1: $statusLabel = 'ผ่านการคัดเลือก'; $statusClass = 'bg-blue-100 text-blue-700'; $cardClass = 'border-blue-200'; break;
+                            case 2: $statusLabel = 'ยืนยันแล้ว'; $statusClass = 'bg-green-100 text-green-700'; $cardClass = 'border-green-200'; break;
+                            case 3: $statusLabel = 'สละสิทธิ์แล้ว'; $statusClass = 'bg-red-100 text-red-700'; $cardClass = 'border-red-200'; break;
+                        }
+                    ?>
+                        <div class="p-4 rounded-xl border-2 <?php echo $isCurrentReg ? 'ring-2 ring-indigo-500 ' . $cardClass : $cardClass; ?> transition-all <?php echo $regStatus == 3 ? 'opacity-60' : ''; ?>">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200"><?php echo $reg['typeregis']; ?></span>
+                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium <?php echo $statusClass; ?>">
+                                        <?php echo $statusLabel; ?>
+                                    </span>
+                                </div>
+                                <?php if (!$isCurrentReg && $regStatus != 3): ?>
+                                    <form method="POST" action="" class="inline">
+                                        <input type="hidden" name="citizenid" value="<?php echo $reg['citizenid']; ?>">
+                                        <input type="hidden" name="selected_reg_id" value="<?php echo $reg['id']; ?>">
+                                        <input type="hidden" name="search" value="1">
+                                        <button type="submit" class="px-3 py-1 text-xs bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                                            ดูรายละเอียด
+                                        </button>
+                                    </form>
+                                <?php elseif ($isCurrentReg): ?>
+                                    <span class="px-3 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-lg font-medium">
+                                        <i class="fas fa-eye mr-1"></i>กำลังดู
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <?php if ($currentStatus == 2): ?>
             <!-- Already Confirmed State -->
@@ -57,10 +107,15 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-2">
                     <strong><?php echo $studentData['stu_prefix'] . $studentData['stu_name'] . ' ' . $studentData['stu_lastname']; ?></strong>
                 </p>
-                <p class="text-gray-500 text-sm mb-6">เลขบัตร: <?php echo $studentData['citizenid']; ?></p>
+                <p class="text-gray-500 text-sm mb-2">เลขบัตร: <?php echo $studentData['citizenid']; ?></p>
+                <?php if ($hasMultipleRegistrations): ?>
+                    <p class="text-gray-500 text-sm mb-6">ประเภท: <strong><?php echo $studentData['typeregis']; ?></strong></p>
+                <?php else: ?>
+                    <div class="mb-6"></div>
+                <?php endif; ?>
                 <div class="p-4 bg-green-50 rounded-xl border border-green-200 mb-6">
                     <p class="text-green-700"><i
-                            class="fas fa-info-circle mr-2"></i>ท่านได้ยืนยันสิทธิ์การเข้าศึกษาต่อเรียบร้อยแล้ว</p>
+                            class="fas fa-info-circle mr-2"></i>ท่านได้ยืนยันสิทธิ์การเข้าศึกษาต่อเรียบร้อยแล้ว<?php echo $hasMultipleRegistrations ? ' (ประเภท' . $studentData['typeregis'] . ')' : ''; ?></p>
                 </div>
                 <a href="index.php"
                     class="inline-block px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-lg transition-all">
@@ -78,11 +133,21 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-2">
                     <strong><?php echo $studentData['stu_prefix'] . $studentData['stu_name'] . ' ' . $studentData['stu_lastname']; ?></strong>
                 </p>
-                <p class="text-gray-500 text-sm mb-6">เลขบัตร: <?php echo $studentData['citizenid']; ?></p>
+                <p class="text-gray-500 text-sm mb-2">เลขบัตร: <?php echo $studentData['citizenid']; ?></p>
+                <?php if ($hasMultipleRegistrations): ?>
+                    <p class="text-gray-500 text-sm mb-6">ประเภท: <strong><?php echo $studentData['typeregis']; ?></strong></p>
+                <?php else: ?>
+                    <div class="mb-6"></div>
+                <?php endif; ?>
                 <div class="p-4 bg-red-50 rounded-xl border border-red-200 mb-6">
-                    <p class="text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>ท่านได้สละสิทธิ์การเข้าศึกษาต่อแล้ว
+                    <p class="text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>ท่านได้สละสิทธิ์การเข้าศึกษาต่อแล้ว<?php echo $hasMultipleRegistrations ? ' (ประเภท' . $studentData['typeregis'] . ')' : ''; ?>
                         ไม่สามารถดำเนินการใดๆ ได้อีก</p>
                 </div>
+                <?php if ($hasMultipleRegistrations): ?>
+                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-6">
+                        <p class="text-blue-700"><i class="fas fa-info-circle mr-2"></i>ท่านยังมีการสมัครประเภทอื่น กรุณาเลือกดูรายละเอียดจากตารางด้านบน</p>
+                    </div>
+                <?php endif; ?>
                 <a href="index.php"
                     class="inline-block px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl font-bold hover:shadow-lg transition-all">
                     <i class="fas fa-home mr-2"></i>กลับหน้าหลัก
@@ -301,7 +366,7 @@
                             </div>
                         <?php else: ?>
                             <div class="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                                <a href="cancel_report.php?citizenid=<?php echo urlencode($studentData['citizenid']); ?>"
+                                <a href="cancel_report.php?citizenid=<?php echo urlencode($studentData['citizenid']); ?>&id=<?php echo $studentData['id']; ?>"
                                     class="px-8 py-3 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 font-bold transition-all text-center">
                                     สละสิทธิ์
                                 </a>

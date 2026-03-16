@@ -866,6 +866,37 @@ class StudentRegis
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Get ALL registration records for a citizen ID
+     * Ordered by status priority: 1 (passed) first, then 0 (pending), 2 (confirmed), 3 (cancelled) last
+     * This is important for students who register for multiple types
+     */
+    public function getAllStudentsByCitizenId($citizen_id)
+    {
+        $query = "SELECT 
+                        id,
+                        citizenid,
+                        typeregis,
+                        level, 
+                        CONCAT_WS('-', date_birth, month_birth, year_birth) AS birthday, 
+                        stu_prefix,
+                        stu_name,
+                        stu_lastname, 
+                        now_tel, 
+                        parent_tel,
+                        final_plan_id,
+                        status,
+                        is_called,
+                        pass_rank
+                    FROM users 
+                    WHERE citizenid = :citizen_id
+                    ORDER BY FIELD(status, 1, 0, 2, 3), id ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':citizen_id', $citizen_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getStudentBySearchInput($search_input)
     {
         $query = "SELECT 

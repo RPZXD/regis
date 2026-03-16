@@ -143,6 +143,12 @@
                             <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                                 <i class="fas fa-id-card mr-1"></i> <?php echo $studentData['citizenid']; ?>
                             </span>
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                                <i class="fas fa-tag mr-1"></i> <?php echo $studentData['typeregis']; ?>
+                            </span>
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                                <i class="fas fa-graduation-cap mr-1"></i> ชั้นมัธยมศึกษาปีที่ <?php echo $studentData['level']; ?>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -153,7 +159,8 @@
                         <i class="fas fa-exclamation-triangle mr-2"></i>คำเตือน
                     </h3>
                     <p class="text-red-600 dark:text-red-300 text-sm">
-                        การสละสิทธิ์จะทำให้ท่านสูญเสียสิทธิ์ในการเข้าศึกษาต่อ และไม่สามารถเปลี่ยนแปลงได้ภายหลัง
+                        การสละสิทธิ์ในประเภท <strong><?php echo $studentData['typeregis']; ?></strong> 
+                        จะทำให้ท่านสูญเสียสิทธิ์ในการเข้าศึกษาต่อในประเภทนี้ และไม่สามารถเปลี่ยนแปลงได้ภายหลัง
                         กรุณาตรวจสอบให้แน่ใจก่อนดำเนินการ
                     </p>
                 </div>
