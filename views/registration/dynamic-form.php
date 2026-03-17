@@ -120,7 +120,7 @@ $prefixOptions = ($grade == '1')
                                             class="study-plan-select w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                                             data-choice="<?php echo $choice; ?>" <?php echo $choice === 1 ? 'required' : ''; ?>>
                                             <option value="">
-                                                <?php echo $choice === 1 ? 'เลือกแผน (จำเป็น)' : 'ว่าง (ไม่บังคับ)'; ?>
+                                                <?php echo $choice === 1 ? 'เลือกแผน (จำเป็น)' : 'โปรดเลือกแผนตามลำดับ (บังคับ)'; ?>
                                             </option>
                                             <?php foreach ($plans as $plan): ?>
                                                 <option value="<?php echo $plan['id']; ?>"

@@ -126,7 +126,8 @@ try {
         'grade_science' => !empty($_POST['grade_science']) ? $_POST['grade_science'] : null,
         'grade_english' => !empty($_POST['grade_english']) ? $_POST['grade_english'] : null,
 
-        'typeregis' => $typeName,
+        // For M.1 General (รอบทั่วไป): use zone_type (ในเขต/นอกเขต) as typeregis
+        'typeregis' => !empty($_POST['zone_type']) ? $_POST['zone_type'] : $typeName,
         'level' => $level,
         'reg_pee' => $academicYear,
         'numreg' => $numreg,

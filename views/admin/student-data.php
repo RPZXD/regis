@@ -1,5 +1,8 @@
 <!-- Dynamic Student Data View -->
-<?php $isTalentType = (isset($regisType['code']) && $regisType['code'] === 'talent'); ?>
+<?php
+$isTalentType = (isset($regisType['code']) && $regisType['code'] === 'talent');
+$isM1General = (isset($regisType['grade_code']) && $regisType['grade_code'] === 'm1' && isset($regisType['code']) && $regisType['code'] === 'general');
+?>
 <div class="space-y-6 animate-fade-in-up">
     <!-- Page Header & Stats -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -70,6 +73,9 @@
                         <th class="px-4 py-4 text-center">GPA</th>
                         <?php if ($isTalentType): ?>
                             <th class="px-4 py-4 text-left">ความสามารถพิเศษ</th>
+                        <?php endif; ?>
+                        <?php if ($isM1General): ?>
+                            <th class="px-4 py-4 text-center">ประเภท</th>
                         <?php endif; ?>
                         <th class="px-4 py-4 text-left">แผนการเรียน</th>
                         <th class="px-4 py-4 text-center">สถานะ</th>
@@ -167,8 +173,15 @@
                             </div>
                             <div>
                                 <label class="label-text">ประเภทการสมัคร</label>
-                                <input type="text" id="editTyperegis" class="input-field bg-gray-100 dark:bg-gray-600"
-                                    readonly>
+                                <?php if ($isM1General): ?>
+                                    <select id="editTyperegis" class="input-field border-green-300 focus:border-green-500">
+                                        <option value="ในเขต">ในเขต</option>
+                                        <option value="นอกเขต">นอกเขต</option>
+                                    </select>
+                                <?php else: ?>
+                                    <input type="text" id="editTyperegis" class="input-field bg-gray-100 dark:bg-gray-600"
+                                        readonly>
+                                <?php endif; ?>
                             </div>
                             <div>
                                 <label class="label-text">คำนำหน้า</label>
@@ -441,6 +454,7 @@
     const typeId = <?php echo $typeId; ?>;
     const plansMap = <?php echo json_encode($plansMap); ?>;
     const isTalentType = <?php echo $isTalentType ? 'true' : 'false'; ?>;
+    const isM1General = <?php echo $isM1General ? 'true' : 'false'; ?>;
 
     function getPlanName(id) {
         return plansMap[id] || '-';
@@ -474,7 +488,7 @@
                 $('#record_table tbody').empty();
 
                 if (response.length === 0) {
-                    $('#record_table tbody').append('<tr><td colspan="' + (isTalentType ? 10 : 9) + '" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
+                    $('#record_table tbody').append('<tr><td colspan="' + (isTalentType ? 10 : (isM1General ? 10 : 9)) + '" class="text-center py-8 text-gray-400">ไม่พบข้อมูลในระบบ</td></tr>');
                 } else {
                     $.each(response, function (index, record) {
                         // Parse Plan String
@@ -511,7 +525,22 @@
                             '<td class="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">' + (record.fullname || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center text-gray-600 dark:text-gray-400 font-mono text-sm">' + (record.now_tel || '-') + '</td>' +
                             '<td class="px-4 py-3 text-center"><span class="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-bold text-xs">' + (record.gpa_total || '-') + '</span></td>' +
-                            (isTalentType ? '<td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs max-w-[200px] truncate" title="' + (record.talent_skill || '') + '">' + (record.talent_skill || '-') + '</td>' : '') +
+                            (isTalentType ? '<td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs max-w-[200px] truncate" title="' + (record.talent_skill || '') + '">' + (record.talent_skill || '-') + '</td>' : '');
+
+                        // Add zone type column for M1 General
+                        if (isM1General) {
+                            var zoneBadge = '-';
+                            if (record.typeregis === 'ในเขต') {
+                                zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">ในเขต</span>';
+                            } else if (record.typeregis === 'นอกเขต') {
+                                zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded-full">นอกเขต</span>';
+                            } else {
+                                zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-500 rounded-full">' + (record.typeregis || '-') + '</span>';
+                            }
+                            row += '<td class="px-4 py-3 text-center">' + zoneBadge + '</td>';
+                        }
+
+                        row +=
                             '<td class="px-4 py-3">' + plansHtml + '</td>' +
                             '<td class="px-4 py-3 text-center">' + statusBadge + '</td>' +
                             '<td class="px-4 py-3 text-center">' +
@@ -540,7 +569,7 @@
             },
             error: function (xhr, status, error) {
                 console.error(error);
-                $('#record_table tbody').html('<tr><td colspan="' + (isTalentType ? 10 : 9) + '" class="text-center text-red-500 py-4">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>');
+                $('#record_table tbody').html('<tr><td colspan="' + (isTalentType ? 10 : (isM1General ? 10 : 9)) + '" class="text-center text-red-500 py-4">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>');
             }
         });
     }

@@ -111,7 +111,7 @@ class StudentRegis
                         status
                     FROM users 
                     WHERE level = '1' 
-                    AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')
+                    AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต' OR typeregis = 'รอบทั่วไป')
                     ORDER BY create_at DESC
                     ";
         $stmt = $this->conn->prepare($query);
@@ -148,7 +148,7 @@ class StudentRegis
 
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
-            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
+            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต' OR u.typeregis = 'รอบทั่วไป')";
         } else {
             $sql .= " AND u.typeregis = :typeName";
         }
@@ -199,7 +199,7 @@ class StudentRegis
                 WHERE level IN ($levelStr)";
 
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
-            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
+            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต' OR typeregis = 'รอบทั่วไป')";
         } else {
             $sql .= " AND typeregis = :typeName";
         }
@@ -287,7 +287,7 @@ class StudentRegis
 
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
-            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')";
+            $sql .= " AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต' OR u.typeregis = 'รอบทั่วไป')";
         } else {
             $sql .= " AND u.typeregis = :typeName";
         }
@@ -371,7 +371,7 @@ class StudentRegis
                     FROM users u
                     LEFT JOIN tbl_uploads t ON u.citizenid = t.citizenid
                     WHERE u.level = '1' 
-                        AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต')
+                        AND (u.typeregis = 'ในเขต' OR u.typeregis = 'นอกเขต' OR u.typeregis = 'รอบทั่วไป')
                     GROUP BY u.id
                     ORDER BY u.create_at ASC
 
@@ -402,7 +402,7 @@ class StudentRegis
                         update_at
                     FROM users u
                     WHERE level = '1' 
-                        AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')
+                        AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต' OR typeregis = 'รอบทั่วไป')
                         AND status = 1
                         AND DATE(update_at) = :date
                     ORDER BY pass_rank ASC, update_at ASC";
@@ -1174,7 +1174,7 @@ class StudentRegis
 
         // Special case for M.1 General (Zone)
         if (($level == '1' || $level == 'm1') && $typeName == 'รอบทั่วไป') {
-            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต')";
+            $sql .= " AND (typeregis = 'ในเขต' OR typeregis = 'นอกเขต' OR typeregis = 'รอบทั่วไป')";
         } else {
             $sql .= " AND typeregis = :typeName";
         }

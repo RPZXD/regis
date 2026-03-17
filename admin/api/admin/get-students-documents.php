@@ -121,6 +121,7 @@ try {
             'citizenid' => $citizenid,
             'numreg' => $student['numreg'] ?? null,
             'fullname' => trim(($student['stu_prefix'] ?? '') . ($student['stu_name'] ?? '') . ' ' . ($student['stu_lastname'] ?? '')),
+            'typeregis' => $student['typeregis'] ?? '',
             'type_name' => $regType['grade_name'] . ' - ' . $regType['name'],
             'status' => $student['status'] ?? 0,
             'reject_reason' => $student['reject_reason'] ?? '',

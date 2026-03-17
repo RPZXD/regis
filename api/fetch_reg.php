@@ -138,6 +138,54 @@ function processStudentData($student, $db, $adminConfig, $context)
         $formMsg = 'ไม่ผ่านคุณสมบัติ: ' . ($student['reject_reason'] ?: '-');
     }
 
+    // 4. Upload Schedule Check
+    $canUpload = true;
+    $uploadMessage = '';
+    $uploadSchedule = null;
+
+    try {
+        $level = $student['level'];
+        $typeregis = $student['typeregis'];
+        $gradeCode = ($level == '1') ? 'm1' : 'm4';
+        $zoneTypes = ['ในเขต', 'นอกเขต', 'รอบทั่วไป'];
+
+        if (in_array($typeregis, $zoneTypes)) {
+            $rtStmt = $db->prepare("
+                SELECT rt.upload_start, rt.upload_end FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE gl.code = ? AND (rt.code = 'general' OR rt.name = 'รอบทั่วไป')
+                LIMIT 1
+            ");
+            $rtStmt->execute([$gradeCode]);
+        } else {
+            $rtStmt = $db->prepare("
+                SELECT rt.upload_start, rt.upload_end FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE gl.code = ? AND rt.name = ?
+                LIMIT 1
+            ");
+            $rtStmt->execute([$gradeCode, $typeregis]);
+        }
+
+        $rtSchedule = $rtStmt->fetch(PDO::FETCH_ASSOC);
+        if ($rtSchedule && $rtSchedule['upload_start'] && $rtSchedule['upload_end']) {
+            $now = date('Y-m-d H:i:s');
+            $uploadSchedule = [
+                'start' => date('d/m/Y H:i', strtotime($rtSchedule['upload_start'])),
+                'end' => date('d/m/Y H:i', strtotime($rtSchedule['upload_end']))
+            ];
+            if ($now >= $rtSchedule['upload_start'] && $now <= $rtSchedule['upload_end']) {
+                $canUpload = true;
+                $uploadMessage = 'อัพโหลดได้ถึง ' . $uploadSchedule['end'];
+            } else {
+                $canUpload = false;
+                $uploadMessage = 'ไม่อยู่ในช่วงเวลาอัพโหลด (เปิดให้อัพโหลด ' . $uploadSchedule['start'] . ' - ' . $uploadSchedule['end'] . ')';
+            }
+        }
+    } catch (Exception $e) {
+        // If schedule check fails, allow upload by default
+    }
+
     return [
         'exists' => true,
         'id' => $student['id'],
@@ -160,7 +208,10 @@ function processStudentData($student, $db, $adminConfig, $context)
         'canPrintCard' => $canPrintCard,
         'printMessage' => ($context === 'application' ? $formMsg : $examMsg),
         'printCardMessage' => $examMsg,
-        'printSchedule' => ($context === 'application' ? $formSchedule : $examSchedule)
+        'printSchedule' => ($context === 'application' ? $formSchedule : $examSchedule),
+        'canUpload' => $canUpload,
+        'uploadMessage' => $uploadMessage,
+        'uploadSchedule' => $uploadSchedule
     ];
 }
 

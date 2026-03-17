@@ -103,6 +103,7 @@ $currentTypeId = $typeId ?? 0;
                         <th class="px-3 py-3">#</th>
                         <th class="px-3 py-3">เลขที่ผู้สมัคร</th>
                         <th class="px-3 py-3">ผู้สมัคร</th>
+                        <th class="px-3 py-3 zone-col" style="display:none">ประเภท</th>
                         <th class="px-3 py-3">เลขบัตร</th>
                         <th class="px-3 py-3">เอกสาร</th>
                         <th class="px-3 py-3 text-center">สถานะเอกสาร</th>
@@ -112,7 +113,7 @@ $currentTypeId = $typeId ?? 0;
                 </thead>
                 <tbody class="text-gray-700 dark:text-gray-300" id="docsTableBody">
                     <tr>
-                        <td colspan="8" class="text-center py-8 text-gray-400">กำลังโหลด...</td>
+                        <td colspan="9" class="text-center py-8 text-gray-400">กำลังโหลด...</td>
                     </tr>
                 </tbody>
             </table>
@@ -189,6 +190,7 @@ $currentTypeId = $typeId ?? 0;
     const currentTypeId = <?= $currentTypeId ?>;
     let allStudents = [];
     let allDocs = [];
+    let isM1General = false;
     let requirements = [];
 
     function getDocStatusBadge(status) {
@@ -216,7 +218,7 @@ $currentTypeId = $typeId ?? 0;
 
     function loadStudents() {
         if (!currentTypeId) {
-            $('#docsTableBody').html('<tr><td colspan="8" class="text-center py-8 text-gray-400">กรุณาเลือกประเภทการสมัครจากเมนู</td></tr>');
+            $('#docsTableBody').html('<tr><td colspan="9" class="text-center py-8 text-gray-400">กรุณาเลือกประเภทการสมัครจากเมนู</td></tr>');
             return;
         }
 
@@ -228,6 +230,15 @@ $currentTypeId = $typeId ?? 0;
 
             allStudents = data.students || [];
             requirements = data.requirements || [];
+
+            // Check if this is M1 general type
+            const typeInfo = data.type_info || {};
+            isM1General = (typeInfo.grade_code === 'm1' && typeInfo.code === 'general');
+            if (isM1General) {
+                $('.zone-col').show();
+            } else {
+                $('.zone-col').hide();
+            }
 
             // Build allDocs from students' documents for preview functionality
             allDocs = [];
@@ -277,7 +288,7 @@ $currentTypeId = $typeId ?? 0;
         }
 
         if (filtered.length === 0) {
-            $('#docsTableBody').html('<tr><td colspan="8" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>');
+            $('#docsTableBody').html('<tr><td colspan="9" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>');
             return;
         }
 
@@ -311,10 +322,23 @@ $currentTypeId = $typeId ?? 0;
             }
             docList += '</div>';
 
+            // Zone type badge
+            let zoneBadge = '';
+            if (isM1General) {
+                if (student.typeregis === 'ในเขต') {
+                    zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">ในเขต</span>';
+                } else if (student.typeregis === 'นอกเขต') {
+                    zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded-full">นอกเขต</span>';
+                } else {
+                    zoneBadge = '<span class="px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-500 rounded-full">' + (student.typeregis || '-') + '</span>';
+                }
+            }
+
             html += `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
             <td class="px-3 py-3 text-center text-gray-500">${index + 1}</td>
             <td class="px-3 py-3 font-mono text-sm font-bold text-blue-600">${student.numreg || '-'}</td>
             <td class="px-3 py-3 font-medium">${student.fullname || '-'}</td>
+            ${isM1General ? '<td class="px-3 py-3 text-center zone-col">' + zoneBadge + '</td>' : ''}
             <td class="px-3 py-3 font-mono text-sm">${student.citizenid}</td>
             <td class="px-3 py-3">${docList}</td>
             <td class="px-3 py-3 text-center">${getDocStatusBadge(student.doc_status)}</td>
