@@ -104,8 +104,7 @@ $prefixOptions = ($grade == '1')
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                                 <i class="fas fa-list-ol mr-2 text-primary-500"></i>เลือกแผนการเรียนตามลำดับความต้องการ *
                             </label>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">เลือกแผนการเรียนอย่างน้อย 1 อันดับ
-                                และไม่สามารถเลือกซ้ำได้</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">กรุณาเลือกแผนการเรียนให้ครบทุกอันดับ (บังคับเลือกทุกแผน) และไม่สามารถเลือกซ้ำกันได้</p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="studyPlanSelects">
                                 <?php for ($choice = 1; $choice <= $maxChoices; $choice++): ?>
@@ -118,9 +117,9 @@ $prefixOptions = ($grade == '1')
                                         </label>
                                         <select name="study_plan_<?php echo $choice; ?>"
                                             class="study-plan-select w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
-                                            data-choice="<?php echo $choice; ?>" <?php echo $choice === 1 ? 'required' : ''; ?>>
+                                            data-choice="<?php echo $choice; ?>" required>
                                             <option value="">
-                                                <?php echo $choice === 1 ? 'เลือกแผน (จำเป็น)' : 'โปรดเลือกแผนตามลำดับ (บังคับ)'; ?>
+                                                โปรดเลือกแผนลำดับที่ <?php echo $choice; ?> (จำเป็น)
                                             </option>
                                             <?php foreach ($plans as $plan): ?>
                                                 <option value="<?php echo $plan['id']; ?>"
