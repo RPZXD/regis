@@ -104,7 +104,8 @@ $prefixOptions = ($grade == '1')
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                                 <i class="fas fa-list-ol mr-2 text-primary-500"></i>เลือกแผนการเรียนตามลำดับความต้องการ *
                             </label>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">กรุณาเลือกแผนการเรียนให้ครบทุกอันดับ (บังคับเลือกทุกแผน) และไม่สามารถเลือกซ้ำกันได้</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">กรุณาเลือกแผนการเรียนให้ครบทุกอันดับ
+                                (บังคับเลือกทุกแผน) และไม่สามารถเลือกซ้ำกันได้</p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="studyPlanSelects">
                                 <?php for ($choice = 1; $choice <= $maxChoices; $choice++): ?>
@@ -1231,7 +1232,7 @@ $prefixOptions = ($grade == '1')
                         icon: 'success',
                         title: 'สมัครเรียนสำเร็จ!',
                         text: 'ระบบได้บันทึกข้อมูลเรียบร้อยแล้ว',
-                        confirmButtonText: 'ตรวจวสอบการสมัครและพิมพ์บัตร',
+                        confirmButtonText: 'ตรวจสอบการสมัครและพิมพ์บัตร',
                         allowOutsideClick: false,
                         customClass: {
                             popup: 'rounded-2xl',
