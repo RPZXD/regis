@@ -131,7 +131,8 @@ try {
                     'doc_name' => $d['doc_name'],
                     'file_path' => $d['file_path'],
                     'status' => $d['status'] ?? 'pending',
-                    'reject_reason' => $d['reject_reason'] ?? ''
+                    'reject_reason' => $d['reject_reason'] ?? '',
+                    'uploaded_at' => $d['uploaded_at'] ?? null
                 ];
             }, $studentDocs),
             'doc_status' => $docStatus,

@@ -216,6 +216,21 @@ $currentTypeId = $typeId ?? 0;
         return '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">รอตรวจสอบ</span>';
     }
 
+    function formatThaiDateTime(dateTimeString) {
+        if (!dateTimeString) return '-';
+        const date = new Date(dateTimeString);
+        if (isNaN(date.getTime())) return dateTimeString;
+        
+        const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const day = date.getDate();
+        const month = thaiMonths[date.getMonth()];
+        const year = (date.getFullYear() + 543).toString().substring(2);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${day} ${month} ${year} ${hours}:${minutes}`;
+    }
+
     function loadStudents() {
         if (!currentTypeId) {
             $('#docsTableBody').html('<tr><td colspan="9" class="text-center py-8 text-gray-400">กรุณาเลือกประเภทการสมัครจากเมนู</td></tr>');
@@ -301,9 +316,10 @@ $currentTypeId = $typeId ?? 0;
                     const icon = d.status === 'approved' ? '<i class="fas fa-check-circle text-green-500"></i>' :
                         d.status === 'rejected' ? '<i class="fas fa-times-circle text-red-500"></i>' :
                             '<i class="fas fa-clock text-amber-500"></i>';
-                    docList += `<div class="flex items-center gap-2 text-xs cursor-pointer hover:text-blue-500" onclick="openPreview(${d.id}, ${student.user_id})">
+                    docList += `<div class="flex items-center gap-2 text-xs cursor-pointer hover:text-blue-500" onclick="openPreview(${d.id}, ${student.user_id})" title="อัพโหลดเมื่อ: ${formatThaiDateTime(d.uploaded_at)}">
                     ${icon}
-                    <span class="truncate max-w-[200px]">${d.doc_name}</span>
+                    <span class="truncate max-w-[120px]">${d.doc_name}</span>
+                    <span class="text-[10px] text-gray-400 font-mono">${formatThaiDateTime(d.uploaded_at)}</span>
                 </div>`;
                 });
             } else {
@@ -381,7 +397,7 @@ $currentTypeId = $typeId ?? 0;
         $('#currentUserId').val(userId);
         $('#previewTitle').text('ตรวจสอบเอกสาร');
         $('#previewStudent').text(doc.fullname + ' (' + doc.citizenid + ')');
-        $('#previewDocName').text(doc.doc_name);
+        $('#previewDocName').html(doc.doc_name + ' <span class="text-xs font-normal text-gray-500 ml-2">(อัพโหลดเมื่อ: ' + formatThaiDateTime(doc.uploaded_at) + ')</span>');
         $('#rejectReason').val(doc.reject_reason || '');
 
         const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.file_path);

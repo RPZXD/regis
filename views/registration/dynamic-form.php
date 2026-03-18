@@ -610,7 +610,7 @@ $prefixOptions = ($grade == '1')
                                         class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
                                         <option value="">เลือกคำนำหน้า</option>
                                         <option value="นาย">นาย</option>
-                                        <option value="ดร.">ดร.</option>
+                                        <!-- <option value="ดร.">ดร.</option> -->
                                         <option value="ศ.">ศ.</option>
                                         <option value="รศ.">รศ.</option>
                                         <option value="ผศ.">ผศ.</option>
@@ -683,7 +683,7 @@ $prefixOptions = ($grade == '1')
                                         <option value="">เลือกคำนำหน้า</option>
                                         <option value="นาง">นาง</option>
                                         <option value="นางสาว">นางสาว</option>
-                                        <option value="ดร.">ดร.</option>
+                                        <!-- <option value="ดร.">ดร.</option> -->
                                         <option value="ศ.">ศ.</option>
                                         <option value="รศ.">รศ.</option>
                                         <option value="ผศ.">ผศ.</option>
@@ -782,7 +782,7 @@ $prefixOptions = ($grade == '1')
                                 <option value="นาย">นาย</option>
                                 <option value="นาง">นาง</option>
                                 <option value="นางสาว">นางสาว</option>
-                                <option value="ดร.">ดร.</option>
+                                <!-- <option value="ดร.">ดร.</option> -->
                                 <option value="ศ.">ศ.</option>
                                 <option value="รศ.">รศ.</option>
                                 <option value="ผศ.">ผศ.</option>
