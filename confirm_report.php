@@ -23,10 +23,11 @@ $plan = null;
 $fees = [];
 $error = null;
 
-// Handle Search
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
-    $citizenid = trim($_POST['citizenid']);
+// Handle Search (POST or GET)
+$citizenid = trim($_POST['citizenid'] ?? $_GET['citizenid'] ?? '');
+$isSearching = ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) || !empty($_GET['citizenid']);
 
+if ($isSearching) {
     if (empty($citizenid)) {
         $error = "กรุณากรอกเลขประจำตัวประชาชน";
     } else {
@@ -34,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
         $allRegistrations = $studentRegis->getAllStudentsByCitizenId($citizenid);
 
         if (!empty($allRegistrations)) {
-            // If a specific registration ID was selected via POST
-            $selectedRegId = $_POST['selected_reg_id'] ?? null;
+            // If a specific registration ID was selected via POST or GET
+            $selectedRegId = $_POST['selected_reg_id'] ?? $_GET['selected_reg_id'] ?? $_GET['id'] ?? null;
 
             if ($selectedRegId) {
                 // Find the selected registration

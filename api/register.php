@@ -36,22 +36,34 @@ try {
         throw new Exception('ข้อมูลไม่ครบถ้วน');
     }
 
-    // Check for duplicate citizen ID
-    $checkStmt = $db->prepare("SELECT id FROM users WHERE citizenid = ?");
-    $checkStmt->execute([$citizenid]);
-    if ($checkStmt->fetch()) {
-        throw new Exception('เลขบัตรประชาชนนี้เคยสมัครแล้ว');
-    }
-
-    // Get Academic Year
-    $academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
-    $yearShort = substr($academicYear, -2);
-
     // Get Type Name
     $typeStmt = $db->prepare("SELECT name FROM registration_types WHERE id = ?");
     $typeStmt->execute([$typeId]);
     $typeRow = $typeStmt->fetch(PDO::FETCH_ASSOC);
     $typeName = $typeRow ? $typeRow['name'] : 'ไม่ระบุ';
+
+    // For M.1 General (รอบทั่วไป): use zone_type as typeregis for the check
+    $checkTypeName = !empty($_POST['zone_type']) ? $_POST['zone_type'] : $typeName;
+
+    // Check for duplicate registration of the SAME type
+    $zoneTypes = ['ในเขต', 'นอกเขต', 'รอบทั่วไป'];
+    $isRequestedGeneral = in_array($checkTypeName, $zoneTypes);
+
+    if ($isRequestedGeneral) {
+        $checkStmt = $db->prepare("SELECT id, typeregis FROM users WHERE citizenid = ? AND typeregis IN ('ในเขต', 'นอกเขต', 'รอบทั่วไป')");
+        $checkStmt->execute([$citizenid]);
+    } else {
+        $checkStmt = $db->prepare("SELECT id, typeregis FROM users WHERE citizenid = ? AND typeregis = ?");
+        $checkStmt->execute([$citizenid, $checkTypeName]);
+    }
+
+    if ($existing = $checkStmt->fetch()) {
+        throw new Exception("เลขบัตรประชาชนนี้เคยสมัครในประเภท {$existing['typeregis']} แล้ว");
+    }
+
+    // Get Academic Year
+    $academicYear = $adminConfig->getSetting('academic_year') ?? (date('Y') + 543);
+    $yearShort = substr($academicYear, -2);
 
     // Generate numreg if empty
     $numreg = $_POST['numreg'] ?? '';

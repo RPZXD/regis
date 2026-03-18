@@ -11,7 +11,9 @@ try {
     require_once __DIR__ . '/../class/AdminConfig.php';
 
     $citizenid = $_GET['citizenid'] ?? '';
-    if (empty($citizenid)) {
+    $regId = $_GET['reg_id'] ?? '';
+
+    if (empty($citizenid) && empty($regId)) {
         echo json_encode(['requirements' => [], 'uploaded' => []]);
         exit;
     }
@@ -19,15 +21,22 @@ try {
     $db = (new Database_Regis())->getConnection();
     $adminConfig = new AdminConfig($db);
 
-    // 1. Look up the student to find their level and typeregis
-    $stmt = $db->prepare("SELECT id, level, typeregis FROM users WHERE citizenid = ? LIMIT 1");
-    $stmt->execute([$citizenid]);
+    // 1. Look up the student record
+    if (!empty($regId)) {
+        $stmt = $db->prepare("SELECT id, citizenid, level, typeregis FROM users WHERE id = ? LIMIT 1");
+        $stmt->execute([$regId]);
+    } else {
+        $stmt = $db->prepare("SELECT id, citizenid, level, typeregis FROM users WHERE citizenid = ? LIMIT 1");
+        $stmt->execute([$citizenid]);
+    }
     $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$student) {
         echo json_encode(['requirements' => [], 'uploaded' => []]);
         exit;
     }
+
+    $citizenid = $student['citizenid']; // Safety if only regId was provided
 
     $level = $student['level'];
     $typeregis = $student['typeregis'];

@@ -248,9 +248,9 @@
                         plansList.innerHTML = '<li class="text-gray-400 italic text-sm">ไม่พบข้อมูลแผนการเรียน</li>';
                     }
 
-                    document.getElementById('uploadLink').href = 'upload.php?citizenid=' + data.citizenid;
-                    document.getElementById('printLink').href = 'print.php?citizenid=' + data.citizenid;
-                    document.getElementById('checkDocsLink').href = 'check_uploads.php?citizenid=' + data.citizenid;
+                    document.getElementById('uploadLink').href = 'upload.php?citizenid=' + data.citizenid + '&reg_id=' + data.id;
+                    document.getElementById('printLink').href = 'print.php?citizenid=' + data.citizenid + '&reg_id=' + data.id;
+                    document.getElementById('checkDocsLink').href = 'check_uploads.php?citizenid=' + data.citizenid + '&reg_id=' + data.id;
 
                     document.getElementById('studentInfo').classList.remove('hidden');
                     document.getElementById('studentInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });

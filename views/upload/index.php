@@ -137,6 +137,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
 
 <script>
     let currentCitizenid = '';
+    let currentRegId = '';
     let currentTypeId = 0;
 
     // Auto-search if citizenid is provided in URL
@@ -195,7 +196,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                     return;
                 }
                 if (data.exists) {
-                    currentCitizenid = data.citizenid;
+                    currentRegId = data.id;
                     document.getElementById('studentName').textContent = data.fullname;
                     document.getElementById('studentType').textContent = data.typeregis + ' | ม.' + data.level;
 
@@ -215,7 +216,7 @@ $citizenidParam = $_GET['citizenid'] ?? '';
                         uploadStatusDiv.className = 'hidden';
                     }
 
-                    loadDocumentRequirements(citizenid);
+                    loadDocumentRequirements(citizenid, currentRegId);
                     document.getElementById('uploadArea').classList.remove('hidden');
                     document.getElementById('uploadArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -227,8 +228,8 @@ $citizenidParam = $_GET['citizenid'] ?? '';
             .catch(error => { Swal.close(); Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', confirmButtonColor: '#ef4444' }); });
     }
 
-    function loadDocumentRequirements(citizenid) {
-        fetch(`api/get-document-requirements.php?citizenid=${citizenid}`)
+    function loadDocumentRequirements(citizenid, regId) {
+        fetch(`api/get-document-requirements.php?citizenid=${citizenid}&reg_id=${regId || ''}`)
             .then(response => response.json())
             .then(data => {
                 let html = '';

@@ -219,7 +219,7 @@
                     document.getElementById('statusIcon').className = 'fas fa-clipboard-check text-2xl mb-2 ' + iconClass;
 
                     document.getElementById('studentInfo').classList.remove('hidden');
-                    loadDocuments(data.citizenid);
+                    loadDocuments(data.citizenid, data.id);
                     document.getElementById('studentInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                 } else {
@@ -230,8 +230,8 @@
             .catch(error => { Swal.close(); Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', confirmButtonColor: '#ef4444' }); });
     }
 
-    function loadDocuments(citizenid) {
-        fetch(`api/get-document-requirements.php?citizenid=${citizenid}`)
+    function loadDocuments(citizenid, regId) {
+        fetch(`api/get-document-requirements.php?citizenid=${citizenid}&reg_id=${regId || ''}`)
             .then(response => response.json())
             .then(data => {
                 const container = document.getElementById('documentsList');
@@ -282,7 +282,7 @@
                     </div>
                     <div class="flex items-center gap-3">
                         ${statusBadge}
-                        ${!uploaded ? `<a href="upload.php?citizenid=${citizenid}" class="px-3 py-1 bg-teal-500 hover:bg-teal-600 text-white text-sm rounded-lg transition-colors"><i class="fas fa-upload mr-1"></i>อัพโหลด</a>` : ''}
+                        ${!uploaded ? `<a href="upload.php?citizenid=${citizenid}&reg_id=${regId || ''}" class="px-3 py-1 bg-teal-500 hover:bg-teal-600 text-white text-sm rounded-lg transition-colors"><i class="fas fa-upload mr-1"></i>อัพโหลด</a>` : ''}
                     </div>
                 </div>`;
                     });

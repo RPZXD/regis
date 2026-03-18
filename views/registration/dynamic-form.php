@@ -7,7 +7,7 @@ $academicYear = $formData['academicYear'];
 
 // Determine which fields to show based on type
 $typeCode = $type['code'];
-$showGPA = in_array($typeCode, ['special', 'general', 'quota']);
+$showGPA = in_array($typeCode, ['special', 'general', 'quota', 'talent']);
 $showTalent = ($typeCode === 'talent');
 $showQuotaConfirm = ($typeCode === 'quota');
 $showZoneSelect = ($grade == '1' && $typeCode === 'general'); // ม.1 ทั่วไป มีในเขต/นอกเขต
@@ -301,7 +301,7 @@ $prefixOptions = ($grade == '1')
                             placeholder="0xxxxxxxxx" required>
                     </div>
 
-                    <!-- GPA (for special, general, quota types) -->
+                    <!-- GPA (for special, general, quota, talent types) -->
                     <?php if ($showGPA): ?>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
