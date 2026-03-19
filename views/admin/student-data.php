@@ -830,7 +830,7 @@ $isM1General = (isset($regisType['grade_code']) && $regisType['grade_code'] === 
                         }
                     }).then((result) => {
                         if (result.dismiss === Swal.DismissReason.cancel) {
-                            window.open('../print.php?citizenid=' + data.citizenid, '_blank');
+                            window.open('../print_pdf.php?uid=' + data.id, '_blank');
                         }
                         closeModal('editStudentModal');
                         loadTable();
