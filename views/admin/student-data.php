@@ -817,11 +817,24 @@ $isM1General = (isset($regisType['grade_code']) && $regisType['grade_code'] === 
                     Swal.fire({
                         icon: 'success',
                         title: 'บันทึกสำเร็จ',
-                        showConfirmButton: false,
-                        timer: 1500
+                        text: 'ข้อมูลนักเรียนได้รับการแก้ไขเรียบร้อยแล้ว',
+                        showCancelButton: true,
+                        confirmButtonText: 'ตกลง',
+                        cancelButtonText: 'พิมพ์ใบสมัคร',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#10b981',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-xl px-6 py-2',
+                            cancelButton: 'rounded-xl px-6 py-2'
+                        }
+                    }).then((result) => {
+                        if (result.dismiss === Swal.DismissReason.cancel) {
+                            window.open('../print.php?citizenid=' + data.citizenid, '_blank');
+                        }
+                        closeModal('editStudentModal');
+                        loadTable();
                     });
-                    closeModal('editStudentModal');
-                    loadTable();
                 }
                 else Swal.fire('ข้อผิดพลาด', d.message, 'error');
             }).catch(err => {
