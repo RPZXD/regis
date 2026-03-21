@@ -97,8 +97,8 @@ $fullName = htmlspecialchars($row['stu_prefix'] . $row['stu_name'] . ' ' . $row[
 // ── Theme colors by typeregis ──────────────────────────────────────
 // palette: [header, darker, light-tint, label]
 $palettes = [
-  'ในเขต' => ['#1d4ed8', '#1e40af', '#dbeafe', '🔵 ในเขตพื้นที่บริการ'],
-  'นอกเขต' => ['#0f766e', '#115e59', '#ccfbf1', '🟢 นอกเขตพื้นที่บริการ'],
+  'ในเขต' => ['#b45309', '#92400e', '#fef3c7', '🟡 รอบทั่วไป (ห้องเรียนปกติ)'],
+  'นอกเขต' => ['#b45309', '#92400e', '#fef3c7', '🟡 รอบทั่วไป (ห้องเรียนปกติ)'],
   'โควต้า' => ['#be123c', '#9f1239', '#ffe4e6', '🔴 โควต้า ม.3 เดิม'],
   'รอบทั่วไป' => ['#b45309', '#92400e', '#fef3c7', '🟡 รอบทั่วไป'],
   'ESC' => ['#0369a1', '#075985', '#e0f2fe', '🔷 ห้องเรียนพิเศษ (ESC)'],
@@ -411,10 +411,7 @@ $html = '
               <tr>
 
                 <!-- PHOTO -->
-                <td class="photo-wrap">
-                  ' . $photoTag . '
-                  <div class="photo-caption">รูปถ่าย 1.5 นิ้ว</div>
-                </td>
+  
 
                 <!-- INFO TABLE -->
                 <td class="info-wrap">

@@ -120,8 +120,55 @@ function processStudentData($student, $db, $adminConfig, $context)
     $isExamCardAvailable = $adminConfig->isMenuAvailable('exam_card');
     $isPrintFormAvailable = $adminConfig->isMenuAvailable('print_form');
 
-    $examSchedule = getScheduleInfo($db, 'exam_card');
+    $examSchedule = getScheduleInfo($db, 'exam_card'); // Global menu schedule
     $formSchedule = getScheduleInfo($db, 'print_form');
+
+    // 3.1 Type-Specific Schedule Check
+    $typeExamStart = null;
+    $typeExamEnd = null;
+    try {
+        $level = $student['level'];
+        $typeregis = $student['typeregis'];
+        $gradeCode = ($level == '1' || $level == 'm1') ? 'm1' : 'm4';
+        $zoneTypes = ['ในเขต', 'นอกเขต', 'รอบทั่วไป'];
+
+        if ($gradeCode === 'm1' && in_array($typeregis, $zoneTypes)) {
+            // M.1 Zone types follow 'General Round' schedule
+            $rtStmt = $db->prepare("
+                SELECT rt.exam_card_start, rt.exam_card_end FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE gl.code = ? AND (rt.code = 'general' OR rt.name = 'รอบทั่วไป')
+                LIMIT 1
+            ");
+            $rtStmt->execute([$gradeCode]);
+        } else {
+            // Specific type schedule
+            $rtStmt = $db->prepare("
+                SELECT rt.exam_card_start, rt.exam_card_end FROM registration_types rt 
+                JOIN grade_levels gl ON rt.grade_level_id = gl.id
+                WHERE gl.code = ? AND rt.name = ?
+                LIMIT 1
+            ");
+            $rtStmt->execute([$gradeCode, $typeregis]);
+        }
+        $typeSchedule = $rtStmt->fetch(PDO::FETCH_ASSOC);
+        if ($typeSchedule && $typeSchedule['exam_card_start'] && $typeSchedule['exam_card_end']) {
+            $typeExamStart = $typeSchedule['exam_card_start'];
+            $typeExamEnd = $typeSchedule['exam_card_end'];
+            
+            // If type schedule is more specific than global, use it for messaging
+            $examSchedule = [
+                'start' => date('d/m/Y H:i', strtotime($typeExamStart)),
+                'end' => date('d/m/Y H:i', strtotime($typeExamEnd))
+            ];
+            
+            // Check if current time is within type schedule
+            $now = date('Y-m-d H:i:s');
+            if ($now < $typeExamStart || $now > $typeExamEnd) {
+                $isExamCardAvailable = false;
+            }
+        }
+    } catch (Exception $e) {}
 
     $canPrintCard = ($isExamCardAvailable && $student['status'] == 1);
     $canPrintForm = $isPrintFormAvailable;
@@ -131,6 +178,8 @@ function processStudentData($student, $db, $adminConfig, $context)
         $examMsg = 'ไม่ผ่านคุณสมบัติ: ' . ($student['reject_reason'] ?: '-');
     } elseif ($isExamCardAvailable) {
         $examMsg = ($student['status'] == 1) ? 'พร้อมพิมพ์บัตรประจำตัวสอบ' : 'รอการยืนยันสถานะการสมัครก่อนพิมพ์บัตร';
+    } else if ($typeExamStart && date('Y-m-d H:i:s') < $typeExamStart) {
+        $examMsg = 'ยังไม่ถึงช่วงเวลาพิมพ์ (เปิด ' . date('d/m/Y H:i', strtotime($typeExamStart)) . ')';
     }
 
     $formMsg = $isPrintFormAvailable ? 'พร้อมพิมพ์ใบสมัคร' : 'ยังไม่ถึงช่วงเวลาพิมพ์ใบสมัคร';
