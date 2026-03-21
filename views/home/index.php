@@ -198,14 +198,26 @@
                 </div>
             </a>
             
-            <a href="print_reg.php" class="group p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
+            <a href="print.php" class="group p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl group-hover:scale-110 transition-transform">
-                        <i class="fas fa-print text-xl"></i>
+                        <i class="fas fa-file-alt text-xl"></i>
                     </div>
                     <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white">พิมพ์ใบสมัคร</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">ดาวน์โหลด PDF</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">ดาวน์โหลดใบสมัคร (PDF)</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="print_reg.php" class="group p-4 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl group-hover:scale-110 transition-transform">
+                        <i class="fas fa-id-card text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">พิมพ์บัตรสอบ</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">พิมพ์บัตรประจำตัวผู้เข้าสอบ</p>
                     </div>
                 </div>
             </a>

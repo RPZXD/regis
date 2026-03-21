@@ -8,6 +8,7 @@ require_once "function.php";
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('memory_limit', '256M');
 
 $dbRegis = new Database_Regis();
 $db = $dbRegis->getConnection();
@@ -173,11 +174,7 @@ if (!file_exists($photoPath)) {
 }
 $photoTag = '';
 if (file_exists($photoPath)) {
-  $ext = strtolower(pathinfo($photoPath, PATHINFO_EXTENSION));
-  $mime = $ext === 'png' ? 'image/png' : 'image/jpeg';
-  $b64 = base64_encode(file_get_contents($photoPath));
-  // 113px ≈ 30mm, 150px ≈ 40mm at 96dpi
-  $photoTag = '<img src="data:' . $mime . ';base64,' . $b64 . '" width="113" height="150"
+  $photoTag = '<img src="' . $photoPath . '" width="113" height="150"
                       style="border:2px solid ' . $col1 . ';border-radius:4px;object-fit:cover;">';
 } else {
   $photoTag = '<table width="113" height="150" cellpadding="0" cellspacing="0"

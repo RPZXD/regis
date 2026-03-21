@@ -1,6 +1,6 @@
 <?php
 /**
- * Print Exam Card Page
+ * Print Application Form Page (UI)
  * Uses the new MVC layout with modern UI
  */
 session_start();
